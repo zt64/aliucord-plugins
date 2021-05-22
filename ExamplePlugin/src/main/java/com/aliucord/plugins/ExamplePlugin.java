@@ -15,7 +15,7 @@ public class ExamplePlugin extends Plugin {
     @Override
     public Manifest getManifest() {
         Manifest manifest = new Manifest();
-        manifest.authors = new Manifest.Author[]{ new Manifest.Author("DISCORD USERNAME", 123456789L) };
+        manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513) };
         manifest.description = "Example Plugin.";
         manifest.version = "1.0.0";
         manifest.updateUrl = "https://raw.githubusercontent.com/USERNAME/REPONAME/builds/updater.json";

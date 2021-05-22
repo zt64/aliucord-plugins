@@ -6,6 +6,6 @@
     "default": {
         "minimumDiscordVersion": 1456,
         "version": "1.0.0",
-        "build": "https://raw.githubusercontent.com/USERNAME/REPONAME/builds/%s.apk"
+        "build": "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/%s.apk"
     }
 }

@@ -24,6 +24,7 @@ jobs:
       uses: actions/checkout@master
       with:
         repository: 'Aliucord/Aliucord'
+        path: 'Aliucord'
 
     - name: Setup JDK 1.8
       uses: actions/setup-java@v1

@@ -1,8 +1,8 @@
-include ':ExamplePlugin'
 rootProject.name = "plugins"
 
-include ':DiscordStubs'
-project(':DiscordStubs').projectDir = new File('../repo/DiscordStubs')
+include ':SystemInfo'
 
 include ':Aliucord'
-project(':Aliucord').projectDir = new File('../repo/Aliucord')
+project(':Aliucord').projectDir = new File('../Aliucord/Aliucord')
+include ':DiscordStubs'
+project(':DiscordStubs').projectDir = new File('../Aliucord/DiscordStubs')

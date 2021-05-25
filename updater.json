@@ -1,5 +1,5 @@
 {
-    "ExamplePlugin": {
+    "SystemInfo": {
         "version": "1.0.0",
         "minimumDiscordVersion": 1498
     },

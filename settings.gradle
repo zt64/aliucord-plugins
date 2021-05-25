@@ -1,6 +1,6 @@
-rootProject.name = "plugins"
-
 include ':SystemInfo'
+
+rootProject.name = "plugins"
 
 include ':Aliucord'
 project(':Aliucord').projectDir = new File('../Aliucord/Aliucord')

@@ -1,4 +1,8 @@
 {
+    "Weather": {
+      "version": "1.0.0",
+      "minimumDiscordVersion": 1498
+    },
     "SystemInfo": {
         "version": "1.0.1",
         "minimumDiscordVersion": 1498

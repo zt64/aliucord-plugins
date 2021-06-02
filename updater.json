@@ -1,14 +1,12 @@
 {
     "Weather": {
       "version": "1.0.1",
-      "minimumDiscordVersion": 1498
     },
     "SystemInfo": {
         "version": "1.0.2",
-        "minimumDiscordVersion": 1498
     },
     "default": {
-        "minimumDiscordVersion": 1456,
+        "minimumDiscordVersion": 79201,
         "version": "1.0.0",
         "build": "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/%s.zip"
     }

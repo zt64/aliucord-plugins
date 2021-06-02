@@ -4,7 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.aliucord.Utils;
+import com.aliucord.Http;
 import com.aliucord.api.CommandsAPI;
 import com.aliucord.entities.MessageEmbed;
 import com.aliucord.entities.Plugin;
@@ -12,12 +12,8 @@ import com.aliucord.plugins.weather.WeatherResponse;
 import com.discord.api.commands.ApplicationCommandType;
 import com.discord.models.commands.ApplicationCommandOption;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +33,7 @@ public class Weather extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
         manifest.description = "Weather";
-        manifest.version = "1.0.0";
+        manifest.version = "1.0.1";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -55,7 +51,7 @@ public class Weather extends Plugin {
             WeatherResponse weather;
 
             try {
-                weather = fetchWeather(location);
+                weather = Http.simpleJsonGet("http://wttr.in" + (location == null ? "" : location) + "?format=j1", WeatherResponse.class);
             } catch (IOException e) {
                 e.printStackTrace();
                 return new CommandsAPI.CommandResult("Uh oh, failed to fetch weather data", null, false);
@@ -108,28 +104,12 @@ public class Weather extends Plugin {
                 embed.setUrl("http://wttr.in/" + (location == null ? "" : URLEncoder.encode(location, "UTF-8")));
             } catch (UnsupportedEncodingException ignored) {}
 
-            return new CommandsAPI.CommandResult(null, Collections.singletonList(embed), false);
+            return new CommandsAPI.CommandResult(null, Collections.singletonList(embed.embed), false);
         });
     }
 
     @Override
     public void stop(Context context) {
         commands.unregisterAll();
-    }
-
-    private WeatherResponse fetchWeather(String location) throws IOException {
-        URL url = location == null ? new URL("http://wttr.in/?format=j1") : new URL(String.format("http://wttr.in/%s?format=j1", URLEncoder.encode(location, "UTF-8")));
-
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestProperty("User-Agent", "Aliucord");
-
-        String line;
-        StringBuilder sb = new StringBuilder();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
-            while ((line = reader.readLine()) != null) sb.append(line);
-        }
-
-        return Utils.fromJson(sb.toString(), WeatherResponse.class);
     }
 }

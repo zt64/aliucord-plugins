@@ -19,7 +19,7 @@ public class SystemInfo extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
         manifest.description = "System Info";
-        manifest.version = "1.0.1";
+        manifest.version = "1.0.2";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -35,7 +35,7 @@ public class SystemInfo extends Plugin {
             embed.addField("Version:", Build.VERSION.RELEASE, true);
             embed.addField("Codename:", Build.VERSION.CODENAME, true);
 
-            return new CommandsAPI.CommandResult(null, Collections.singletonList(embed), false);
+            return new CommandsAPI.CommandResult(null, Collections.singletonList(embed.embed), false);
         });
     }
 

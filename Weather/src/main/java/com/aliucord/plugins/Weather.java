@@ -6,13 +6,12 @@ import androidx.annotation.NonNull;
 
 import com.aliucord.Http;
 import com.aliucord.api.CommandsAPI;
-import com.aliucord.entities.MessageEmbed;
+import com.aliucord.entities.MessageEmbedBuilder;
 import com.aliucord.entities.Plugin;
 import com.aliucord.plugins.weather.WeatherResponse;
 import com.discord.api.commands.ApplicationCommandType;
 import com.discord.models.commands.ApplicationCommandOption;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
@@ -33,7 +32,7 @@ public class Weather extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
         manifest.description = "Weather";
-        manifest.version = "1.0.1";
+        manifest.version = "1.0.2";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -45,15 +44,15 @@ public class Weather extends Plugin {
         );
 
         commands.registerCommand("weather", "Get the weather for the current location, or a specific location", arguments, args -> {
-            MessageEmbed embed = new MessageEmbed();
+            MessageEmbedBuilder embed = new MessageEmbedBuilder();
             String location = (String) args.get("location");
 
             WeatherResponse weather;
 
             try {
-                weather = Http.simpleJsonGet("http://wttr.in" + (location == null ? "" : location) + "?format=j1", WeatherResponse.class);
-            } catch (IOException e) {
-                e.printStackTrace();
+                weather = Http.simpleJsonGet("http://wttr.in/" + (location == null ? "" : location) + "?format=j1", WeatherResponse.class);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
                 return new CommandsAPI.CommandResult("Uh oh, failed to fetch weather data", null, false);
             }
 
@@ -104,7 +103,7 @@ public class Weather extends Plugin {
                 embed.setUrl("http://wttr.in/" + (location == null ? "" : URLEncoder.encode(location, "UTF-8")));
             } catch (UnsupportedEncodingException ignored) {}
 
-            return new CommandsAPI.CommandResult(null, Collections.singletonList(embed.embed), false);
+            return new CommandsAPI.CommandResult(null, Collections.singletonList(embed.build()), false);
         });
     }
 

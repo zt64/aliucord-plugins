@@ -6,7 +6,7 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 
 import com.aliucord.api.CommandsAPI;
-import com.aliucord.entities.MessageEmbed;
+import com.aliucord.entities.MessageEmbedBuilder;
 import com.aliucord.entities.Plugin;
 
 import java.util.Collections;
@@ -19,7 +19,7 @@ public class SystemInfo extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
         manifest.description = "System Info";
-        manifest.version = "1.0.2";
+        manifest.version = "1.0.3";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -27,7 +27,7 @@ public class SystemInfo extends Plugin {
     @Override
     public void start(Context context) {
         commands.registerCommand("system-info", "Get system information", Collections.emptyList(), args -> {
-            MessageEmbed embed = new MessageEmbed();
+            MessageEmbedBuilder embed = new MessageEmbedBuilder();
 
             embed.setTitle("System Information");
             embed.setColor(0x00FFA200);
@@ -35,7 +35,7 @@ public class SystemInfo extends Plugin {
             embed.addField("Version:", Build.VERSION.RELEASE, true);
             embed.addField("Codename:", Build.VERSION.CODENAME, true);
 
-            return new CommandsAPI.CommandResult(null, Collections.singletonList(embed.embed), false);
+            return new CommandsAPI.CommandResult(null, Collections.singletonList(embed.build()), false);
         });
     }
 

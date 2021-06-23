@@ -1,5 +1,5 @@
-include ':SystemInfo'
 include ':Weather'
+include ':SystemInfo'
 rootProject.name = "plugins"
 
 include ':Aliucord'

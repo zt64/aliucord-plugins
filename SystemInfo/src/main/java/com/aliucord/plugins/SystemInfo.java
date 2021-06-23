@@ -18,8 +18,8 @@ public class SystemInfo extends Plugin {
     public Manifest getManifest() {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
-        manifest.description = "System Info";
-        manifest.version = "1.0.3";
+        manifest.description = "Adds a systeminfo slash command that provides basic system information.";
+        manifest.version = "1.0.4";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }

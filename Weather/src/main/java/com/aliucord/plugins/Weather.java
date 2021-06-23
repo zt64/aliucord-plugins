@@ -31,8 +31,8 @@ public class Weather extends Plugin {
     public Manifest getManifest() {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
-        manifest.description = "Weather";
-        manifest.version = "1.0.2";
+        manifest.description = "Adds a weather slash command to get information for the current location or one that's provided.";
+        manifest.version = "1.0.3";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }

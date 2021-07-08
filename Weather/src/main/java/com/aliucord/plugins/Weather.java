@@ -32,7 +32,7 @@ public class Weather extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
         manifest.description = "Adds a weather slash command to get information for the current location or one that's provided.";
-        manifest.version = "1.0.3";
+        manifest.version = "1.0.4";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -43,9 +43,9 @@ public class Weather extends Plugin {
                 new ApplicationCommandOption(ApplicationCommandType.STRING, "location", "The location to query", null, false, true, null, null)
         );
 
-        commands.registerCommand("weather", "Get the weather for the current location, or a specific location", arguments, args -> {
+        commands.registerCommand("weather", "Get the weather for the current location, or a specific location", arguments, ctx -> {
             MessageEmbedBuilder embed = new MessageEmbedBuilder();
-            String location = (String) args.get("location");
+            String location = (String) ctx.get("location");
 
             WeatherResponse weather;
 
@@ -56,13 +56,14 @@ public class Weather extends Plugin {
                 return new CommandsAPI.CommandResult("Uh oh, failed to fetch weather data", null, false);
             }
 
-            WeatherResponse.Condition condition = weather.current_condition.get(0);
-            WeatherResponse.WeatherDesc weatherDesc = condition.weatherDesc.get(0);
-            WeatherResponse.NearestArea nearestArea = weather.nearest_area.get(0);
-            WeatherResponse.AreaName areaName = nearestArea.areaName.get(0);
-            WeatherResponse.Country country = nearestArea.country.get(0);
+            var condition = weather.current_condition[0];
+            var weatherDesc = condition.weatherDesc[0];
+            var nearestArea = weather.nearest_area[0];
+            var areaName = nearestArea.areaName[0].value;
+            var country = nearestArea.country[0].value;
+            var region = nearestArea.region[0].value;
 
-            embed.setTitle("Weather for " + areaName.value)
+            embed.setTitle("Weather for " + areaName)
                     .setColor(0xEDEDED)
                     .setDescription(String.format(Locale.ENGLISH,
                         "%s\n\n" +
@@ -97,7 +98,7 @@ public class Weather extends Plugin {
                         uvIndexEmoji,
                         condition.uvIndex
                     ))
-                    .setFooter(areaName.value + ", " + country.value, null);
+                    .setFooter(areaName  + ", " + region + ", " + country, null);
 
             try {
                 embed.setUrl("http://wttr.in/" + (location == null ? "" : URLEncoder.encode(location, "UTF-8")));

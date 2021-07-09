@@ -1,3 +1,4 @@
+include ':Token'
 include ':Weather'
 include ':SystemInfo'
 rootProject.name = "plugins"

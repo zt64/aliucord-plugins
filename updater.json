@@ -1,4 +1,7 @@
 {
+    "Token": {
+      "version": "1.0.0"
+    },
     "Weather": {
       "version": "1.0.4"
     },

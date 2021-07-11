@@ -4,6 +4,9 @@ Plugins for [Aliucord](https://github.com/Aliucord)
 #### How To Download
 Click on plugin name in README, move downloaded file to `Aliucord/plugins` folder.
 
+### [WiderScrollbar](https://github.com/litleck/aliucord-plugins/raw/builds/WiderScrollbar.zip)
+Allows changing the chat scrollbar size, which can be accessed in the plugin settings. Currently effects the height too.
+
 ### [Token](https://github.com/litleck/aliucord-plugins/raw/builds/Token.zip)
 Adds a `token` slash command to tell you your Discord token.
 

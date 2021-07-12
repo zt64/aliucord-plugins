@@ -5,7 +5,7 @@ Plugins for [Aliucord](https://github.com/Aliucord)
 Click on plugin name in README, move downloaded file to `Aliucord/plugins` folder.
 
 ### [DataSaver](https://github.com/litleck/aliucord-plugins/raw/builds/DataSaver.zip)
-Disables media previews when on mobile data to limit data usage.
+Disables media previews when on mobile data to limit data usage. Consider disabling `Sync across clients` in your `Text & Images` settings so that it doesn't sync to other devices.
 
 ### [RotatedChat](https://github.com/litleck/aliucord-plugins/raw/builds/RotatedChat.zip)
 Rotate your chat! Just set a rotation in the plugin settings.

@@ -72,7 +72,7 @@ public class WiderScrollbar extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
         manifest.description = "Allows changing the scrollbar width to make it easier to drag.";
-        manifest.version = "1.0.0";
+        manifest.version = "1.0.1";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -92,7 +92,7 @@ public class WiderScrollbar extends Plugin {
             }
 
             if (widgetChatListBinding == null) return;
-            widgetChatListBinding.a.setScrollBarSize(settings.getInt("scrollbarWidth", Utils.dpToPx(50)));
+            widgetChatListBinding.getRoot().setScrollBarSize(settings.getInt("scrollbarWidth", Utils.dpToPx(50)));
         }));
     }
 

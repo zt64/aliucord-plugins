@@ -1,4 +1,10 @@
 {
+    "DataSaver": {
+      "version": "1.0.0"
+    },
+    "RotatedChat": {
+      "version": "1.0.0"
+    },
     "WiderScrollbar": {
       "version": "1.0.1"
     },

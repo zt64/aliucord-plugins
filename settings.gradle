@@ -1,3 +1,7 @@
+include ':RadialStatus'
+include ':TypingIndicators'
+include ':CharCounter'
+include ':QuickStar'
 include ':DataSaver'
 include ':RotatedChat'
 include ':WiderScrollbar'
@@ -10,4 +14,3 @@ include ':Aliucord'
 project(':Aliucord').projectDir = new File('../Aliucord/Aliucord')
 include ':DiscordStubs'
 project(':DiscordStubs').projectDir = new File('../Aliucord/DiscordStubs')
-

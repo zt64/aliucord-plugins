@@ -1,18 +1,30 @@
 {
+    "QuickStar": {
+        "version": "1.0.1"
+    },
+    "CharCounter": {
+        "version": "1.0.0"
+    },
+    "TypingIndicators": {
+        "version": "1.0.0"
+    },
+    "RadialStatus": {
+        "version": "1.0.0"
+    },
     "DataSaver": {
-      "version": "1.0.0"
+        "version": "1.0.0"
     },
     "RotatedChat": {
-      "version": "1.0.0"
+        "version": "1.0.0"
     },
     "WiderScrollbar": {
-      "version": "1.0.1"
+        "version": "1.0.1"
     },
     "Token": {
-      "version": "1.0.0"
+        "version": "1.0.0"
     },
     "Weather": {
-      "version": "1.0.4"
+        "version": "1.0.4"
     },
     "SystemInfo": {
         "version": "1.0.5"

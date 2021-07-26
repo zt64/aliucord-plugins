@@ -39,8 +39,8 @@ public class QuickStar extends Plugin {
     public Manifest getManifest() {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
-        manifest.description = "Adds a star option to the message context menu that reacts to the message with the star emoji.";
-        manifest.version = "1.0.0";
+        manifest.description = "Adds a star button to the message context menu that reacts to the message with the star emoji.";
+        manifest.version = "1.0.1";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -55,7 +55,7 @@ public class QuickStar extends Plugin {
         final Method getBinding = c.getDeclaredMethod("getBinding");
         getBinding.setAccessible(true);
 
-        final Method addReaction =   WidgetChatListActions.class.getDeclaredMethod("addReaction", Emoji.class);
+        final Method addReaction = WidgetChatListActions.class.getDeclaredMethod("addReaction", Emoji.class);
         addReaction.setAccessible(true);
 
         final Emoji starEmoji = new Emoji() {
@@ -134,7 +134,7 @@ public class QuickStar extends Plugin {
             if (icon != null) icon.setTint(ColorCompat.getThemedColor(ctx, R$b.colorInteractiveNormal));
 
             quickStar.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null);
-            linearLayout.addView(quickStar);
+            linearLayout.addView(quickStar, 1);
         }));
     }
 

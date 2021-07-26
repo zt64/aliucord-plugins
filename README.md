@@ -4,6 +4,12 @@ Plugins for [Aliucord](https://github.com/Aliucord)
 #### How To Download
 Click on plugin name in README, move downloaded file to `Aliucord/plugins` folder.
 
+### [QuickStar](https://github.com/litleck/aliucord-plugins/raw/builds/QuickStar.zip)
+Adds a quick star button to the message context options. When clicked, the a star reaction will be added to the message and if there's no permission it will show a toast.
+
+### [CharCounter](https://github.com/litleck/aliucord-plugins/raw/builds/CharCounter.zip)
+Adds a character counter to the chat input box, with support for nitro char limit.
+
 ### [DataSaver](https://github.com/litleck/aliucord-plugins/raw/builds/DataSaver.zip)
 Disables media previews when on mobile data to limit data usage. Consider disabling `Sync across clients` in your `Text & Images` settings so that it doesn't sync to other devices.
 

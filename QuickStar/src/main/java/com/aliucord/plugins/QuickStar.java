@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 
-import com.aliucord.Utils;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.PinePatchFn;
 import com.discord.databinding.WidgetChatListActionsBinding;
@@ -40,7 +39,7 @@ public class QuickStar extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
         manifest.description = "Adds a star button to the message context menu that reacts to the message with the star emoji.";
-        manifest.version = "1.0.1";
+        manifest.version = "1.1.1";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -110,9 +109,11 @@ public class QuickStar extends Plugin {
                 WidgetChatListActionsBinding binding = (WidgetChatListActionsBinding) getBinding.invoke(callFrame.thisObject);
                 if (binding == null) return;
 
-                binding.a.findViewById(id).setOnClickListener(e -> {
-                    if (!((WidgetChatListActions.Model) callFrame.args[0]).getManageMessageContext().getCanAddReactions()) Utils.showToast(context, "Missing react permission");
+                boolean canReact = ((WidgetChatListActions.Model) callFrame.args[0]).getManageMessageContext().getCanAddReactions();
 
+                TextView quickStar = binding.a.findViewById(id);
+                quickStar.setVisibility(canReact ? View.VISIBLE : View.GONE);
+                if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener(e -> {
                     try {
                         addReaction.invoke(callFrame.thisObject, starEmoji);
                     } catch (IllegalAccessException | InvocationTargetException error) {

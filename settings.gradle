@@ -1,5 +1,3 @@
-include ':RadialStatus'
-include ':TypingIndicators'
 include ':CharCounter'
 include ':QuickStar'
 include ':DataSaver'

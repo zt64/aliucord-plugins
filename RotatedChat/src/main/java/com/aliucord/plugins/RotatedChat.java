@@ -5,9 +5,9 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliucord.api.SettingsAPI;
 import com.aliucord.entities.Plugin;
@@ -19,31 +19,27 @@ import com.discord.widgets.chat.list.WidgetChatList;
 import com.discord.widgets.chat.list.model.WidgetChatListModel;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-@SuppressWarnings("unused")
 public class RotatedChat extends Plugin {
-    public RotatedChat () {
-        settingsTab = new SettingsTab(PluginSettings.class).withArgs(settings);
-    }
+    public RotatedChat () { settingsTab = new SettingsTab(PluginSettings.class).withArgs(settings); }
 
     public static class PluginSettings extends SettingsPage {
         private final SettingsAPI settings;
-        public PluginSettings(SettingsAPI settings) {
-            this.settings = settings;
-        }
+
+        public PluginSettings(SettingsAPI settings) { this.settings = settings; }
 
         @Override
         @SuppressWarnings("ResultOfMethodCallIgnored")
         public void onViewBound(View view) {
             super.onViewBound(view);
+
             setActionBarTitle("Wider Scrollbar");
 
-            var context = view.getContext();
-            var input = new TextInput(context);
-
+            TextInput input = new TextInput(requireContext());
             input.setHint("Rotation of chat in degrees");
 
-            var editText = input.getEditText();
+            EditText editText = input.getEditText();
             assert editText != null;
 
             editText.setMaxLines(1);
@@ -69,30 +65,25 @@ public class RotatedChat extends Plugin {
     @Override
     public Manifest getManifest() {
         Manifest manifest = new Manifest();
-        manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
+        manifest.authors = new Manifest.Author[]{ new Manifest.Author("zt", 289556910426816513L) };
         manifest.description = "Rotate your chat!";
-        manifest.version = "1.0.0";
-        manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
+        manifest.version = "1.0.1";
+        manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }
 
     @Override
     public void start(Context context) throws Throwable {
-        final var getBindingMethod = WidgetChatList.class.getDeclaredMethod("getBinding");
+        final Method getBindingMethod = WidgetChatList.class.getDeclaredMethod("getBinding");
         getBindingMethod.setAccessible(true);
 
         patcher.patch(WidgetChatList.class.getDeclaredMethod("configureUI", WidgetChatListModel.class), new PinePatchFn(callFrame -> {
-            WidgetChatListBinding widgetChatListBinding = null;
-
             try {
-                widgetChatListBinding = (WidgetChatListBinding) getBindingMethod.invoke(callFrame.thisObject);
+                WidgetChatListBinding widgetChatListBinding = (WidgetChatListBinding) getBindingMethod.invoke(callFrame.thisObject);
+                if (widgetChatListBinding != null) widgetChatListBinding.getRoot().setRotation(settings.getFloat("degrees", 0));
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-
-            if (widgetChatListBinding == null) return;
-            var root = (RecyclerView) widgetChatListBinding.getRoot();
-            widgetChatListBinding.getRoot().setRotation(settings.getFloat("degrees", 0));
         }));
     }
 

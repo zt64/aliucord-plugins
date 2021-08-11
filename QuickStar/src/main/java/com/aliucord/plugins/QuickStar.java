@@ -31,16 +31,15 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("unused")
 public class QuickStar extends Plugin {
     @NonNull
     @Override
     public Manifest getManifest() {
         Manifest manifest = new Manifest();
-        manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
+        manifest.authors = new Manifest.Author[]{ new Manifest.Author("zt", 289556910426816513L) };
         manifest.description = "Adds a star button to the message context menu that reacts to the message with the star emoji.";
-        manifest.version = "1.1.1";
-        manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
+        manifest.version = "1.1.2";
+        manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }
 
@@ -107,20 +106,19 @@ public class QuickStar extends Plugin {
         patcher.patch(c.getDeclaredMethod("configureUI", WidgetChatListActions.Model.class), new PinePatchFn(callFrame -> {
             try {
                 WidgetChatListActionsBinding binding = (WidgetChatListActionsBinding) getBinding.invoke(callFrame.thisObject);
-                if (binding == null) return;
 
                 boolean canReact = ((WidgetChatListActions.Model) callFrame.args[0]).getManageMessageContext().getCanAddReactions();
 
+                assert binding != null;
                 TextView quickStar = binding.a.findViewById(id);
                 quickStar.setVisibility(canReact ? View.VISIBLE : View.GONE);
-                if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener(e -> {
+                if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener(l -> {
                     try {
                         addReaction.invoke(callFrame.thisObject, starEmoji);
-                    } catch (IllegalAccessException | InvocationTargetException error) {
-                        error.printStackTrace();
+                        ((WidgetChatListActions) callFrame.thisObject).dismiss();
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
                     }
-
-                    ((WidgetChatListActions) callFrame.thisObject).dismiss();
                 });
             } catch (Throwable ignored) { }
         }));

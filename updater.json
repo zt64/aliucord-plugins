@@ -3,28 +3,28 @@
         "version": "1.0.0"
     },
     "QuickStar": {
-        "version": "1.1.1"
+        "version": "1.1.2"
     },
     "CharCounter": {
         "version": "1.0.0"
     },
     "DataSaver": {
-        "version": "1.0.0"
+        "version": "1.0.1"
     },
     "RotatedChat": {
-        "version": "1.0.0"
+        "version": "1.0.1"
     },
     "WiderScrollbar": {
-        "version": "1.0.2"
+        "version": "1.0.3"
     },
     "Token": {
-        "version": "1.0.0"
+        "version": "1.0.1"
     },
     "Weather": {
         "version": "1.0.4"
     },
     "SystemInfo": {
-        "version": "1.0.5"
+        "version": "1.0.6"
     },
     "default": {
         "minimumDiscordVersion": 83210,

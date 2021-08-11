@@ -27,16 +27,13 @@ public class WiderScrollbar extends Plugin {
     public static class PluginSettings extends SettingsPage {
         private final SettingsAPI settings;
 
-        public PluginSettings(SettingsAPI settings) {
-            this.settings = settings;
-        }
+        public PluginSettings(SettingsAPI settings) { this.settings = settings; }
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
         public void onViewBound(View view) {
             super.onViewBound(view);
 
             setActionBarTitle("Wider Scrollbar");
-            setPadding(0);
 
             TextInput input = new TextInput(requireContext());
             input.setHint("Scrollbar width in dp");
@@ -72,7 +69,7 @@ public class WiderScrollbar extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("zt", 289556910426816513L) };
         manifest.description = "Allows changing the scrollbar width to make it easier to drag.";
-        manifest.version = "1.0.2";
+        manifest.version = "1.0.3";
         manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }

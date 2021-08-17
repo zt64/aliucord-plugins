@@ -20,9 +20,7 @@ import com.discord.databinding.WidgetChatListActionsBinding;
 import com.discord.models.domain.emoji.Emoji;
 import com.discord.utilities.color.ColorCompat;
 import com.discord.widgets.chat.list.actions.WidgetChatListActions;
-import com.lytefast.flexinput.R$b;
-import com.lytefast.flexinput.R$d;
-import com.lytefast.flexinput.R$h;
+import com.lytefast.flexinput.R;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +36,7 @@ public class QuickStar extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("zt", 289556910426816513L) };
         manifest.description = "Adds a star button to the message context menu that reacts to the message with the star emoji.";
-        manifest.version = "1.1.2";
+        manifest.version = "1.1.3";
         manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -46,7 +44,7 @@ public class QuickStar extends Plugin {
     @SuppressLint("SetTextI18n")
     @Override
     public void start(Context context) throws NoSuchMethodException {
-        final Drawable icon = ContextCompat.getDrawable(context, R$d.ic_star_24dp);
+        final Drawable icon = ContextCompat.getDrawable(context, R.d.ic_star_24dp);
         final int id = View.generateViewId();
 
         final Class<WidgetChatListActions> c = WidgetChatListActions.class;
@@ -88,19 +86,33 @@ public class QuickStar extends Plugin {
             public Pattern getRegex(@Nullable String str) { return null; }
 
             @Override
-            public String getUniqueId() { return null; }
+            public String getUniqueId() {
+                return null;
+            }
 
             @Override
-            public boolean isAvailable() { return false; }
+            public boolean isAvailable() {
+                return false;
+            }
 
             @Override
-            public boolean isUsable() { return false; }
+            public boolean isUsable() {
+                return false;
+            }
 
             @Override
-            public int describeContents() { return 0; }
+            public boolean requiresColons() {
+                return false;
+            }
 
             @Override
-            public void writeToParcel(Parcel dest, int flags) { }
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel dest, int flags) {
+            }
         };
 
         patcher.patch(c.getDeclaredMethod("configureUI", WidgetChatListActions.Model.class), new PinePatchFn(callFrame -> {
@@ -126,11 +138,12 @@ public class QuickStar extends Plugin {
         patcher.patch(c.getDeclaredMethod("onViewCreated", View.class, Bundle.class), new PinePatchFn(callFrame -> {
             LinearLayout linearLayout = (LinearLayout) ((NestedScrollView) callFrame.args[0]).getChildAt(0);
             Context ctx = linearLayout.getContext();
-            TextView quickStar =  new TextView(ctx, null, 0, R$h.UiKit_Settings_Item_Icon);
+            TextView quickStar = new TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon);
             quickStar.setText("Quick Star");
             quickStar.setId(id);
 
-            if (icon != null) icon.setTint(ColorCompat.getThemedColor(ctx, R$b.colorInteractiveNormal));
+            if (icon != null)
+                icon.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal));
 
             quickStar.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null);
             linearLayout.addView(quickStar, 1);

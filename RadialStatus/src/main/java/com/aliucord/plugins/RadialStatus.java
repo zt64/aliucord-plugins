@@ -18,15 +18,14 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.lang.reflect.Field;
 
-@SuppressWarnings("unused")
 public class RadialStatus extends Plugin {
     @NonNull
     @Override
     public Manifest getManifest() {
         Manifest manifest = new Manifest();
-        manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
+        manifest.authors = new Manifest.Author[]{new Manifest.Author("zt", 289556910426816513L)};
         manifest.description = "Displays the user status as a radial circle around the avatar.";
-        manifest.version = "1.0.0";
+        manifest.version = "1.0.1";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }

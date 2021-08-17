@@ -9,11 +9,11 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 
-import com.aliucord.Utils;
 import com.aliucord.api.SettingsAPI;
 import com.aliucord.entities.Plugin;
 import com.aliucord.fragments.SettingsPage;
 import com.aliucord.patcher.PinePatchFn;
+import com.aliucord.utils.DimenUtils;
 import com.aliucord.views.TextInput;
 import com.discord.databinding.WidgetChatListBinding;
 import com.discord.widgets.chat.list.WidgetChatList;
@@ -29,7 +29,6 @@ public class WiderScrollbar extends Plugin {
 
         public PluginSettings(SettingsAPI settings) { this.settings = settings; }
 
-        @SuppressWarnings("ResultOfMethodCallIgnored")
         public void onViewBound(View view) {
             super.onViewBound(view);
 
@@ -69,7 +68,7 @@ public class WiderScrollbar extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("zt", 289556910426816513L) };
         manifest.description = "Allows changing the scrollbar width to make it easier to drag.";
-        manifest.version = "1.0.3";
+        manifest.version = "1.0.4";
         manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -82,7 +81,8 @@ public class WiderScrollbar extends Plugin {
         patcher.patch(WidgetChatList.class.getDeclaredMethod("configureUI", WidgetChatListModel.class), new PinePatchFn(callFrame -> {
             try {
                 WidgetChatListBinding widgetChatListBinding = (WidgetChatListBinding) getBindingMethod.invoke(callFrame.thisObject);
-                if (widgetChatListBinding != null) widgetChatListBinding.getRoot().setScrollBarSize(settings.getInt("scrollbarWidth", Utils.dpToPx(50)));
+                if (widgetChatListBinding != null)
+                    widgetChatListBinding.getRoot().setScrollBarSize(settings.getInt("scrollbarWidth", DimenUtils.dpToPx(50)));
             } catch (Throwable ignored) { }
         }));
     }

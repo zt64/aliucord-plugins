@@ -18,9 +18,9 @@ public class AvatarMention extends Plugin {
     @Override
     public Manifest getManifest() {
         Manifest manifest = new Manifest();
-        manifest.authors = new Manifest.Author[]{ new Manifest.Author("Zt", 289556910426816513L) };
+        manifest.authors = new Manifest.Author[]{new Manifest.Author("zt", 289556910426816513L)};
         manifest.description = "Tapping a message avatar will mention the user.";
-        manifest.version = "1.0.0";
+        manifest.version = "1.0.1";
         manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }

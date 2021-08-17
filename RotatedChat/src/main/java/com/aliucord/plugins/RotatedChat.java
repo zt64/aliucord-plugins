@@ -30,7 +30,6 @@ public class RotatedChat extends Plugin {
         public PluginSettings(SettingsAPI settings) { this.settings = settings; }
 
         @Override
-        @SuppressWarnings("ResultOfMethodCallIgnored")
         public void onViewBound(View view) {
             super.onViewBound(view);
 
@@ -67,7 +66,7 @@ public class RotatedChat extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("zt", 289556910426816513L) };
         manifest.description = "Rotate your chat!";
-        manifest.version = "1.0.1";
+        manifest.version = "1.0.2";
         manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }

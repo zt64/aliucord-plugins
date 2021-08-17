@@ -10,9 +10,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.aliucord.Constants;
-import com.aliucord.Utils;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.PinePatchFn;
+import com.aliucord.utils.DimenUtils;
 import com.discord.api.premium.PremiumTier;
 import com.discord.databinding.WidgetChatOverlayBinding;
 import com.discord.stores.StoreStream;
@@ -24,9 +24,9 @@ public class CharCounter extends Plugin {
     @Override
     public Manifest getManifest() {
         Manifest manifest = new Manifest();
-        manifest.authors = new Manifest.Author[]{ new Manifest.Author("Möth", 289556910426816513L) };
+        manifest.authors = new Manifest.Author[]{new Manifest.Author("zt", 289556910426816513L)};
         manifest.description = "Adds a character counter to the message box.";
-        manifest.version = "1.0.0";
+        manifest.version = "1.0.1";
         manifest.updateUrl = "https://raw.githubusercontent.com/litleck/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -36,7 +36,7 @@ public class CharCounter extends Plugin {
         final String maxChars = StoreStream.getUsers().getMe().getPremiumTier() == PremiumTier.TIER_2 ? "4000" : "2000";
         final TextView counter = new TextView(context);
         counter.setTypeface(ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium));
-        counter.setTextSize(Utils.dpToPx(4));
+        counter.setTextSize(DimenUtils.dpToPx(3));
         counter.setTextColor(Color.WHITE);
         counter.setVisibility(View.GONE);
 

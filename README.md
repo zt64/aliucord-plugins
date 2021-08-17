@@ -4,6 +4,10 @@ Plugins for [Aliucord](https://github.com/Aliucord)
 #### How To Download
 Click on plugin name in README, move downloaded file to `Aliucord/plugins` folder.
 
+
+### [RestartButton](https://github.com/zt64/aliucord-plugins/raw/builds/RestartButton.zip)
+Adds a restart button to the settings menu.
+
 ### [AvatarMention](https://github.com/zt64/aliucord-plugins/raw/builds/AvatarMention.zip)
 Makes tapping a message avatar mention that user.
 

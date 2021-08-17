@@ -1,3 +1,4 @@
+include(":RestartButton")
 include(":AlwaysAnimate")
 include(":AvatarMention")
 include(":CharCounter")
@@ -12,6 +13,3 @@ rootProject.name = "plugins"
 
 include(":Aliucord")
 project(":Aliucord").projectDir = File("../Aliucord/Aliucord")
-
-include(":DiscordStubs")
-project(":DiscordStubs").projectDir = File("../Aliucord/DiscordStubs")

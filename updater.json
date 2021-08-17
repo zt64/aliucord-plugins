@@ -1,4 +1,7 @@
 {
+    "RestartButton": {
+        "version": "1.0.1"
+    },
     "AvatarMention": {
         "version": "1.0.1"
     },

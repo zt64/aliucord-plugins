@@ -14,6 +14,8 @@ import com.discord.utilities.color.ColorCompat;
 import com.discord.widgets.settings.WidgetSettings;
 import com.lytefast.flexinput.R;
 
+import java.util.Objects;
+
 public class RestartButton extends Plugin {
     @NonNull
     @Override
@@ -21,22 +23,21 @@ public class RestartButton extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{new Manifest.Author("zt", 289556910426816513L)};
         manifest.description = "Adds a button to restart Aliucord to the settings page";
-        manifest.version = "1.0.2";
+        manifest.version = "1.0.3";
         manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }
 
     @Override
     public void start(Context context) throws NoSuchMethodException {
-        final Drawable icon = ContextCompat.getDrawable(context, com.yalantis.ucrop.R.c.ucrop_rotate);
+        final Drawable icon = Objects.requireNonNull(ContextCompat.getDrawable(context, com.yalantis.ucrop.R.c.ucrop_rotate)).mutate();
 
-        patcher.patch(WidgetSettings.class.getDeclaredMethod("configureToolbar"), new PinePatchFn(callFrame -> {
+        patcher.patch(WidgetSettings.class.getDeclaredMethod("onTabSelected"), new PinePatchFn(callFrame -> {
             final WidgetSettings _this = (WidgetSettings) callFrame.thisObject;
 
-            if (icon != null)
-                icon.setTint(ColorCompat.getThemedColor(_this.requireContext(), R.b.colorInteractiveNormal));
+            icon.setTint(ColorCompat.getThemedColor(_this.requireContext(), R.b.colorInteractiveNormal));
 
-            _this.getAppActivity().t.getMenu().add("Restart")
+            _this.requireAppActivity().t.getMenu().add("Restart")
                     .setIcon(icon)
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
                     .setOnMenuItemClickListener(item -> {

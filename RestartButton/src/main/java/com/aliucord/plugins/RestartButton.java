@@ -21,14 +21,14 @@ public class RestartButton extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{new Manifest.Author("zt", 289556910426816513L)};
         manifest.description = "Adds a button to restart Aliucord to the settings page";
-        manifest.version = "1.0.1";
+        manifest.version = "1.0.2";
         manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }
 
     @Override
     public void start(Context context) throws NoSuchMethodException {
-        final Drawable icon = ContextCompat.getDrawable(context, R.d.ic_resend_24dp);
+        final Drawable icon = ContextCompat.getDrawable(context, com.yalantis.ucrop.R.c.ucrop_rotate);
 
         patcher.patch(WidgetSettings.class.getDeclaredMethod("configureToolbar"), new PinePatchFn(callFrame -> {
             final WidgetSettings _this = (WidgetSettings) callFrame.thisObject;

@@ -1,5 +1,14 @@
+rootProject.name = "plugins"
+
 include(":RestartButton")
 include(":FolderOpacity")
+include(":BetterMediaViewer")
+include(":NoNumberHighlight")
+include(":RandomEmote")
+include(":AccountSwitcher")
+include(":RoleBadge")
+include(":RadialStatus")
+include(":TypingIndicators")
 include(":AlwaysAnimate")
 include(":AvatarMention")
 include(":CharCounter")
@@ -10,7 +19,3 @@ include(":WiderScrollbar")
 include(":Token")
 include(":Weather")
 include(":SystemInfo")
-rootProject.name = "plugins"
-
-include(":Aliucord")
-project(":Aliucord").projectDir = File("../Aliucord/Aliucord")

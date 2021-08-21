@@ -2,13 +2,6 @@ rootProject.name = "plugins"
 
 include(":RestartButton")
 include(":FolderOpacity")
-include(":BetterMediaViewer")
-include(":NoNumberHighlight")
-include(":RandomEmote")
-include(":AccountSwitcher")
-include(":RoleBadge")
-include(":RadialStatus")
-include(":TypingIndicators")
 include(":AlwaysAnimate")
 include(":AvatarMention")
 include(":CharCounter")

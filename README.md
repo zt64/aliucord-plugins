@@ -4,6 +4,8 @@ Plugins for [Aliucord](https://github.com/Aliucord)
 #### How To Download
 Click on plugin name in README, move downloaded file to `Aliucord/plugins` folder.
 
+### [FolderOpacity](https://github.com/zt64/aliucord-plugins/raw/builds/FolderOpacity.zip)
+Adds an option to the guild folder settings to set the opacity.
 
 ### [RestartButton](https://github.com/zt64/aliucord-plugins/raw/builds/RestartButton.zip)
 Adds a restart button to the settings menu.

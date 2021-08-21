@@ -1,4 +1,5 @@
 include(":RestartButton")
+include(":FolderOpacity")
 include(":AlwaysAnimate")
 include(":AvatarMention")
 include(":CharCounter")

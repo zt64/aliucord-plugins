@@ -1,4 +1,7 @@
 {
+    "FolderOpacity": {
+        "version": "1.0.0"
+    },
     "RestartButton": {
         "version": "1.0.3"
     },

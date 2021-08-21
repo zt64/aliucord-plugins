@@ -2,6 +2,7 @@ package com.aliucord.plugins;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.view.View;
@@ -45,7 +46,7 @@ public class FolderOpacity extends Plugin {
         Manifest manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{ new Manifest.Author("zt", 289556910426816513L) };
         manifest.description = "Adds an option to the guild folder settings to set the opacity";
-        manifest.version = "1.0.0";
+        manifest.version = "1.0.1";
         manifest.updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json";
         return manifest;
     }
@@ -70,7 +71,7 @@ public class FolderOpacity extends Plugin {
 
                 if (linearLayout.findViewById(seekBarId) != null) return;
 
-                int opacity = settings.getInt(viewModel.getFolderId() + "opacity", 255);
+                int opacity = settings.getInt(viewModel.getFolderId() + "opacity", 30);
 
                 TextView opacityHeader = new TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Header);
                 opacityHeader.setText("Folder Opacity");
@@ -165,17 +166,16 @@ public class FolderOpacity extends Plugin {
                         int numChildren = folderViewHolder.getNumChildren();
                         if (numChildren == 0) {
                             Integer color = folderViewHolder.getColor();
+                            int alpha = settings.getInt(((GuildListItem.FolderItem) Objects.requireNonNull(ReflectUtils.getField(folderViewHolder, "data"))).getFolderId() + "opacity", 30);
                             if (color != null) {
                                 assert tintableDrawableNoChildren != null;
-                                int alpha = settings.getInt(((GuildListItem.FolderItem) Objects.requireNonNull(ReflectUtils.getField(folderViewHolder, "data"))).getFolderId() + "opacity", 255);
-                                color = ColorUtils.setAlphaComponent(color, alpha);
-                                tintableDrawableNoChildren.setColorFilter(color, PorterDuff.Mode.SRC);
-
+                                tintableDrawableNoChildren.setColorFilter(ColorUtils.setAlphaComponent(color, alpha), PorterDuff.Mode.SRC);
                                 drawable = tintableDrawableNoChildren;
                             } else {
+                                assert drawableNoChildren != null;
+                                drawableNoChildren.setColorFilter(ColorUtils.setAlphaComponent(Color.WHITE, alpha), PorterDuff.Mode.SRC);
                                 drawable = drawableNoChildren;
                             }
-                            assert drawable != null;
                             drawable.setBounds(left - halfSize, top - halfSize, left + halfSize, top + halfSize);
                             drawable.draw(canvas);
                         } else {

@@ -8,7 +8,8 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:7.0.1")
-        classpath("com.github.Aliucord:gradle:master-SNAPSHOT")
+        classpath("com.github.Aliucord:gradle:main-SNAPSHOT")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
     }
 }
 
@@ -24,6 +25,7 @@ fun Project.android(configuration: BaseExtension.() -> Unit) = extensions.getByN
 subprojects {
     apply(plugin = "com.android.library")
     apply(plugin = "com.aliucord.gradle")
+    apply(plugin = "kotlin-android")
 
     android {
         compileSdkVersion(30)
@@ -46,11 +48,11 @@ subprojects {
     }
 
     dependencies {
-        val api by configurations
         val discord by configurations
+        val implementation by configurations
 
-        discord("com.discord:discord:88202")
-        api("com.github.Aliucord:Aliucord:0300fa7f1b")
+        discord("com.discord:discord:aliucord-SNAPSHOT")
+        implementation("com.github.Aliucord:Aliucord:main-SNAPSHOT")
     }
 }
 

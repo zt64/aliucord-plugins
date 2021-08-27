@@ -14,7 +14,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
         super.onViewCreated(view, bundle)
 
         with(requireContext()) {
-            addView(createCheckedSetting(this, "User mentions", "Whether mentions are colored", "mention"))
+            addView(createCheckedSetting(this, "User mentions", "Whether mentions are colored", "userMentions"))
             addView(createCheckedSetting(this, "Typing text", "Whether typing users are colored", "typingText"))
             addView(createCheckedSetting(this, "Voice users", "Whether usernames in voice channels are colored", "voiceChannel"))
         }

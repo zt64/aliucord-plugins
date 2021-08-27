@@ -7,20 +7,20 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
+import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import com.aliucord.Logger
+import com.aliucord.Utils
 import com.aliucord.entities.Plugin
 import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.patcher.PinePatchFn
 import com.aliucord.plugins.rolecoloreverywhere.PluginSettings
-import com.aliucord.wrappers.ChannelWrapper.Companion.guildId
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
 import com.discord.databinding.WidgetChannelsListItemVoiceUserBinding
 import com.discord.databinding.WidgetChatOverlayBinding
 import com.discord.models.member.GuildMember
 import com.discord.models.user.User
 import com.discord.stores.StoreStream
-import com.discord.utilities.guilds.RoleUtils
 import com.discord.utilities.textprocessing.node.UserMentionNode
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.list.items.ChannelListItem
@@ -59,7 +59,7 @@ class RoleColorEverywhere : Plugin() {
         return Manifest().apply {
             authors = arrayOf(Author("zt", 289556910426816513L))
             description = "Displays the highest role color in more places like mentions and typing text"
-            version = "1.0.0"
+            version = "1.1.0"
             updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
         }
     }
@@ -78,21 +78,20 @@ class RoleColorEverywhere : Plugin() {
 
                 val users = it.args[0] as Map<Long, User>
                 val members = it.args[1] as Map<Long, GuildMember>
-                val roles = guildStore.roles[channel.guildId]
 
-                members.forEach { entry ->
-                    val role = RoleUtils.getHighestRole(roles, entry.value)
-
-                    if (!RoleUtils.isDefaultColor(role)) {
-                        typingUsers[GuildMember.getNickOrUsername(entry.value, users[entry.key])] = RoleUtils.getOpaqueColor(role)
+                members.forEach { (id, member) ->
+                    val color = member.color
+                    if (color != Color.BLACK) {
+                        typingUsers[GuildMember.getNickOrUsername(member, users[id])] = color
                     }
                 }
             })
 
             patcher.patch(WidgetChatOverlay.TypingIndicatorViewHolder::class.java.getDeclaredMethod("configureTyping", ChatTypingModel.Typing::class.java), PinePatchFn {
                 val binding = (it.thisObject as WidgetChatOverlay.TypingIndicatorViewHolder).binding
+                val textView = binding.root.findViewById<TextView>(Utils.getResId("chat_typing_users_typing", "id"))
 
-                binding.g.apply {
+                textView.apply {
                     text = SpannableString(text).apply {
                         typingUsers.forEach { (username, color) ->
                             val start = text.indexOf(username)
@@ -103,7 +102,7 @@ class RoleColorEverywhere : Plugin() {
             })
         }
 
-        if (settings.getBool("mentions", true)) {
+        if (settings.getBool("userMentions", true)) {
             patcher.patch(UserMentionNode::class.java.getDeclaredMethod("renderUserMention", SpannableStringBuilder::class.java, UserMentionNode.RenderContext::class.java), object : MethodHook() {
                 private var length: Int = 0
 
@@ -114,13 +113,9 @@ class RoleColorEverywhere : Plugin() {
                 override fun afterCall(callFrame: Pine.CallFrame) {
                     val userMentionNode = callFrame.thisObject as UserMentionNode<UserMentionNode.RenderContext>
                     val guild = guildStore.getGuild(StoreStream.getGuildSelected().selectedGuildId)
+                    val member = guildStore.getMember(guild.id, userMentionNode.userId)
 
-                    val roles = guildStore.roles[guild.id]
-                    val role = RoleUtils.getHighestRole(roles, guildStore.getMember(guild.id, userMentionNode.userId))
-
-                    if (RoleUtils.isDefaultColor(role)) return
-
-                    val foregroundColor = RoleUtils.getOpaqueColor(role)
+                    val foregroundColor = member.color.also { if (it == Color.BLACK) return }
                     val backgroundColor = ColorUtils.setAlphaComponent(ColorUtils.blendARGB(foregroundColor, Color.BLACK, 0.6f), 30)
 
                     val spannableStringBuilder = callFrame.args[0] as SpannableStringBuilder
@@ -134,13 +129,10 @@ class RoleColorEverywhere : Plugin() {
             patcher.patch(WidgetChannelsListAdapter.ItemVoiceUser::class.java.getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), PinePatchFn {
                 val channelListItemVoiceUser = it.args[1] as ChannelListItemVoiceUser
                 val binding = (it.thisObject as WidgetChannelsListAdapter.ItemVoiceUser).binding
-                val guildMember = channelListItemVoiceUser.computed
-                val roles = guildStore.roles[guildMember.guildId]
-                val role = RoleUtils.getHighestRole(roles, guildMember)
+                val textView = binding.root.findViewById<TextView>(Utils.getResId("channels_item_voice_user_name", "id"))
+                val color = channelListItemVoiceUser.computed.color
 
-                if (RoleUtils.isDefaultColor(role)) return@PinePatchFn
-
-                binding.g.setTextColor(RoleUtils.getOpaqueColor(role))
+                if (color != Color.BLACK) textView.setTextColor(color)
             })
         }
     }

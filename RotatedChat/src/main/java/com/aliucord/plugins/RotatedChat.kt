@@ -30,22 +30,24 @@ class RotatedChat : Plugin() {
 
             setActionBarTitle("Rotated Chat")
 
-            addView(TextInput(requireContext()).apply { hint = "Rotation of chat in degrees" }.editText?.apply {
-                    maxLines = 1
-                    inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-                    setText(settings.getFloat("degrees", 0f).toString())
-                    addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) { }
-                        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) { }
-                        override fun afterTextChanged(s: Editable) {
-                            try {
-                                settings.setFloat("degrees", s.toString().toFloat())
-                            } catch (ignored: Throwable) {
-                                settings.setFloat("degrees", 0f)
-                            }
+            val textInput = TextInput(requireContext()).apply { hint = "Rotation of chat in degrees" }
+            textInput.editText?.apply {
+                maxLines = 1
+                inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                setText(settings.getFloat("degrees", 0f).toString())
+                addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                    override fun afterTextChanged(s: Editable) {
+                        try {
+                            settings.setFloat("degrees", s.toString().toFloat())
+                        } catch (ignored: Throwable) {
+                            settings.setFloat("degrees", 0f)
                         }
-                    })
+                    }
                 })
+            }
+            addView(textInput)
         }
     }
 
@@ -53,7 +55,7 @@ class RotatedChat : Plugin() {
         return Manifest().apply {
             authors = arrayOf(Author("zt", 289556910426816513L))
             description = "Rotate your chat!"
-            version = "1.1.2"
+            version = "1.1.3"
             updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
         }
     }

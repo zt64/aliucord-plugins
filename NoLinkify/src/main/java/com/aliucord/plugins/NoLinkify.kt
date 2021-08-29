@@ -10,7 +10,7 @@ class NoLinkify : Plugin() {
     override fun getManifest(): Manifest {
         return Manifest().apply {
             authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Disables linkify for phone numbers and email addresses in messages."
+            description = "Disables highlighting for phone numbers and addresses in messages\n."
             version = "1.0.0"
             updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
         }

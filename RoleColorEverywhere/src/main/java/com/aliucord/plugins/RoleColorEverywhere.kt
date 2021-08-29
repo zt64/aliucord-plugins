@@ -73,7 +73,7 @@ class RoleColorEverywhere : Plugin() {
         return Manifest().apply {
             authors = arrayOf(Author("zt", 289556910426816513L))
             description = "Displays the highest role color in more places like mentions and typing text"
-            version = "1.2.0"
+            version = "1.2.1"
             updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
         }
     }
@@ -127,7 +127,7 @@ class RoleColorEverywhere : Plugin() {
                 override fun afterCall(callFrame: Pine.CallFrame) {
                     val userMentionNode = callFrame.thisObject as UserMentionNode<UserMentionNode.RenderContext>
                     val guild = guildStore.getGuild(StoreStream.getGuildSelected().selectedGuildId)
-                    val member = guildStore.getMember(guild.id, userMentionNode.userId)
+                    val member = guildStore.getMember(guild.id, userMentionNode.userId) ?: return
 
                     var foregroundColor = member.color
                     if (foregroundColor == Color.BLACK) foregroundColor = Color.WHITE

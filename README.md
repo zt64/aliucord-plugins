@@ -2,10 +2,10 @@
 
 Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
 
-- [AlwaysAnimate](https://github.com/zt64/aliucord-plugins/raw/builds/RoleColorEverywhere.zip)
+- [AlwaysAnimate](https://github.com/zt64/aliucord-plugins/raw/builds/AlwaysAnimate.zip)
 Adds options to always animate server icons, and eventually user avatars
 
-- [RoleColorEverywhere](https://github.com/zt64/aliucord-plugins/raw/builds/AlwaysAnimate.zip)
+- [RoleColorEverywhere](https://github.com/zt64/aliucord-plugins/raw/builds/RoleColorEverywhere.zip)
 Changes text color in specific areas to match the users highest role. Currently supports mentions, voice users, and typing users, and can even be toggled what is colored
 
 - [FolderOpacity](https://github.com/zt64/aliucord-plugins/raw/builds/FolderOpacity.zip)

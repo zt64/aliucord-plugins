@@ -1,4 +1,7 @@
 {
+    "NoLinkify": {
+        "version": "1.0.0"
+    },
     "AlwaysAnimate": {
         "version": "1.0.2"
     },

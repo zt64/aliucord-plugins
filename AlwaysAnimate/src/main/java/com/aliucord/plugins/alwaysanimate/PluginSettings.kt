@@ -15,9 +15,8 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
 
         val ctx = requireContext()
 
-        addView(createCheckedSetting(ctx, "Server icons", "guildIcon"))
+        addView(createCheckedSetting(ctx, "Server icons", "guildIcons"))
 //        addView(createCheckedSetting(ctx, "Message author avatar", "messageAvatar"))
-//        addView(createCheckedSetting(ctx, "Members list avatar", "memberListAvatar"))
     }
 
     private fun createCheckedSetting(ctx: Context, title: String, setting: String): CheckedSetting {

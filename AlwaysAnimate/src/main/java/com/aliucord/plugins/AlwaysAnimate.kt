@@ -20,7 +20,7 @@ class AlwaysAnimate : Plugin() {
             })
         }
 
-        if (settings.getBool("avatars", true)) {
+        if (settings.getBool("messageAvatar", false)) {
             patcher.patch(IconUtils::class.java.getDeclaredMethod("getForUser", Long::class.javaObjectType, String::class.javaObjectType, Int::class.javaObjectType, Boolean::class.javaPrimitiveType, Int::class.javaObjectType), PinePrePatchFn {
                 it.args[3] = true
             })

@@ -1,3 +1,4 @@
+import com.aliucord.gradle.AliucordExtension
 import com.android.build.gradle.BaseExtension
 
 buildscript {
@@ -8,8 +9,8 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:7.0.1")
-        classpath("com.github.Aliucord:gradle:main-SNAPSHOT")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
+        classpath("com.github.Aliucord:gradle:main-SNAPSHOT")
     }
 }
 
@@ -20,12 +21,22 @@ allprojects {
     }
 }
 
-fun Project.android(configuration: BaseExtension.() -> Unit) = extensions.getByName<BaseExtension>("android").configuration()
+fun Project.android(configuration: BaseExtension.() -> Unit) =
+        extensions.getByName<BaseExtension>("android").configuration()
+
+fun Project.aliucord(configuration: AliucordExtension.() -> Unit) =
+        extensions.getByName<AliucordExtension>("aliucord").configuration()
 
 subprojects {
     apply(plugin = "com.android.library")
     apply(plugin = "com.aliucord.gradle")
     apply(plugin = "kotlin-android")
+
+    aliucord {
+        author("zt", 289556910426816513L)
+        updateUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json")
+        buildUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/%s.zip")
+    }
 
     android {
         compileSdkVersion(30)
@@ -59,10 +70,10 @@ subprojects {
 
     dependencies {
         val discord by configurations
-        val implementation by configurations
+        val api by configurations
 
         discord("com.discord:discord:aliucord-SNAPSHOT")
-        implementation("com.github.Aliucord:Aliucord:main-SNAPSHOT")
+        api("com.github.Aliucord:Aliucord:main-SNAPSHOT")
     }
 }
 

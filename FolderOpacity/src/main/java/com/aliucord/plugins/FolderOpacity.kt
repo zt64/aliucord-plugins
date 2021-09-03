@@ -14,8 +14,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.aliucord.Logger
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.patcher.PinePatchFn
 import com.aliucord.utils.DimenUtils
 import com.aliucord.utils.ReflectUtils
@@ -33,18 +33,10 @@ import top.canyie.pine.Pine.CallFrame
 import top.canyie.pine.callback.MethodReplacement
 import java.lang.reflect.InvocationTargetException
 
+@AliucordPlugin
 class FolderOpacity : Plugin() {
     private val logger = Logger("FolderOpacity")
     private val folderViewHolderMap = HashMap<Long, View>()
-
-    override fun getManifest(): Manifest {
-        return Manifest().apply {
-            authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Adds an option to the guild folder settings to set the opacity"
-            version = "1.1.1"
-            updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
-        }
-    }
 
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {

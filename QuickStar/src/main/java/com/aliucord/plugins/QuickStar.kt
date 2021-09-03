@@ -8,8 +8,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.patcher.PinePatchFn
 import com.discord.databinding.WidgetChatListActionsBinding
 import com.discord.models.domain.emoji.Emoji
@@ -20,16 +20,8 @@ import com.lytefast.flexinput.R
 import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 
+@AliucordPlugin
 class QuickStar : Plugin() {
-    override fun getManifest(): Manifest {
-        return Manifest().apply {
-            authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Adds a star button to the message context menu that reacts to the message with the star emoji."
-            version = "1.2.3"
-            updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
-        }
-    }
-
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         val icon = ContextCompat.getDrawable(context, R.d.ic_star_24dp)

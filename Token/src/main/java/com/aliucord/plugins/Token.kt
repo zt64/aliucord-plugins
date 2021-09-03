@@ -1,22 +1,14 @@
 package com.aliucord.plugins
 
 import android.content.Context
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.CommandsAPI.CommandResult
 import com.aliucord.entities.Plugin
-import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.utils.ReflectUtils
 import com.discord.stores.StoreStream
 
+@AliucordPlugin
 class Token : Plugin() {
-    override fun getManifest(): Manifest {
-        return Manifest().apply {
-            authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Adds a token slash command to tell you your Discord token."
-            version = "1.1.1"
-            updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
-        }
-    }
-
     override fun start(context: Context) {
         commands.registerCommand("token", "Tells you your token", emptyList()) {
             try {

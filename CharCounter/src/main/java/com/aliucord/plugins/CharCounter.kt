@@ -7,8 +7,8 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import com.aliucord.Constants
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.patcher.PinePatchFn
 import com.aliucord.utils.DimenUtils
 import com.discord.api.premium.PremiumTier
@@ -17,16 +17,8 @@ import com.discord.stores.StoreStream
 import com.discord.widgets.chat.input.AppFlexInputViewModel
 import com.discord.widgets.chat.overlay.`WidgetChatOverlay$binding$2`
 
+@AliucordPlugin
 class CharCounter : Plugin() {
-    override fun getManifest(): Manifest {
-        return Manifest().apply {
-            authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Adds a character counter to the message box."
-            version = "1.0.1"
-            updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
-        }
-    }
-
     override fun start(context: Context) {
         val counter = TextView(context).apply {
             typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)

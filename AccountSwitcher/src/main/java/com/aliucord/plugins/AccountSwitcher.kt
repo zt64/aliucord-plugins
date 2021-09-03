@@ -4,26 +4,18 @@ import android.content.Context
 import android.view.MenuItem
 import androidx.core.content.ContextCompat
 import com.aliucord.Utils
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.patcher.PinePatchFn
 import com.aliucord.plugins.accountswitcher.PluginSettings
 import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.settings.WidgetSettings
 import com.lytefast.flexinput.R
 
+@AliucordPlugin
 class AccountSwitcher : Plugin() {
     init {
         settingsTab = SettingsTab(PluginSettings::class.java).withArgs(settings)
-    }
-
-    override fun getManifest(): Manifest {
-        return Manifest().apply {
-            authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Account switcher"
-            version = "1.0.0"
-            updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
-        }
     }
 
     override fun start(context: Context) {

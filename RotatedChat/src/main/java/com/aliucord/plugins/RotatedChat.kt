@@ -6,9 +6,9 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import com.aliucord.Logger
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.patcher.PinePatchFn
 import com.aliucord.views.TextInput
@@ -17,6 +17,7 @@ import com.discord.widgets.chat.list.WidgetChatList
 import com.discord.widgets.chat.list.model.WidgetChatListModel
 import java.lang.reflect.InvocationTargetException
 
+@AliucordPlugin
 class RotatedChat : Plugin() {
     private var logger = Logger("RotatedChat")
 
@@ -51,23 +52,14 @@ class RotatedChat : Plugin() {
         }
     }
 
-    override fun getManifest(): Manifest {
-        return Manifest().apply {
-            authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Rotate your chat!"
-            version = "1.1.3"
-            updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
-        }
-    }
-
     override fun start(context: Context) {
         val getBindingMethod = WidgetChatList::class.java.getDeclaredMethod("getBinding").apply { isAccessible = true }
 
         patcher.patch(WidgetChatList::class.java.getDeclaredMethod("configureUI", WidgetChatListModel::class.java), PinePatchFn {
             try {
-                with(getBindingMethod.invoke(it.thisObject) as WidgetChatListBinding, {
+                with(getBindingMethod.invoke(it.thisObject) as WidgetChatListBinding) {
                     root.rotation = settings.getFloat("degrees", 0f)
-                })
+                }
             } catch (e: IllegalAccessException) {
                 logger.error(e)
             } catch (e: InvocationTargetException) {

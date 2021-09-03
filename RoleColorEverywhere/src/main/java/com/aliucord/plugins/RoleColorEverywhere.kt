@@ -10,10 +10,9 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
-import com.aliucord.Logger
 import com.aliucord.Utils
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.patcher.PinePatchFn
 import com.aliucord.plugins.rolecoloreverywhere.PluginSettings
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
@@ -24,24 +23,26 @@ import com.discord.models.member.GuildMember
 import com.discord.models.user.User
 import com.discord.stores.StoreStream
 import com.discord.utilities.textprocessing.node.UserMentionNode
+import com.discord.utilities.view.text.SimpleDraweeSpanTextView
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.list.items.ChannelListItem
 import com.discord.widgets.channels.list.items.ChannelListItemVoiceUser
 import com.discord.widgets.chat.input.autocomplete.UserAutocompletable
 import com.discord.widgets.chat.input.autocomplete.adapter.AutocompleteItemViewHolder
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
+import com.discord.widgets.chat.list.entries.MessageEntry
 import com.discord.widgets.chat.overlay.ChatTypingModel
 import com.discord.widgets.chat.overlay.WidgetChatOverlay
 import com.discord.widgets.chat.overlay.`ChatTypingModel$Companion$getTypingUsers$1$1`
 import com.discord.widgets.user.profile.UserProfileHeaderView
 import com.discord.widgets.user.profile.UserProfileHeaderViewModel
-import com.facebook.drawee.span.SimpleDraweeSpanTextView
+import com.facebook.drawee.span.DraweeSpanStringBuilder
 import top.canyie.pine.Pine
 import top.canyie.pine.callback.MethodHook
 import java.lang.reflect.Field
 
+@AliucordPlugin
 class RoleColorEverywhere : Plugin() {
-    private val logger = Logger("RoleColorEverywhere")
-
     private val typingUsers = HashMap<String, Int>()
 
     private var typingIndicatorBinding: Field? = null
@@ -65,17 +66,15 @@ class RoleColorEverywhere : Plugin() {
             autoCompleteBinding = this
         })[this] as WidgetChatInputAutocompleteItemBinding
 
+    private var mDraweeStringBuilderField: Field? = null
+    private val SimpleDraweeSpanTextView.mDraweeStringBuilder
+        get() = (mDraweeStringBuilderField ?: javaClass.superclass.getDeclaredField("mDraweeStringBuilder").apply {
+            isAccessible = true
+            mDraweeStringBuilderField = this
+        })[this] as DraweeSpanStringBuilder
+
     init {
         settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
-    }
-
-    override fun getManifest(): Manifest {
-        return Manifest().apply {
-            authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Displays the highest role color in more places like mentions and typing text"
-            version = "1.2.1"
-            updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
-        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -129,14 +128,13 @@ class RoleColorEverywhere : Plugin() {
                     val guild = guildStore.getGuild(StoreStream.getGuildSelected().selectedGuildId)
                     val member = guildStore.getMember(guild.id, userMentionNode.userId) ?: return
 
-                    var foregroundColor = member.color
-                    if (foregroundColor == Color.BLACK) foregroundColor = Color.WHITE
-
+                    val foregroundColor = member.color.also { if (it == Color.BLACK) Color.WHITE }
                     val backgroundColor = ColorUtils.setAlphaComponent(ColorUtils.blendARGB(foregroundColor, Color.BLACK, 0.65f), 70)
 
-                    val spannableStringBuilder = callFrame.args[0] as SpannableStringBuilder
-                    spannableStringBuilder.setSpan(ForegroundColorSpan(foregroundColor), length, spannableStringBuilder.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    spannableStringBuilder.setSpan(BackgroundColorSpan(backgroundColor), length, spannableStringBuilder.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    with(callFrame.args[0] as SpannableStringBuilder) {
+                        setSpan(ForegroundColorSpan(foregroundColor), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        setSpan(BackgroundColorSpan(backgroundColor), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
                 }
             })
         }
@@ -153,12 +151,13 @@ class RoleColorEverywhere : Plugin() {
         }
 
         if (settings.getBool("userMentionList", true)) {
-            patcher.patch(AutocompleteItemViewHolder::class.java.getDeclaredMethod("bindUser", UserAutocompletable::class.java), PinePatchFn { callFrame ->
-                val userAutocompletable = callFrame.args[0] as UserAutocompletable
-                val binding = (callFrame.thisObject as AutocompleteItemViewHolder).binding
+            patcher.patch(AutocompleteItemViewHolder::class.java.getDeclaredMethod("bindUser", UserAutocompletable::class.java), PinePatchFn {
+                val userAutocompletable = it.args[0] as UserAutocompletable
+                val binding = (it.thisObject as AutocompleteItemViewHolder).binding
 
                 val itemName = binding.root.findViewById<TextView>(Utils.getResId("chat_input_item_name", "id"))
                 val color = userAutocompletable.guildMember.color
+
                 if (color != Color.BLACK) itemName.setTextColor(color)
             })
         }
@@ -169,7 +168,7 @@ class RoleColorEverywhere : Plugin() {
 
                 loaded.guildMember?.let {
                     val textView = UserProfileHeaderView.`access$getBinding$p`(callFrame.thisObject as UserProfileHeaderView).root
-                            .findViewById<SimpleDraweeSpanTextView>(Utils.getResId("username_text", "id"))
+                            .findViewById<com.facebook.drawee.span.SimpleDraweeSpanTextView>(Utils.getResId("username_text", "id"))
 
                     textView.apply {
                         if (it.color == Color.BLACK) return@PinePatchFn
@@ -181,6 +180,21 @@ class RoleColorEverywhere : Plugin() {
 
                         i.setSpan(ForegroundColorSpan(it.color), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         setDraweeSpanStringBuilder(i)
+                    }
+                }
+            })
+        }
+
+        if (settings.getBool("messages", false)) {
+            patcher.patch(WidgetChatListAdapterItemMessage::class.java, "processMessageText", arrayOf(SimpleDraweeSpanTextView::class.java, MessageEntry::class.java), PinePatchFn {
+                val messageEntry = it.args[1] as MessageEntry
+                val member = messageEntry.author ?: return@PinePatchFn
+
+                if (member.color != Color.BLACK) {
+                    val textView = it.args[0] as SimpleDraweeSpanTextView
+                    textView.mDraweeStringBuilder.apply {
+                        setSpan(ForegroundColorSpan(member.color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        textView.setDraweeSpanStringBuilder(this)
                     }
                 }
             })

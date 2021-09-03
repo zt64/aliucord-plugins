@@ -19,12 +19,13 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
             addView(createCheckedSetting(this, "Voice users", "Whether usernames in voice channels are colored", "voiceChannel"))
             addView(createCheckedSetting(this, "Profile name", "Whether usernames on profiles are colored", "profileName"))
             addView(createCheckedSetting(this, "Profile name tag", "Whether tags on profiles are colored", "profileTag"))
+            addView(createCheckedSetting(this, "Messages", "Whether messages are colored", "messages", false))
         }
     }
 
-    private fun createCheckedSetting(ctx: Context, title: String, subtext: String, setting: String): CheckedSetting {
+    private fun createCheckedSetting(ctx: Context, title: String, subtext: String, setting: String, default: Boolean = true): CheckedSetting {
         return Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, subtext).apply {
-            isChecked = settings.getBool(setting, true)
+            isChecked = settings.getBool(setting, default)
             setOnCheckedListener {
                 settings.setBool(setting, it)
                 PluginManager.stopPlugin("RoleColorEverywhere")

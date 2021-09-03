@@ -6,9 +6,9 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import com.aliucord.Logger
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.patcher.PinePatchFn
 import com.aliucord.utils.DimenUtils
@@ -17,6 +17,7 @@ import com.discord.databinding.WidgetChatListBinding
 import com.discord.widgets.chat.list.WidgetChatList
 import com.discord.widgets.chat.list.model.WidgetChatListModel
 
+@AliucordPlugin
 class WiderScrollbar : Plugin() {
     private val logger = Logger("WiderScrollbar")
 
@@ -49,15 +50,6 @@ class WiderScrollbar : Plugin() {
                 })
             }
             addView(textInput)
-        }
-    }
-
-    override fun getManifest(): Manifest {
-        return Manifest().apply {
-            authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Allows changing the scrollbar width to make it easier to drag."
-            version = "1.1.5"
-            updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
         }
     }
 

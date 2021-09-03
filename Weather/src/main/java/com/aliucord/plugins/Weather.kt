@@ -3,10 +3,10 @@ package com.aliucord.plugins
 import android.content.Context
 import com.aliucord.Http
 import com.aliucord.Logger
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.CommandsAPI.CommandResult
 import com.aliucord.entities.MessageEmbedBuilder
 import com.aliucord.entities.Plugin
-import com.aliucord.entities.Plugin.Manifest.Author
 import com.aliucord.plugins.weather.WeatherResponse
 import com.discord.api.commands.ApplicationCommandType
 import com.discord.models.commands.ApplicationCommandOption
@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.*
 
+@AliucordPlugin
 class Weather : Plugin() {
     private val logger = Logger("Weather")
     private val thermometerEmoji = "\uD83C\uDF21"
@@ -21,15 +22,6 @@ class Weather : Plugin() {
     private val humidityEmoji = "\uD83D\uDCA6"
     private val uvIndexEmoji = "\uD83D\uDD76️"
     private val windEmoji = "\uD83D\uDCA8"
-
-    override fun getManifest(): Manifest {
-        return Manifest().apply {
-            authors = arrayOf(Author("zt", 289556910426816513L))
-            description = "Adds a weather slash command to get information for the current location or one that's provided."
-            version = "1.1.4"
-            updateUrl = "https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json"
-        }
-    }
 
     override fun start(context: Context) {
         val arguments = listOf(ApplicationCommandOption(ApplicationCommandType.STRING, "location", "The location to query", null, false, true, null, null))

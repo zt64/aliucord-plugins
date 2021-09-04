@@ -15,10 +15,10 @@ import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.PinePatchFn
 import com.aliucord.plugins.rolecoloreverywhere.PluginSettings
+import com.aliucord.plugins.rolecoloreverywhere.ReflectionExtensions
+import com.aliucord.plugins.rolecoloreverywhere.ReflectionExtensions.binding
+import com.aliucord.plugins.rolecoloreverywhere.ReflectionExtensions.mDraweeStringBuilder
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
-import com.discord.databinding.WidgetChannelsListItemVoiceUserBinding
-import com.discord.databinding.WidgetChatInputAutocompleteItemBinding
-import com.discord.databinding.WidgetChatOverlayBinding
 import com.discord.models.member.GuildMember
 import com.discord.models.user.User
 import com.discord.stores.StoreStream
@@ -36,42 +36,12 @@ import com.discord.widgets.chat.overlay.WidgetChatOverlay
 import com.discord.widgets.chat.overlay.`ChatTypingModel$Companion$getTypingUsers$1$1`
 import com.discord.widgets.user.profile.UserProfileHeaderView
 import com.discord.widgets.user.profile.UserProfileHeaderViewModel
-import com.facebook.drawee.span.DraweeSpanStringBuilder
 import top.canyie.pine.Pine
 import top.canyie.pine.callback.MethodHook
-import java.lang.reflect.Field
 
 @AliucordPlugin
 class RoleColorEverywhere : Plugin() {
     private val typingUsers = HashMap<String, Int>()
-
-    private var typingIndicatorBinding: Field? = null
-    private val WidgetChatOverlay.TypingIndicatorViewHolder.binding: WidgetChatOverlayBinding
-        get() = (typingIndicatorBinding ?: javaClass.getDeclaredField("binding").apply {
-            isAccessible = true
-            typingIndicatorBinding = this
-        })[this] as WidgetChatOverlayBinding
-
-    private var itemVoiceBinding: Field? = null
-    private val WidgetChannelsListAdapter.ItemVoiceUser.binding: WidgetChannelsListItemVoiceUserBinding
-        get() = (itemVoiceBinding ?: javaClass.getDeclaredField("binding").apply {
-            isAccessible = true
-            itemVoiceBinding = this
-        })[this] as WidgetChannelsListItemVoiceUserBinding
-
-    private var autoCompleteBinding: Field? = null
-    private val AutocompleteItemViewHolder.binding: WidgetChatInputAutocompleteItemBinding
-        get() = (autoCompleteBinding ?: javaClass.getDeclaredField("binding").apply {
-            isAccessible = true
-            autoCompleteBinding = this
-        })[this] as WidgetChatInputAutocompleteItemBinding
-
-    private var mDraweeStringBuilderField: Field? = null
-    private val SimpleDraweeSpanTextView.mDraweeStringBuilder
-        get() = (mDraweeStringBuilderField ?: javaClass.superclass.getDeclaredField("mDraweeStringBuilder").apply {
-            isAccessible = true
-            mDraweeStringBuilderField = this
-        })[this] as DraweeSpanStringBuilder
 
     init {
         settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
@@ -79,6 +49,7 @@ class RoleColorEverywhere : Plugin() {
 
     @Suppress("UNCHECKED_CAST")
     override fun start(context: Context) {
+        ReflectionExtensions.init()
         val guildStore = StoreStream.getGuilds()
 
         if (settings.getBool("typingText", true)) {
@@ -117,10 +88,10 @@ class RoleColorEverywhere : Plugin() {
 
         if (settings.getBool("userMentions", true)) {
             patcher.patch(UserMentionNode::class.java.getDeclaredMethod("renderUserMention", SpannableStringBuilder::class.java, UserMentionNode.RenderContext::class.java), object : MethodHook() {
-                private var length: Int = 0
+                private var mentionLength: Int = 0
 
                 override fun beforeCall(callFrame: Pine.CallFrame) {
-                    length = (callFrame.args[0] as SpannableStringBuilder).length
+                    mentionLength = (callFrame.args[0] as SpannableStringBuilder).length
                 }
 
                 override fun afterCall(callFrame: Pine.CallFrame) {
@@ -128,12 +99,12 @@ class RoleColorEverywhere : Plugin() {
                     val guild = guildStore.getGuild(StoreStream.getGuildSelected().selectedGuildId)
                     val member = guildStore.getMember(guild.id, userMentionNode.userId) ?: return
 
-                    val foregroundColor = member.color.also { if (it == Color.BLACK) Color.WHITE }
+                    val foregroundColor = if (member.color == Color.BLACK) Color.WHITE else member.color
                     val backgroundColor = ColorUtils.setAlphaComponent(ColorUtils.blendARGB(foregroundColor, Color.BLACK, 0.65f), 70)
 
                     with(callFrame.args[0] as SpannableStringBuilder) {
-                        setSpan(ForegroundColorSpan(foregroundColor), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        setSpan(BackgroundColorSpan(backgroundColor), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        setSpan(ForegroundColorSpan(foregroundColor), mentionLength, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        setSpan(BackgroundColorSpan(backgroundColor), mentionLength, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                     }
                 }
             })

@@ -1,10 +1,11 @@
-version = "1.3.0"
+version = "1.3.1"
 description = "Displays the highest role color in more places like mentions and typing text"
 
 aliucord {
     changelog.set(
     """
-        * Added colored message option
+        * Fixed mentions not being colored
+        * Added info to settings sheet
     """.trimIndent()
     )
 }

@@ -1,9 +1,11 @@
 package com.aliucord.plugins
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import com.aliucord.PluginManager
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.PinePatchFn
@@ -33,12 +35,13 @@ class AlwaysAnimate : Plugin() {
             })
 
             patcher.patch(IconUtils::class.java.getDeclaredMethod("setIcon", ImageView::class.java, String::class.java, Int::class.javaPrimitiveType, Int::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Function1::class.java, MGImages.ChangeDetector::class.java), PinePatchFn {
-                if (PluginManager.isPluginEnabled("SquareAvatars")) return@PinePatchFn
+                if (!settings.getBool("roundedAvatars", true)) return@PinePatchFn
 
                 val simpleDraweeView = it.args[0] as SimpleDraweeView
                 simpleDraweeView.apply {
                     background = ContextCompat.getDrawable(context, R.d.drawable_circle_transparent)
                     clipToOutline = true
+                    background = ShapeDrawable(OvalShape()).apply { paint.color = Color.TRANSPARENT }
                 }
             })
         }

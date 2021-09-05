@@ -15,13 +15,13 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
 
         val ctx = requireContext()
 
-        addView(createCheckedSetting(ctx, "Server icons", null, "guildIcons"))
-        addView(createCheckedSetting(ctx, "Message author avatar", "WIP. Animated avatars will not be rounded.","messageAvatar", false))
+        addView(createCheckedSetting(ctx, "Server icons", "guildIcons"))
+        addView(createCheckedSetting(ctx, "User avatars", "avatars"))
     }
 
-    private fun createCheckedSetting(ctx: Context, title: String, subtext: String? = null, setting: String, defValue: Boolean = true): CheckedSetting {
-        return Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, subtext).apply {
-            isChecked = settings.getBool(setting, defValue)
+    private fun createCheckedSetting(ctx: Context, title: String, setting: String): CheckedSetting {
+        return Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, null).apply {
+            isChecked = settings.getBool(setting, true)
             setOnCheckedListener {
                 settings.setBool(setting, it)
                 PluginManager.stopPlugin("AlwaysAnimate")

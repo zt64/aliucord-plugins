@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
+import androidx.appcompat.widget.Toolbar
 import com.airbnb.lottie.parser.AnimatableValueParser
 import com.aliucord.PluginManager
 import com.aliucord.Utils
@@ -17,37 +18,29 @@ import com.aliucord.api.SettingsAPI
 import com.aliucord.patcher.PineInsteadFn
 import com.aliucord.patcher.PinePatchFn
 import com.aliucord.plugins.BetterMediaViewer
-import com.aliucord.utils.ReflectUtils
 import com.aliucord.utils.RxUtils
-import com.discord.databinding.WidgetMediaBinding
 import com.discord.utilities.rx.ObservableExtensionsKt
 import com.discord.widgets.media.WidgetMedia
 import com.discord.widgets.media.`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`
 import com.discord.widgets.media.`WidgetMedia$showControls$1`
 import com.discord.widgets.media.`WidgetMedia$showControls$2`
+import com.google.android.material.appbar.AppBarLayout
 import com.lytefast.flexinput.R
 import top.canyie.pine.callback.MethodReplacement
 import java.util.concurrent.TimeUnit
 
+
 class Patches(private val patcher: PatcherAPI) {
     private var settingsAPI: SettingsAPI? = PluginManager.plugins["BetterMediaViewer"]?.settings
     private val logger = BetterMediaViewer.logger
-
-    private var WidgetMedia.controlsAnimator
-        get() = ReflectUtils.getField(this, "controlsAnimator") as ValueAnimator
-        set(valueAnimator) = ReflectUtils.setField(this, "controlsAnimator", valueAnimator)
-
-    private val WidgetMedia.mediaSource
-        get() = ReflectUtils.getField(this, "mediaSource")
-
-    private fun WidgetMedia.getBinding(): WidgetMediaBinding = WidgetMedia.`access$getBinding$p`(this)
 
     fun patchMenu() {
         val downloadManager = Utils.appContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         patcher.patch(WidgetMedia::class.java.getDeclaredMethod("onViewBoundOrOnResume"), PinePatchFn {
             val ctx = Utils.appContext
             val widgetMedia = it.thisObject as WidgetMedia
-            with(Utils.appActivity.t.menu, {
+            val menu = (widgetMedia.binding.root.findViewById<AppBarLayout>(Utils.getResId("action_bar_toolbar_layout", "id")).getChildAt(0) as Toolbar).menu
+            with(menu, {
 //                findItem(Utils.getResId("menu_media_download", "id")).setOnMenuItemClickListener {
 //                    val uri = Uri.parse(settingsAPI?.getString("downloadDir", ctx.getExternalFilesDir("Downloads")
 //                        .toString()))
@@ -63,11 +56,12 @@ class Patches(private val patcher: PatcherAPI) {
 //                            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE))
 //                    false
 //                }
-                findItem(Utils.getResId("menu_media_share", "id")).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
+                findItem(Utils.getResId("menu_media_share", "id"))?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
 
                 with(Utils.getResId("menu_media_browser", "id"), {
                     if (settingsAPI!!.getBool("showOpenInBrowser", true)) {
-                        findItem(this).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                        findItem(this)?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
                     } else {
                         removeItem(this)
                     }
@@ -84,31 +78,24 @@ class Patches(private val patcher: PatcherAPI) {
 
 
     fun patchControls() {
-        val configureAndStartControlsAnimationMethod = WidgetMedia::class.java.getDeclaredMethod("configureAndStartControlsAnimation", ValueAnimator::class.java)
-            .apply { isAccessible = true }
-        val getToolbarTranslationYMethod = WidgetMedia::class.java.getDeclaredMethod("getToolbarTranslationY")
-            .apply { isAccessible = true }
-
         patcher.patch(WidgetMedia::class.java.getDeclaredMethod("showControls"), PineInsteadFn {
             val widgetMedia = it.thisObject as WidgetMedia
-            val binding = widgetMedia.getBinding()
             if (settingsAPI!!.getBool("autoHideControls", true)) {
-                binding.f.h()
-                WidgetMedia.`access$getControlsVisibilitySubscription$p`(widgetMedia)?.unsubscribe()
-                val timer = RxUtils.timer(settingsAPI!!.getLong("controlsTimeout", 3000), TimeUnit.MILLISECONDS)
+                widgetMedia.binding.f.h()
+                widgetMedia.controlsVisibilitySubscription?.unsubscribe()
+                val timer = RxUtils.timer(settingsAPI!!.getInt("controlsTimeout", 3000).toLong(), TimeUnit.MILLISECONDS)
                 ObservableExtensionsKt.`appSubscribe$default`(ObservableExtensionsKt.`ui$default`(timer, widgetMedia, null, 2, null), WidgetMedia::class.java, null as Context?, `WidgetMedia$showControls$1`(widgetMedia), null as Function1<*, *>?, null as Function0<*>?, null as Function0<*>?, `WidgetMedia$showControls$2`(widgetMedia), 58, null as Any?)
             } else {
-                binding.f.c()
+                widgetMedia.binding.f.c()
             }
 
-            val controlsAnimationAction = WidgetMedia.`access$getControlsAnimationAction$p`(widgetMedia)
             val controlsAnimationAction2 = WidgetMedia.ControlsAnimationAction.SHOW
-            if (controlsAnimationAction != controlsAnimationAction2) {
-                ReflectUtils.setField(widgetMedia, "controlsAnimationAction", controlsAnimationAction2)
-                widgetMedia.controlsAnimator.cancel()
+            if (widgetMedia.controlsAnimationAction != controlsAnimationAction2) {
+                widgetMedia.controlsAnimationAction = controlsAnimationAction2
+                widgetMedia.controlsAnimator?.cancel()
 
-                with(ValueAnimator.ofFloat((getToolbarTranslationYMethod.invoke(widgetMedia) as Float), 0.0f)) {
-                    configureAndStartControlsAnimationMethod.invoke(widgetMedia, this)
+                with(ValueAnimator.ofFloat(widgetMedia.getToolbarTranslationY(), 0.0f)) {
+                    widgetMedia.configureAndStartControlsAnimationMethod(this)
                     widgetMedia.controlsAnimator = this
                 }
             }
@@ -117,7 +104,7 @@ class Patches(private val patcher: PatcherAPI) {
 
     fun patchImmersiveMode() {
         patcher.patch(WidgetMedia::class.java.getDeclaredMethod("onViewBoundOrOnResume"), PinePatchFn {
-            val root = WidgetMedia.`access$getBinding$p`(it.thisObject as WidgetMedia).root
+            val root = (it.thisObject as WidgetMedia).binding.root
             when (settingsAPI!!.getInt("immersiveModeType", 0)) {
                 0 -> root.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
                 1 -> root.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE
@@ -134,23 +121,21 @@ class Patches(private val patcher: PatcherAPI) {
 
     fun patchToolbar() {
         patcher.patch(WidgetMedia::class.java.getDeclaredMethod("onViewBoundOrOnResume"), PinePatchFn {
-            with(it.thisObject as WidgetMedia) {
-                if (mediaSource != null) {
-                    (getBinding().b.layoutParams as FrameLayout.LayoutParams).gravity = Gravity.BOTTOM
-                }
-            }
+            val thisObject = it.thisObject as WidgetMedia
+            if (thisObject.mediaSource != null) return@PinePatchFn
+            (thisObject.binding.b.layoutParams as FrameLayout.LayoutParams).gravity = Gravity.BOTTOM
         })
 
         patcher.patch(WidgetMedia::class.java.getDeclaredMethod("getToolbarTranslationY"), PinePatchFn {
             with(it.thisObject as WidgetMedia) {
-                if (this.mediaSource == null) it.result = -this.getBinding().b.translationY
+                if (this.mediaSource == null) it.result = -this.binding.b.translationY
             }
         })
 
         patcher.patch(`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`::class.java.getDeclaredMethod("onAnimationUpdate", ValueAnimator::class.java), PineInsteadFn {
             val widgetMedia = (it.thisObject as `WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`).`this$0`
             val floatValue = ((it.args[0] as ValueAnimator).animatedValue) as Float
-            val binding = WidgetMedia.`access$getBinding$p`(widgetMedia)
+            val binding = widgetMedia.binding
 
             binding.b.apply {
                 try {
@@ -161,10 +146,11 @@ class Patches(private val patcher: PatcherAPI) {
                     logger.error(e)
                 }
             }
-            if (WidgetMedia.`access$isVideo`(widgetMedia) && WidgetMedia.`access$getPlayerControlsHeight$p`(widgetMedia) > 0) {
+
+            if (widgetMedia.isVideo() && widgetMedia.playerControlsHeight > 0) {
                 binding.f.apply {
                     translationY = -floatValue / (WidgetMedia.`access$getToolbarHeight$p`(widgetMedia)
-                            .toFloat() / WidgetMedia.`access$getPlayerControlsHeight$p`(widgetMedia).toFloat())
+                            .toFloat() / widgetMedia.playerControlsHeight.toFloat())
                 }
             }
         })
@@ -175,8 +161,8 @@ class Patches(private val patcher: PatcherAPI) {
             val res = it.result as String
             if (res.contains(".discordapp.net/")) {
                 val arr = res.split("\\?").toTypedArray()
-                it.result = arr[0] + if (arr[1].contains("format=")) "?format=" + arr[1].split("format=")
-                    .toTypedArray()[1] else ""
+
+                it.result = arr[0] + if (arr[1].contains("format=")) "?format=" + arr[1].split("format=").toTypedArray()[1] else ""
             }
         })
 

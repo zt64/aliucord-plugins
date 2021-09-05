@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Environment
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.RadioGroup
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -15,11 +17,11 @@ import com.aliucord.PluginManager
 import com.aliucord.Utils
 import com.aliucord.api.SettingsAPI
 import com.aliucord.fragments.SettingsPage
+import com.aliucord.utils.DimenUtils
 import com.aliucord.views.Button
 import com.aliucord.views.Divider
 import com.discord.views.CheckedSetting
 import com.discord.views.RadioManager
-import com.google.android.material.slider.Slider
 import com.lytefast.flexinput.R
 import java.util.*
 
@@ -35,22 +37,45 @@ class PluginSettings(private val settingsAPI: SettingsAPI) : SettingsPage() {
         val ctx = requireContext()
 
         // Create settings for changing auto hiding behaviour
-        val controlsTimeoutSlider = Slider(ctx).apply {
-            valueFrom = 500f
-            valueTo = 5000f
-            stepSize = 100f
-            value = settingsAPI.getLong("controlsTimeout", 3000).toFloat()
+        val offset = 500
+        val controlsTimeout = settingsAPI.getInt("controlsTimeout", 3000)
+        val currentTimeout = TextView(ctx, null, 0, R.h.UiKit_TextView).apply {
+            text = "$controlsTimeout ms"
+            width = DimenUtils.dpToPx(72)
+        }
+        val seekbar = SeekBar(ctx, null, 0, R.h.UiKit_SeekBar).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            max = 4500
+            progress = controlsTimeout - offset
+            setPadding(DimenUtils.dpToPx(12), 0, DimenUtils.dpToPx(12), 0)
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    with((progress / 100) * 100) {
+                        seekBar.progress = this
+                        currentTimeout.text = "${this + offset} ms"
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {}
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    settingsAPI.setInt("controlsTimeout", seekBar.progress + offset)
+                }
+            })
+        }
+        val timeoutSection = LinearLayout(ctx, null, 0, R.h.UiKit_Settings_Item).apply {
             visibility = if (settingsAPI.getBool("autoHideControls", true)) View.VISIBLE else View.GONE
-            addOnChangeListener(Slider.OnChangeListener { _, value, _ -> settingsAPI.setLong("controlsTimeout", value.toLong()) })
+            addView(currentTimeout)
+            addView(seekbar)
         }
 
-        addView(createCheckedSetting(ctx, "Auto-hide controls", "Hide the top and bottom bar after a " + "delay", "autoHideControls", true).apply {
+        addView(createCheckedSetting(ctx, "Auto-hide controls", "Hide the top and bottom bar after a delay", "autoHideControls", true).apply {
             setOnCheckedListener {
                 settingsAPI.setBool("autoHideControls", it)
-                controlsTimeoutSlider.visibility = if (it) View.VISIBLE else View.GONE
+                timeoutSection.visibility = if (it) View.VISIBLE else View.GONE
             }
         })
-        addView(controlsTimeoutSlider)
+        addView(timeoutSection)
         addView(Divider(ctx))
 
         val radios = listOf(Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.RADIO, "Status bar", null), Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.RADIO, "Navigation bar", null), Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.RADIO, "Both bars", null))

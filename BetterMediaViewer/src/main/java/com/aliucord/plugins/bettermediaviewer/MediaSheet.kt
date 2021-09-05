@@ -28,10 +28,12 @@ class MediaSheet(private val widgetMedia: WidgetMedia) : BottomSheet() {
 
         addView(createTextView(ctx, "Copy link", R.d.ic_link_white_24dp) {
             val parse = Uri.parse(widgetMedia.mostRecentIntent.getStringExtra("INTENT_MEDIA_URL"))
-            Snackbar.make(widgetMedia.requireView(), "Copied to clipboard", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(widgetMedia.requireView(), "Copied to clipboard", Snackbar.LENGTH_SHORT).setAction("Dismiss") {
+                dismiss()
+            }.show()
             Utils.setClipboard("Media link", parse.toString()).also { dismiss() }
         })
-        if (!WidgetMedia.`access$isVideo`(widgetMedia)) addView(createTextView(ctx, "Google image search", R.d.ic_search_white_24dp) {
+        if (widgetMedia.isVideo()) addView(createTextView(ctx, "Google image search", R.d.ic_search_white_24dp) {
             val parse = Uri.parse(widgetMedia.mostRecentIntent.getStringExtra("INTENT_MEDIA_URL"))
             UriHandler.`handleOrUntrusted$default`(it.context, "https://www.google.com/searchbyimage?site=search&sa=X&image_url=$parse", null, 4, null)
         })
@@ -49,7 +51,9 @@ class MediaSheet(private val widgetMedia: WidgetMedia) : BottomSheet() {
     }
 
     private fun createTextView(ctx: Context, text: String, resID: Int, onClickListener: View.OnClickListener): TextView {
-        val icon = ContextCompat.getDrawable(ctx, resID).also { it?.setTint(ColorCompat.getThemedColor(requireContext(), R.b.colorInteractiveNormal)) }
+        val icon = ContextCompat.getDrawable(ctx, resID)?.apply {
+            setTint(ColorCompat.getThemedColor(requireContext(), R.b.colorInteractiveNormal))
+        }
 
         return TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
             this.text = text

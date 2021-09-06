@@ -18,6 +18,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
         addView(createCheckedSetting(ctx, "Server icons", "guildIcons"))
         addView(createCheckedSetting(ctx, "User avatars", "avatars"))
         addView(createCheckedSetting(ctx, "Round Animated Avatars", "roundedAvatars"))
+        addView(createCheckedSetting(ctx, "Animate when battery saver is on", "batterySaver"))
     }
 
     private fun createCheckedSetting(ctx: Context, title: String, setting: String): CheckedSetting {

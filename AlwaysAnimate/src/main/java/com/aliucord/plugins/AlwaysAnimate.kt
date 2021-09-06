@@ -25,7 +25,7 @@ class AlwaysAnimate : Plugin() {
 
     override fun start(context: Context) {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager;
-        if (settings.getBool("batterySaver", true) && powerManager.isPowerSaveMode) return;
+        if (settings.getBool("batterySaver", false) && powerManager.isPowerSaveMode) return;
 
         if (settings.getBool("guildIcons", true)) {
             patcher.patch(IconUtils::class.java.getDeclaredMethod("getForGuild", Long::class.javaObjectType, String::class.javaObjectType, String::class.javaObjectType, Boolean::class.java, Int::class.javaObjectType), PinePrePatchFn {

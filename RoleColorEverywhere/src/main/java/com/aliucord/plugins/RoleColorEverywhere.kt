@@ -178,12 +178,12 @@ class RoleColorEverywhere : Plugin() {
                 val member = (it.args[0] as ChannelMembersListAdapter.Item.Member) ?: return@PinePatchFn
                 val binding = (it.thisObject as ChannelMembersListViewHolderMember).binding
 
-                if (member.color != Color.BLACK) {
+                if (member.color != Color.BLACK && member.color != null) {
                     val textView = binding.root
                         .findViewById<SimpleDraweeSpanTextView>(Utils.getResId("channel_members_list_item_game", "id"))
 
                     textView.mDraweeStringBuilder.apply {
-                        setSpan(ForegroundColorSpan(member.color ?: 0), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        setSpan(ForegroundColorSpan(member.color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textView.setDraweeSpanStringBuilder(this)
                     }
                 }

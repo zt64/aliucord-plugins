@@ -16,6 +16,8 @@ import com.aliucord.utils.DimenUtils
 import com.discord.utilities.icon.IconUtils
 import com.discord.utilities.images.MGImages
 import com.facebook.drawee.view.SimpleDraweeView
+import com.discord.models.presence.Presence
+import com.discord.utilities.presence.PresenceUtils
 
 @AliucordPlugin
 class AlwaysAnimate : Plugin() {
@@ -53,6 +55,12 @@ class AlwaysAnimate : Plugin() {
                             }
                     }
                 }
+            })
+        }
+
+        if (settings.getBool("status", true)) {
+            patcher.patch(PresenceUtils::class.java.getDeclaredMethod("getStatusDraweeSpanStringBuilder", Context::class.java, Presence::class.java, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType), PinePrePatchFn {
+                it.args[5] = true
             })
         }
     }

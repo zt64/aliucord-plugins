@@ -24,6 +24,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
             addView(createCheckedSetting(this, "Voice users", "Whether usernames in voice channels are colored", "voiceChannel"))
             addView(createCheckedSetting(this, "Profile name", "Whether usernames on profiles are colored", "profileName"))
             addView(createCheckedSetting(this, "Profile name tag", "Whether tags on profiles are colored", "profileTag"))
+            addView(createCheckedSetting(this, "Statuses", "Whether statuses on sidebars and profiles are colored", "status"))
             addView(createCheckedSetting(this, "Messages", "Whether messages are colored", "messages", false))
         }
     }

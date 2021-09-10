@@ -27,6 +27,8 @@ import com.discord.utilities.view.text.SimpleDraweeSpanTextView
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.list.items.ChannelListItem
 import com.discord.widgets.channels.list.items.ChannelListItemVoiceUser
+import com.discord.widgets.channels.memberlist.adapter.ChannelMembersListAdapter
+import com.discord.widgets.channels.memberlist.adapter.ChannelMembersListViewHolderMember
 import com.discord.widgets.chat.input.autocomplete.UserAutocompletable
 import com.discord.widgets.chat.input.autocomplete.adapter.AutocompleteItemViewHolder
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
@@ -166,6 +168,39 @@ class RoleColorEverywhere : Plugin() {
                     textView.mDraweeStringBuilder.apply {
                         setSpan(ForegroundColorSpan(member.color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textView.setDraweeSpanStringBuilder(this)
+                    }
+                }
+            })
+        }
+
+        if (settings.getBool("status", true)) {
+            patcher.patch(ChannelMembersListViewHolderMember::class.java, "bind", arrayOf(ChannelMembersListAdapter.Item.Member::class.java, Function0::class.java), PinePatchFn {
+                val member = (it.args[0] as ChannelMembersListAdapter.Item.Member) ?: return@PinePatchFn
+                val binding = (it.thisObject as ChannelMembersListViewHolderMember).binding
+
+                if (member.color != Color.BLACK) {
+                    val textView = binding.root
+                        .findViewById<SimpleDraweeSpanTextView>(Utils.getResId("channel_members_list_item_game", "id"))
+
+                    textView.mDraweeStringBuilder.apply {
+                        setSpan(ForegroundColorSpan(member.color ?: 0), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        textView.setDraweeSpanStringBuilder(this)
+                    }
+                }
+            })
+
+            patcher.patch(UserProfileHeaderView::class.java.getDeclaredMethod("updateViewState", UserProfileHeaderViewModel.ViewState.Loaded::class.java), PinePatchFn { callFrame ->
+                val loaded = callFrame.args[0] as UserProfileHeaderViewModel.ViewState.Loaded
+
+                loaded.guildMember?.let {
+                    val textView = UserProfileHeaderView.`access$getBinding$p`(callFrame.thisObject as UserProfileHeaderView).root
+                        .findViewById<SimpleDraweeSpanTextView>(Utils.getResId("user_profile_header_custom_status", "id"))
+
+                    textView.apply {
+                        if (it.color == Color.BLACK) return@PinePatchFn
+
+                        mDraweeStringBuilder.setSpan(ForegroundColorSpan(it.color), 0, mDraweeStringBuilder.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        textView.setDraweeSpanStringBuilder(mDraweeStringBuilder)
                     }
                 }
             })

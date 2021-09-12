@@ -195,7 +195,8 @@ class RoleColorEverywhere : Plugin() {
                 loaded.guildMember?.let {
                     val textView = UserProfileHeaderView.`access$getBinding$p`(callFrame.thisObject as UserProfileHeaderView).root
                         .findViewById<SimpleDraweeSpanTextView>(Utils.getResId("user_profile_header_custom_status", "id"))
-
+                        ?: return@PinePatchFn
+                    
                     textView.apply {
                         if (it.color == Color.BLACK) return@PinePatchFn
 

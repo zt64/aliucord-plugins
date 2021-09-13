@@ -21,6 +21,7 @@ import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
 import com.discord.models.member.GuildMember
 import com.discord.models.user.User
 import com.discord.stores.StoreStream
+import com.discord.utilities.mg_recycler.MGRecyclerDataPayload
 import com.discord.utilities.textprocessing.FontColorSpan
 import com.discord.utilities.textprocessing.node.UserMentionNode
 import com.discord.utilities.view.text.SimpleDraweeSpanTextView
@@ -39,6 +40,10 @@ import com.discord.widgets.chat.overlay.WidgetChatOverlay
 import com.discord.widgets.chat.overlay.`ChatTypingModel$Companion$getTypingUsers$1$1`
 import com.discord.widgets.user.profile.UserProfileHeaderView
 import com.discord.widgets.user.profile.UserProfileHeaderViewModel
+import com.discord.widgets.voice.fullscreen.stage.AudienceViewHolder
+import com.discord.widgets.voice.fullscreen.stage.SpeakerViewHolder
+import com.discord.widgets.voice.fullscreen.stage.StageCallItem
+import com.discord.widgets.voice.sheet.CallParticipantsAdapter
 import top.canyie.pine.Pine
 import top.canyie.pine.callback.MethodHook
 import java.util.*
@@ -136,6 +141,36 @@ class RoleColorEverywhere : Plugin() {
                 if (color != Color.BLACK) {
                     val root = (it.thisObject as WidgetChannelsListAdapter.ItemVoiceUser).binding.root
                     root.findViewById<TextView>(Utils.getResId("channels_item_voice_user_name", "id")).setTextColor(color)
+                }
+            })
+
+            patcher.patch(CallParticipantsAdapter.ViewHolderUser::class.java.getDeclaredMethod("onConfigure", Int::class.java, MGRecyclerDataPayload::class.java), PinePatchFn {
+                val callParticipant = it.args[1] as CallParticipantsAdapter.ListItem.VoiceUser
+                val color = callParticipant.participant.guildMember.color
+
+                if (color != Color.BLACK) {
+                    val root = (it.thisObject as CallParticipantsAdapter.ViewHolderUser).binding.root
+                    root.findViewById<TextView>(Utils.getResId("voice_user_list_item_user_name", "id")).setTextColor(color)
+                }
+            })
+
+            patcher.patch(AudienceViewHolder::class.java.getDeclaredMethod("onConfigure", Int::class.java, StageCallItem::class.java), PinePatchFn {
+                val stageCallItem = it.args[1] as StageCallItem.AudienceItem
+                val color = stageCallItem.voiceUser.guildMember.color
+
+                if (color != Color.BLACK) {
+                    val root = (it.thisObject as AudienceViewHolder).binding.root
+                    root.findViewById<TextView>(Utils.getResId("stage_channel_audience_member_name", "id")).setTextColor(color)
+                }
+            })
+
+            patcher.patch(SpeakerViewHolder::class.java.getDeclaredMethod("onConfigure", Int::class.java, StageCallItem::class.java), PinePatchFn {
+                val stageCallItem = it.args[1] as StageCallItem.SpeakerItem
+                val color = stageCallItem.voiceUser.guildMember.color
+
+                if (color != Color.BLACK) {
+                    val root = (it.thisObject as SpeakerViewHolder).binding.root
+                    root.findViewById<TextView>(Utils.getResId("stage_channel_speaker_name", "id")).setTextColor(color)
                 }
             })
         }

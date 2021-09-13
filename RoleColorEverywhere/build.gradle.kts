@@ -1,10 +1,11 @@
-version = "1.4.0"
+version = "1.5.0"
 description = "Displays the highest role color in more places like mentions and typing text"
 
 aliucord {
     changelog.set(
     """
-        * Added status color to member list and profiles
+        * Mentions in chat box are now colored
+        * Added some checks to prevent errors from occurring
     """.trimIndent()
     )
 }

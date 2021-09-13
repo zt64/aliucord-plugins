@@ -23,8 +23,7 @@ object ReflectionExtensions {
         typingIndicatorBinding = WidgetChatOverlay.TypingIndicatorViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
         itemVoiceBinding = WidgetChannelsListAdapter.ItemVoiceUser::class.java.getDeclaredField("binding").apply { isAccessible = true }
         autoCompleteBinding = AutocompleteItemViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
-        memberListBinding = ChannelMembersListViewHolderMember::class.java.getDeclaredField("binding").apply {isAccessible = true}
-
+        memberListBinding = ChannelMembersListViewHolderMember::class.java.getDeclaredField("binding").apply { isAccessible = true }
         mDraweeStringBuilderField = SimpleDraweeSpanTextView::class.java.getDeclaredField("mDraweeStringBuilder").apply { isAccessible = true }
     }
 
@@ -40,6 +39,6 @@ object ReflectionExtensions {
     val ChannelMembersListViewHolderMember.binding: WidgetChannelMembersListItemUserBinding
         get() = memberListBinding[this] as WidgetChannelMembersListItemUserBinding
 
-    val SimpleDraweeSpanTextView.mDraweeStringBuilder: DraweeSpanStringBuilder
-        get() = mDraweeStringBuilderField[this] as DraweeSpanStringBuilder
+    val SimpleDraweeSpanTextView.mDraweeStringBuilder: DraweeSpanStringBuilder?
+        get() = mDraweeStringBuilderField[this] as DraweeSpanStringBuilder?
 }

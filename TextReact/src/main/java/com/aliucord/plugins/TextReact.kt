@@ -1,9 +1,14 @@
 package com.aliucord.plugins
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
+import android.text.InputType
+import com.aliucord.Utils
 import android.view.View
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -24,6 +29,28 @@ import java.lang.reflect.InvocationTargetException
 
 @AliucordPlugin
 class TextReact : Plugin() {
+    private fun showDialog(context: Context, callback: (text: String) -> Unit) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        builder.setTitle("Title")
+
+        // Set up the input
+        val input = EditText(context)
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setHint("Enter Text")
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
+            // Here you get get input text from the Edittext
+            val text = input.text.toString()
+            dialog.dismiss()
+            callback(text)
+        })
+        builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
+
+        builder.show()
+    }
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         Toast.makeText(context, "opened the context menu", Toast.LENGTH_SHORT).show()
@@ -43,7 +70,10 @@ class TextReact : Plugin() {
 
                     if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener {
                         try {
-                            addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])
+                            showDialog(context) { text ->
+                                Utils.showToast(context, text);
+                            }
+//                            addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])
                             (callFrame.thisObject as WidgetChatListActions).dismiss()
                         } catch (e: IllegalAccessException) {
                             e.printStackTrace()

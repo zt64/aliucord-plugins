@@ -77,6 +77,13 @@ class TextReact : Plugin() {
             patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn { callFrame: CallFrame ->
                 val linearLayout = (callFrame.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
                 val ctx = linearLayout.context
+                val inDialog = InputDialog()
+                inDialog.setTitle("Text react!")
+                inDialog.setDescription("Enter some text to send as reactions.")
+                inDialog.setPlaceholderText("Enter text...")
+                inDialog.setOnOkListener {
+                    Utils.showToast(context, inDialog.input.toString())
+                }
                 Utils.showToast(ctx, "aaaaaaaaaaaaa")
 
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
@@ -88,7 +95,7 @@ class TextReact : Plugin() {
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }
 
-                linearLayout.addView(quickStar, 1)
+                linearLayout.addView(inDialog.view, 1)
             })
         })
     }

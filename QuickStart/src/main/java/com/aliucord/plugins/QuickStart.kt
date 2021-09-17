@@ -59,7 +59,7 @@ class QuickStart : Plugin() {
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
                 val quickStar = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
-                    text = "Quick Fuck"
+                    text = "Quick Fuck."
                     id = quickStarId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }

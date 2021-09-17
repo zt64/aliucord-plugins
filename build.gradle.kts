@@ -33,9 +33,9 @@ subprojects {
     apply(plugin = "kotlin-android")
 
     aliucord {
-        author("zt", 289556910426816513L)
-        updateUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json")
-        buildUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/%s.zip")
+        author("Arjix", 674710789138939916L)
+        updateUrl.set("https://raw.githubusercontent.com/ArjixWasTaken/aliucord-plugins/builds/updater.json")
+        buildUrl.set("https://raw.githubusercontent.com/ArjixWasTaken/aliucord-plugins/builds/%s.zip")
     }
 
     android {

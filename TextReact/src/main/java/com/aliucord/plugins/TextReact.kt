@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException
 class TextReact : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
-        val icon = ContextCompat.getDrawable(context, R.d.ic_star_24dp)
+        val icon = ContextCompat.getDrawable(context, com.aliucord.plugins.R.drawable.ic_letter_a)
         val quickStarId = View.generateViewId()
 
         with(WidgetChatListActions::class.java, {

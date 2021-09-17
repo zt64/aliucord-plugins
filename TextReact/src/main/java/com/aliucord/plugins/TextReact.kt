@@ -26,11 +26,11 @@ import java.lang.reflect.InvocationTargetException
 class TextReact : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
+        Toast.makeText(context, "opened the context menu", Toast.LENGTH_SHORT).show()
         val icon = ContextCompat.getDrawable(context, com.aliucord.plugins.R.drawable.ic_letter_a)
         val quickStarId = View.generateViewId()
 
         with(WidgetChatListActions::class.java, {
-            Toast.makeText(context, "opened the context menu", Toast.LENGTH_SHORT).show()
             val getBinding = getDeclaredMethod("getBinding").apply { isAccessible = true }
             val addReaction = getDeclaredMethod("addReaction", Emoji::class.java).apply { isAccessible = true }
 

@@ -30,13 +30,13 @@ import java.lang.reflect.InvocationTargetException
 @AliucordPlugin
 class TextReact : Plugin() {
     private fun showDialog(callback: (text: String) -> Unit) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(Utils.appActivity)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(Utils.appActivity.applicationContext)
         builder.setTitle("Title")
 
         // Set up the input
-        val input = EditText(Utils.appActivity)
+        val input = EditText(Utils.appActivity.applicationContext)
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setHint("Enter Text")
+        input.hint = "Enter Text"
         input.inputType = InputType.TYPE_CLASS_TEXT
         builder.setView(input)
 

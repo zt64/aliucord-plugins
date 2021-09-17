@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import com.aliucord.annotations.AliucordPlugin
@@ -29,6 +30,7 @@ class TextReact : Plugin() {
         val quickStarId = View.generateViewId()
 
         with(WidgetChatListActions::class.java, {
+            Toast.makeText(context, "opened the context menu", Toast.LENGTH_SHORT).show()
             val getBinding = getDeclaredMethod("getBinding").apply { isAccessible = true }
             val addReaction = getDeclaredMethod("addReaction", Emoji::class.java).apply { isAccessible = true }
 

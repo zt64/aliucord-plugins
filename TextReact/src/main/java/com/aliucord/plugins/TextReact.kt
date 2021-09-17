@@ -27,7 +27,7 @@ class TextReact : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         Toast.makeText(context, "opened the context menu", Toast.LENGTH_SHORT).show()
-        val icon = ContextCompat.getDrawable(context, com.aliucord.plugins.R.drawable.ic_letter_a)
+        val icon = ContextCompat.getDrawable(context, R.d.ic_keyboard_24dp)
         val quickStarId = View.generateViewId()
 
         with(WidgetChatListActions::class.java, {

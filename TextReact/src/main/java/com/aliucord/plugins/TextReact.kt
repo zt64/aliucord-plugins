@@ -14,8 +14,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.FragmentContainerView
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
+import com.aliucord.fragments.InputDialog
 import com.aliucord.patcher.PinePatchFn
 import com.discord.databinding.WidgetChatListActionsBinding
 import com.discord.models.domain.emoji.Emoji
@@ -63,6 +65,7 @@ class TextReact : Plugin() {
 
             patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn { callFrame: CallFrame ->
                 try {
+                    val linearLayout = (callFrame.args[0] as NestedScrollView).getChildAt(0) as FragmentContainerView
                     val binding = getBinding.invoke(callFrame.thisObject) as WidgetChatListActionsBinding
                     val quickStar = binding.a.findViewById<TextView>(quickStarId).apply {
                         visibility = if ((callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
@@ -70,11 +73,17 @@ class TextReact : Plugin() {
 
                     if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener {
                         try {
-                            showDialog { text ->
-                                Utils.showToast(context, text);
-                            }
-//                            addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])
                             (callFrame.thisObject as WidgetChatListActions).dismiss()
+                            val inDialog = InputDialog()
+                            inDialog.setTitle("Text react!")
+                            inDialog.setDescription("Enter some text to send as reactions.")
+                            inDialog.setPlaceholderText("Enter text...")
+                            inDialog.setOnOkListener {
+                                Utils.showToast(context, inDialog.input.toString())
+                            }
+                            linearLayout.addView(inDialog.view)
+
+                            // addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])
                         } catch (e: IllegalAccessException) {
                             e.printStackTrace()
                         } catch (e: InvocationTargetException) {

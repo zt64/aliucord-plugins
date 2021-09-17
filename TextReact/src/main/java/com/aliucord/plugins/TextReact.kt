@@ -31,28 +31,6 @@ import java.lang.reflect.InvocationTargetException
 
 @AliucordPlugin
 class TextReact : Plugin() {
-    private fun showDialog(callback: (text: String) -> Unit) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(Utils.appActivity.applicationContext)
-        builder.setTitle("Title")
-
-        // Set up the input
-        val input = EditText(Utils.appActivity.applicationContext)
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.hint = "Enter Text"
-        input.inputType = InputType.TYPE_CLASS_TEXT
-        builder.setView(input)
-
-        // Set up the buttons
-        builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
-            // Here you get get input text from the Edittext
-            val text = input.text.toString()
-            dialog.dismiss()
-            callback(text)
-        })
-        builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
-
-        builder.show()
-    }
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         Toast.makeText(context, "opened the context menu", Toast.LENGTH_SHORT).show()
@@ -65,7 +43,9 @@ class TextReact : Plugin() {
 
             patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn { callFrame: CallFrame ->
                 try {
-                    val linearLayout = (callFrame.args[0] as NestedScrollView).getChildAt(0) as FragmentContainerView
+                    val message = (callFrame.args[0] as WidgetChatListActions.Model).message
+                    Utils.showToast((callFrame.args[0] as WidgetChatListActions).context, message.content)
+                    return@PinePatchFn
                     val binding = getBinding.invoke(callFrame.thisObject) as WidgetChatListActionsBinding
                     val quickStar = binding.a.findViewById<TextView>(quickStarId).apply {
                         visibility = if ((callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
@@ -81,7 +61,6 @@ class TextReact : Plugin() {
                             inDialog.setOnOkListener {
                                 Utils.showToast(context, inDialog.input.toString())
                             }
-                            linearLayout.addView(inDialog.view)
 
                             // addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])
                         } catch (e: IllegalAccessException) {

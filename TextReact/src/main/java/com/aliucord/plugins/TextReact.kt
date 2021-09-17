@@ -20,8 +20,9 @@ import com.lytefast.flexinput.R
 import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 
+
 @AliucordPlugin
-class QuickStart : Plugin() {
+class TextReact : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         val icon = ContextCompat.getDrawable(context, R.d.ic_star_24dp)
@@ -59,7 +60,7 @@ class QuickStart : Plugin() {
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
                 val quickStar = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
-                    text = "Quick Fuck."
+                    text = "Text react"
                     id = quickStarId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }

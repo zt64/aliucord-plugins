@@ -1,3 +1,3 @@
 rootProject.name = "plugins"
 
-include(":QuickStart")
+include(":TextReact")

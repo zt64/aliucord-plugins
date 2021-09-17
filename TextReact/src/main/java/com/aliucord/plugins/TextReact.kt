@@ -82,6 +82,7 @@ class TextReact : Plugin() {
                 val quickStar = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
                     text = "Text react"
                     id = quickStarId
+                    visibility = View.VISIBLE
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }
 

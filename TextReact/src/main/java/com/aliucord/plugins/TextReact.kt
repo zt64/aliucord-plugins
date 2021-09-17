@@ -29,12 +29,12 @@ import java.lang.reflect.InvocationTargetException
 
 @AliucordPlugin
 class TextReact : Plugin() {
-    private fun showDialog(context: Context, callback: (text: String) -> Unit) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+    private fun showDialog(callback: (text: String) -> Unit) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(Utils.appActivity)
         builder.setTitle("Title")
 
         // Set up the input
-        val input = EditText(context)
+        val input = EditText(Utils.appActivity)
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setHint("Enter Text")
         input.inputType = InputType.TYPE_CLASS_TEXT
@@ -70,7 +70,7 @@ class TextReact : Plugin() {
 
                     if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener {
                         try {
-                            showDialog(context) { text ->
+                            showDialog { text ->
                                 Utils.showToast(context, text);
                             }
 //                            addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])

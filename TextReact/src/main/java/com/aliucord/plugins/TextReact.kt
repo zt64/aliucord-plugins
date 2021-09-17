@@ -45,6 +45,7 @@ class TextReact : Plugin() {
                 try {
                     val message = (callFrame.args[0] as WidgetChatListActions.Model).message
                     Utils.showToast((callFrame.args[0] as WidgetChatListActions).context, message.content)
+                    (callFrame.thisObject as WidgetChatListActions).dismiss()
                     return@PinePatchFn
                     val binding = getBinding.invoke(callFrame.thisObject) as WidgetChatListActionsBinding
                     val quickStar = binding.a.findViewById<TextView>(quickStarId).apply {
@@ -76,6 +77,7 @@ class TextReact : Plugin() {
             patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn { callFrame: CallFrame ->
                 val linearLayout = (callFrame.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
                 val ctx = linearLayout.context
+                Utils.showToast(ctx, "aaaaaaaaaaaaa")
 
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 

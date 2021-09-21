@@ -45,7 +45,7 @@ class TextReact : Plugin() {
             patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn { callFrame: CallFrame ->
                 try {
                     (callFrame.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
-                    Utils.showToast(context, "2")
+                    Utils.showToast(context.applicationContext, "added dialog")
                     val message = (callFrame.args[0] as WidgetChatListActions.Model).message
                     (callFrame.thisObject as WidgetChatListActions).dismiss()
 
@@ -56,13 +56,13 @@ class TextReact : Plugin() {
 
                     if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener {
                         try {
-                            (callFrame.thisObject as WidgetChatListActions).dismiss()
                             val inDialog = InputDialog()
-                            inDialog.setTitle("Text react!")
-                            inDialog.setDescription("Enter some text to send as reactions.")
-                            inDialog.setPlaceholderText("Enter text...")
+                                .setTitle("Text react!")
+                                .setDescription("Enter some text to send as reactions.")
+                                .setPlaceholderText("Enter text...")
                             inDialog.setOnOkListener {
                                 Utils.showToast(context, inDialog.input.toString())
+                                (callFrame.thisObject as WidgetChatListActions).dismiss()
                             }
                             inDialog.show(FragmentProxy().parentFragmentManager, "")
 
@@ -80,7 +80,6 @@ class TextReact : Plugin() {
             patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn { callFrame: CallFrame ->
                 val linearLayout = (callFrame.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
                 val ctx = linearLayout.context
-                Utils.showToast(ctx, "1")
 
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 

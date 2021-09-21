@@ -44,10 +44,8 @@ class TextReact : Plugin() {
 
             patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn { callFrame: CallFrame ->
                 try {
-                    (callFrame.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
                     Utils.showToast(context.applicationContext, "added dialog")
                     val message = (callFrame.args[0] as WidgetChatListActions.Model).message
-                    (callFrame.thisObject as WidgetChatListActions).dismiss()
 
                     val binding = getBinding.invoke(callFrame.thisObject) as WidgetChatListActionsBinding
                     val quickStar = binding.a.findViewById<TextView>(quickStarId).apply {

@@ -1,2 +1,2 @@
-version = "1.0.25"
+version = "1.0.26"
 description = "Blah blah blah."

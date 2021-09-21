@@ -1,6 +1,9 @@
 ## Plugins for [Aliucord](https://github.com/Aliucord)
 
 Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
+- [CursorInput](https://github.com/zt64/aliucord-plugins/raw/builds/CursorInput.zip)
+  Makes tapping emojis, usernames, and other similar elements add text at the current cursor position, instead of at the end
+
 - [RandomEmote](https://github.com/zt64/aliucord-plugins/raw/builds/RandomEmote.zip)
   Makes long press on the emoji button send a random emote 
 

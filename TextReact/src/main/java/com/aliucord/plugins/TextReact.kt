@@ -28,9 +28,8 @@ import java.lang.reflect.InvocationTargetException
 class TextReact : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
-        Toast.makeText(context, "opened the context menu", Toast.LENGTH_SHORT).show()
         val icon = ContextCompat.getDrawable(context, R.d.ic_keyboard_black_24dp)
-        val quickStarId = View.generateViewId()
+        val textReactId = View.generateViewId()
 
         with(WidgetChatListActions::class.java, {
             val getBinding = getDeclaredMethod("getBinding").apply { isAccessible = true }
@@ -38,11 +37,11 @@ class TextReact : Plugin() {
 
             patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn { callFrame: CallFrame ->
                 try {
-                    Utils.showToast(context.applicationContext, "added dialog")
                     val message = (callFrame.args[0] as WidgetChatListActions.Model).message
 
+
                     val binding = getBinding.invoke(callFrame.thisObject) as WidgetChatListActionsBinding
-                    val quickStar = binding.a.findViewById<TextView>(quickStarId).apply {
+                    val quickStar = binding.a.findViewById<TextView>(textReactId).apply {
                         visibility = if ((callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
                     }
 
@@ -56,7 +55,7 @@ class TextReact : Plugin() {
                                 Utils.showToast(context, inDialog.input.toString())
                                 (callFrame.thisObject as WidgetChatListActions).dismiss()
                             }
-                            inDialog.show(AppFragmentProxy().getmFragment().parentFragmentManager, "")
+                            inDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "")
 
                             // addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])
                         } catch (e: IllegalAccessException) {
@@ -75,13 +74,13 @@ class TextReact : Plugin() {
 
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
-                val quickStar = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+                val textReact = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
                     text = "Text react"
-                    id = quickStarId
+                    id = textReactId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }
 
-                linearLayout.addView(quickStar, 1)
+                linearLayout.addView(textReact, 1)
             })
         })
     }

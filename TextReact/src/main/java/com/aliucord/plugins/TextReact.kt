@@ -51,7 +51,8 @@ class TextReact : Plugin() {
                                 .setPlaceholderText("Enter text...")
                             inDialog.setOnOkListener {
                                 val result = helper().generateEmojiArray(inDialog.input.toString().trim())
-                                Utils.showToast((callFrame.thisObject as WidgetChatListActions).context, result.first.joinToString(" "))
+                                Utils.showToast((callFrame.thisObject as WidgetChatListActions).context, result.first.toString())
+                                inDialog.dismiss()
                             }
                             (callFrame.thisObject as WidgetChatListActions).dismiss()
                             inDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "aaaaaa")

@@ -55,7 +55,7 @@ class TextReact : Plugin() {
                                 Utils.showToast(context, inDialog.input.toString())
                                 (callFrame.thisObject as WidgetChatListActions).dismiss()
                             }
-                            inDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "")
+                            inDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "aaaaaa")
 
                             // addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])
                         } catch (e: IllegalAccessException) {

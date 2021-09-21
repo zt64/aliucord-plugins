@@ -21,6 +21,10 @@ import com.discord.widgets.chat.list.model.WidgetChatListModel
 class WiderScrollbar : Plugin() {
     private val logger = Logger("WiderScrollbar")
 
+    private val getBindingMethod = WidgetChatList::class.java.getDeclaredMethod("getBinding").apply { isAccessible = true }
+    private fun WidgetChatList.getBinding() =
+            getBindingMethod.invoke(this) as WidgetChatListBinding
+
     init {
         settingsTab = SettingsTab(PluginSettings::class.java).withArgs(settings)
     }
@@ -54,14 +58,13 @@ class WiderScrollbar : Plugin() {
     }
 
     override fun start(context: Context) {
-        val getBinding = WidgetChatList::class.java.getDeclaredMethod("getBinding").apply { isAccessible = true }
-
         patcher.patch(WidgetChatList::class.java.getDeclaredMethod("configureUI", WidgetChatListModel::class.java), PinePatchFn {
-            try {
-                val binding = getBinding.invoke(it.thisObject) as WidgetChatListBinding
-                binding.root.scrollBarSize = settings.getInt("scrollbarWidth", DimenUtils.dpToPx(50))
-            } catch (e: Throwable) {
-                logger.error(e)
+            with(it.thisObject as WidgetChatList) {
+                try {
+                    getBinding().root.scrollBarSize = settings.getInt("scrollbarWidth", DimenUtils.dpToPx(50))
+                } catch (e: Throwable) {
+                    logger.error(e)
+                }
             }
         })
     }

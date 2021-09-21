@@ -12,9 +12,9 @@ import com.discord.widgets.chat.list.adapter.`WidgetChatListAdapterItemMessage$o
 class AvatarMention : Plugin() {
     override fun start(context: Context) {
         patcher.patch(`WidgetChatListAdapterItemMessage$onConfigure$5`::class.java.getDeclaredMethod("onClick", View::class.java), PineInsteadFn {
-                val thisObject = it.thisObject as `WidgetChatListAdapterItemMessage$onConfigure$5`
+            val thisObject = it.thisObject as `WidgetChatListAdapterItemMessage$onConfigure$5`
 
-                WidgetChatListAdapterItemMessage.`access$getAdapter$p`(thisObject.`this$0`)
+            WidgetChatListAdapterItemMessage.`access$getAdapter$p`(thisObject.`this$0`)
                     .apply { eventHandler.onMessageAuthorNameClicked(thisObject.`$message`, this.data.guildId) }
         })
     }

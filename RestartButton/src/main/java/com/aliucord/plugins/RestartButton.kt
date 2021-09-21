@@ -13,7 +13,6 @@ import com.lytefast.flexinput.R
 
 @AliucordPlugin
 class RestartButton : Plugin() {
-    @Throws(NoSuchMethodException::class)
     override fun start(context: Context) {
         val icon = ContextCompat.getDrawable(context, com.yalantis.ucrop.R.c.ucrop_rotate)?.mutate()
 

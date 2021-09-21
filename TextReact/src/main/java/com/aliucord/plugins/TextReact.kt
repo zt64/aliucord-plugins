@@ -1,28 +1,22 @@
 package com.aliucord.plugins
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
-import android.text.InputType
 import com.aliucord.Utils
 import android.view.View
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
-import androidx.fragment.app.FragmentContainerView
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.InputDialog
-import com.aliucord.fragments.FragmentProxy
+import com.aliucord.fragments.AppFragmentProxy
 import com.aliucord.patcher.PinePatchFn
 import com.discord.databinding.WidgetChatListActionsBinding
 import com.discord.models.domain.emoji.Emoji
-import com.discord.stores.StoreStream
 import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.chat.list.actions.WidgetChatListActions
 import com.lytefast.flexinput.R
@@ -62,7 +56,7 @@ class TextReact : Plugin() {
                                 Utils.showToast(context, inDialog.input.toString())
                                 (callFrame.thisObject as WidgetChatListActions).dismiss()
                             }
-                            inDialog.show(FragmentProxy().parentFragmentManager, "")
+                            inDialog.show(AppFragmentProxy().getmFragment().parentFragmentManager, "")
 
                             // addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])
                         } catch (e: IllegalAccessException) {

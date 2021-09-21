@@ -34,7 +34,7 @@ class TextReact : Plugin() {
         with(WidgetChatListActions::class.java, {
             val getBinding = getDeclaredMethod("getBinding").apply { isAccessible = true }
             val addReaction = getDeclaredMethod("addReaction", Emoji::class.java).apply { isAccessible = true }
-            Utils.showToast(context, "1")
+            Utils.showToast(Utils.getAppContext(), "1")
 
             patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn { callFrame: CallFrame ->
                 try {
@@ -45,7 +45,7 @@ class TextReact : Plugin() {
                     val quickStar = binding.a.findViewById<TextView>(textReactId).apply {
                         visibility = if ((callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
                     }
-                    Utils.showToast(context, "2")
+                    Utils.showToast((callFrame.thisObject as WidgetChatListActions).context, "2")
 
                     if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener {
                         try {
@@ -55,10 +55,10 @@ class TextReact : Plugin() {
                                 .setDescription("Enter some text to send as reactions.")
                                 .setPlaceholderText("Enter text...")
                             inDialog.setOnOkListener {
-                                Utils.showToast(context, inDialog.input.toString())
+                                Utils.showToast((callFrame.thisObject as WidgetChatListActions).context, inDialog.input.toString())
                                 (callFrame.thisObject as WidgetChatListActions).dismiss()
                             }
-                            Utils.showToast(context, "4")
+                            Utils.showToast((callFrame.thisObject as WidgetChatListActions).context, "4")
                             inDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "aaaaaa")
 
                             // addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])

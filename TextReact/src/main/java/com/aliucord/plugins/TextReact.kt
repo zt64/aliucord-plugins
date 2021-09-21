@@ -34,6 +34,7 @@ class TextReact : Plugin() {
         with(WidgetChatListActions::class.java, {
             val getBinding = getDeclaredMethod("getBinding").apply { isAccessible = true }
             val addReaction = getDeclaredMethod("addReaction", Emoji::class.java).apply { isAccessible = true }
+            Utils.showToast(context, "1")
 
             patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn { callFrame: CallFrame ->
                 try {
@@ -44,9 +45,11 @@ class TextReact : Plugin() {
                     val quickStar = binding.a.findViewById<TextView>(textReactId).apply {
                         visibility = if ((callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
                     }
+                    Utils.showToast(context, "2")
 
                     if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener {
                         try {
+                            Utils.showToast(context, "3")
                             val inDialog = InputDialog()
                                 .setTitle("Text react!")
                                 .setDescription("Enter some text to send as reactions.")
@@ -55,6 +58,7 @@ class TextReact : Plugin() {
                                 Utils.showToast(context, inDialog.input.toString())
                                 (callFrame.thisObject as WidgetChatListActions).dismiss()
                             }
+                            Utils.showToast(context, "4")
                             inDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "aaaaaa")
 
                             // addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])

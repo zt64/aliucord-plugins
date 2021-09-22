@@ -51,7 +51,7 @@ class helper {
             "*" to arrayListOf("*️⃣"),
             "$" to arrayListOf("\uD83D\uDCB2"),
             "#" to arrayListOf("#️⃣"),
-            " " to arrayListOf("▪", "◾", "➖", "◼️", "⬛", "⚫", "\uD83D\uDDA4", "\uD83D\uDD76")
+            " " to arrayListOf("▪", "◾", "➖", "◼", "⬛", "⚫", "\uD83D\uDDA4", "\uD83D\uDD76")
         ),
         multiple=mutableMapOf(
             "wc" to arrayListOf("\uD83D\uDEBE"),
@@ -84,7 +84,7 @@ class helper {
 
     fun generateEmojiArray(string: String): Pair<List<String>, Boolean> {
         val unusedReactions = reactions
-        var msg = string.toLowerCase()
+        var msg = string.lowercase()
         val newReactions = ArrayList<String>()
 
         val allReactions = ArrayList((unusedReactions.single + unusedReactions.multiple).keys)

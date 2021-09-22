@@ -3,7 +3,6 @@ package com.aliucord.plugins
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import com.aliucord.Utils
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -21,9 +20,9 @@ import com.lytefast.flexinput.R
 import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 import com.aliucord.plugins.textReactHelper.helper
-import com.discord.app.AppDialog
 import com.discord.stores.StoreStream
-import com.discord.models.domain.emoji.ModelEmojiUnicode
+import com.aliucord.fragments.ConfirmDialog
+import com.aliucord.Utils
 
 @AliucordPlugin
 class TextReact : Plugin() {
@@ -53,11 +52,32 @@ class TextReact : Plugin() {
                                 .setPlaceholderText("Enter text...")
                             inDialog.setOnOkListener {
                                 val result = helper().generateEmojiArray(inDialog.input.toString().trim())
-
                                 inDialog.dismiss()
-                                result.first.forEach { emoji ->
-                                    addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
-                                    Thread.sleep(1000)
+
+                                if (result.second) {
+                                    // show prompt that the text is incomplete
+                                    val coDialog = ConfirmDialog()
+                                        .setTitle("Text react!")
+                                        .setDescription("Warning: The given input could not be 100% translated to reactions, do you still want to continue?")
+                                    coDialog.setOnOkListener {
+                                        coDialog.dismiss()
+                                        Utils.showToast(context, "Sending the reactions...")
+                                        result.first.forEach { emoji ->
+                                            addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
+                                            Thread.sleep(1000)
+                                        }
+                                    }
+                                    coDialog.setOnCancelListener {
+                                        coDialog.dismiss()
+                                        Utils.showToast(context, "Action cancelled by the user.")
+                                    }
+                                    coDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "bbbbbb")
+                                } else {
+                                    Utils.showToast(context, "Sending the reactions...")
+                                    result.first.forEach { emoji ->
+                                        addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
+                                        Thread.sleep(1000)
+                                    }
                                 }
                             }
                             (callFrame.thisObject as WidgetChatListActions).dismiss()

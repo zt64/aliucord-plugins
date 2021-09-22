@@ -1,5 +1,7 @@
 package com.aliucord.plugins.textReactHelper
 
+// huge thanks to https://github.com/Juby210/text-react/blob/master/index.js
+
 class helper {
     private data class ReactionsType(
         val single: MutableMap<String, ArrayList<String>>,

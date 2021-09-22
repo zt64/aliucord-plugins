@@ -63,12 +63,12 @@ class TextReact : Plugin() {
                                     coDialog.setOnOkListener {
                                         coDialog.dismiss()
                                         Utils.threadPool.execute {
-                                           result.first.forEach { emoji ->
+                                            result.first.forEach { emoji ->
                                                addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
-                                                   Thread.sleep(1000)
-                                               }
+                                                    Thread.sleep(1000)
+                                            }
+                                            Utils.showToast(context, "Finished adding the reactions!")
                                         }
-                                        Utils.showToast(context, "Finished adding the reactions!")
                                         
                                     }
                                     coDialog.setOnCancelListener {
@@ -78,12 +78,12 @@ class TextReact : Plugin() {
                                     coDialog.show(fragmentManager, "bbbbbb")
                                 } else {
                                     Utils.threadPool.execute {
-                                           result.first.forEach { emoji ->
-                                               addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
-                                               Thread.sleep(1000)
-                                           }
-                                     }
-                                     Utils.showToast(context, "Finished adding the reactions!")
+                                        result.first.forEach { emoji ->
+                                            addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
+                                                Thread.sleep(1000)
+                                        }
+                                        Utils.showToast(context, "Finished adding the reactions!")
+                                    }
                                 }
                             }
                             (callFrame.thisObject as WidgetChatListActions).dismiss()

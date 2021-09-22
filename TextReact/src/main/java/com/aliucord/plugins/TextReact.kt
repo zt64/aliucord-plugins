@@ -67,7 +67,6 @@ class TextReact : Plugin() {
                                                addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
                                                     Thread.sleep(1000)
                                             }
-                                            Utils.showToast(context, "Finished adding the reactions!")
                                         }
                                         
                                     }
@@ -82,7 +81,6 @@ class TextReact : Plugin() {
                                             addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
                                                 Thread.sleep(1000)
                                         }
-                                        Utils.showToast(context, "Finished adding the reactions!")
                                     }
                                 }
                             }

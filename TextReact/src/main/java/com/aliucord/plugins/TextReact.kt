@@ -21,8 +21,7 @@ import com.lytefast.flexinput.R
 import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 import com.aliucord.plugins.textReactHelper.helper
-import com.discord.app.AppDialog;
-
+import com.discord.app.AppDialog
 
 @AliucordPlugin
 class TextReact : Plugin() {
@@ -55,6 +54,10 @@ class TextReact : Plugin() {
                                 
                                 Utils.showToast(context, "${result.first}")
                                 inDialog.dismiss()
+                                result.first.forEach {
+                                    Thread.sleep(1000)
+                                    addReaction(it)
+                                }
                             }
                             (callFrame.thisObject as WidgetChatListActions).dismiss()
                             inDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "aaaaaa")

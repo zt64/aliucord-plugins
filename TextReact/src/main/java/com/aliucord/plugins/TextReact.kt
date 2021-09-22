@@ -40,11 +40,11 @@ class TextReact : Plugin() {
                     val message = (callFrame.args[0] as WidgetChatListActions.Model).message
 
                     val binding = getBinding.invoke(callFrame.thisObject) as WidgetChatListActionsBinding
-                    val quickStar = binding.a.findViewById<TextView>(textReactId).apply {
+                    val textReact = binding.a.findViewById<TextView>(textReactId).apply {
                         visibility = if ((callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
                     }
 
-                    if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener {
+                    if (!textReact.hasOnClickListeners()) textReact.setOnClickListener {
                         try {
                             val fragmentManager = (callFrame.thisObject as WidgetChatListActions).parentFragmentManager
                             val inDialog = InputDialog()

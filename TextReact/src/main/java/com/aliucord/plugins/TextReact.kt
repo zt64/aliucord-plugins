@@ -62,7 +62,6 @@ class TextReact : Plugin() {
                                         .setDescription("Warning: The given input could not be 100% translated to reactions, do you still want to continue?")
                                     coDialog.setOnOkListener {
                                         coDialog.dismiss()
-                                        Utils.showToast(context, "Sending the reactions...")
                                         result.first.forEach { emoji ->
                                             addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
                                             Thread.sleep(1000)
@@ -73,7 +72,6 @@ class TextReact : Plugin() {
                                     }
                                     coDialog.show(fragmentManager, "bbbbbb")
                                 } else {
-                                    Utils.showToast(context, "Sending the reactions...")
                                     result.first.forEach { emoji ->
                                         addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
                                         Thread.sleep(1000)

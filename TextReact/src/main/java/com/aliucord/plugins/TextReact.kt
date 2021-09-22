@@ -62,20 +62,28 @@ class TextReact : Plugin() {
                                         .setDescription("Warning: The given input could not be 100% translated to reactions, do you still want to continue?")
                                     coDialog.setOnOkListener {
                                         coDialog.dismiss()
-                                        result.first.forEach { emoji ->
-                                            addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
-                                            Thread.sleep(1000)
+                                        Utils.threadPool.execute {
+                                           result.first.forEach { emoji ->
+                                               addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
+                                                   Thread.sleep(1000)
+                                               }
                                         }
+                                        Utils.showToast(context, "Finished adding the reactions!")
+                                        
                                     }
                                     coDialog.setOnCancelListener {
+                                        coDialog.dismiss()
                                         Utils.showToast(context, "Action cancelled by the user.")
                                     }
                                     coDialog.show(fragmentManager, "bbbbbb")
                                 } else {
-                                    result.first.forEach { emoji ->
-                                        addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
-                                        Thread.sleep(1000)
-                                    }
+                                    Utils.threadPool.execute {
+                                           result.first.forEach { emoji ->
+                                               addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
+                                               Thread.sleep(1000)
+                                           }
+                                     }
+                                     Utils.showToast(context, "Finished adding the reactions!")
                                 }
                             }
                             (callFrame.thisObject as WidgetChatListActions).dismiss()

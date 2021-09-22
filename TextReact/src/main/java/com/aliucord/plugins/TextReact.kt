@@ -21,6 +21,7 @@ import com.lytefast.flexinput.R
 import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 import com.aliucord.plugins.textReactHelper.helper
+import com.discord.app.AppDialog;
 
 
 @AliucordPlugin
@@ -51,6 +52,7 @@ class TextReact : Plugin() {
                                 .setPlaceholderText("Enter text...")
                             inDialog.setOnOkListener {
                                 val result = helper().generateEmojiArray(inDialog.input.toString().trim())
+                                
                                 Utils.showToast(context, "${result.first}")
                                 inDialog.dismiss()
                             }

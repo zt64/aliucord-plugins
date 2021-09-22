@@ -46,6 +46,7 @@ class TextReact : Plugin() {
 
                     if (!quickStar.hasOnClickListeners()) quickStar.setOnClickListener {
                         try {
+                            val fragmentManager = (callFrame.thisObject as WidgetChatListActions).parentFragmentManager
                             val inDialog = InputDialog()
                                 .setTitle("Text react!")
                                 .setDescription("Enter some text to send as reactions.")
@@ -68,10 +69,9 @@ class TextReact : Plugin() {
                                         }
                                     }
                                     coDialog.setOnCancelListener {
-                                        coDialog.dismiss()
                                         Utils.showToast(context, "Action cancelled by the user.")
                                     }
-                                    coDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "bbbbbb")
+                                    coDialog.show(fragmentManager, "bbbbbb")
                                 } else {
                                     Utils.showToast(context, "Sending the reactions...")
                                     result.first.forEach { emoji ->
@@ -81,7 +81,7 @@ class TextReact : Plugin() {
                                 }
                             }
                             (callFrame.thisObject as WidgetChatListActions).dismiss()
-                            inDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "aaaaaa")
+                            inDialog.show(fragmentManager, "aaaaaa")
                         } catch (e: IllegalAccessException) {
                             e.printStackTrace()
                         } catch (e: InvocationTargetException) {

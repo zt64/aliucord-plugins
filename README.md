@@ -1,4 +1,5 @@
 ## Plugins for [Aliucord](https://github.com/Aliucord)
+Fork of https://github.com/zt64/aliucord-plugins for preconfigured kotlin support.
 
 Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
 - [TextReact](https://github.com/ArjixWasTaken/aliucord-plugins/raw/builds/TextReact.zip)

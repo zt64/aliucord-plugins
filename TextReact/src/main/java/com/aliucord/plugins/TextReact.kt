@@ -58,13 +58,11 @@ class TextReact : Plugin() {
                                 inDialog.dismiss()
                                 result.first.forEach { emoji ->
                                     Thread.sleep(1000)
-                                    Utils.showToast(context, "${StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!}")
+                                    addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
                                 }
                             }
                             (callFrame.thisObject as WidgetChatListActions).dismiss()
                             inDialog.show((callFrame.thisObject as WidgetChatListActions).parentFragmentManager, "aaaaaa")
-
-                            // addReaction.invoke(callFrame.thisObject, StoreStream.getEmojis().unicodeEmojisNamesMap["star"])
                         } catch (e: IllegalAccessException) {
                             e.printStackTrace()
                         } catch (e: InvocationTargetException) {

@@ -58,7 +58,7 @@ class TextReact : Plugin() {
                                 inDialog.dismiss()
                                 result.first.forEach { emoji ->
                                     Thread.sleep(1000)
-                                    addReaction(StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!)
+                                    Utils.showToast(context, "${StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji]!!}")
                                 }
                             }
                             (callFrame.thisObject as WidgetChatListActions).dismiss()

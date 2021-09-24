@@ -1,27 +1,50 @@
 package com.aliucord.plugins
 
 import android.content.Context
+import android.util.Base64
+import com.aliucord.Logger
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.CommandsAPI.CommandResult
 import com.aliucord.entities.Plugin
 import com.aliucord.utils.ReflectUtils
+import com.discord.api.commands.ApplicationCommandType
+import com.discord.models.commands.ApplicationCommandOption
 import com.discord.stores.StoreStream
 
 @AliucordPlugin
 class Token : Plugin() {
     override fun start(context: Context) {
-        commands.registerCommand("token", "Tells you your token", emptyList()) {
-            try {
-                val token = ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?
-                return@registerCommand CommandResult("```\n$token```", null, false)
-            } catch (e: NoSuchFieldException) {
-                e.printStackTrace()
-                return@registerCommand CommandResult("Uh oh, failed to get token", null, false)
-            } catch (e: IllegalAccessException) {
-                e.printStackTrace()
-                return@registerCommand CommandResult("Uh oh, failed to get token", null, false)
-            }
+        val options = listOf(
+                ApplicationCommandOption(ApplicationCommandType.BOOLEAN, "send", "Send visible to everyone", null, false, true, null, null)
+        )
+
+        commands.registerCommand("token", "Tells you your token", options) {
+            if (it.getBoolOrDefault("send", false)) {
+                CommandResult(genFakeToken(), null, true)
+            } else
+                try {
+                    val token = ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?
+                    CommandResult("```\n$token```", null, false)
+                } catch (e: ReflectiveOperationException) {
+                    Logger("Token").error(e)
+                    CommandResult("Uh oh, failed to get token", null, false)
+                }
         }
+    }
+
+    // imagine if this somehow generates the actual token that'd be pretty funny dont u think
+    private fun genFakeToken(): String {
+        val id = StoreStream.getUsers().me.id.toString().toByteArray(Charsets.UTF_8)
+        val sb = StringBuilder(Base64.encodeToString(id, Base64.DEFAULT).removeSuffix("\n")).append('.')
+
+        val chars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + '_' + '-'
+
+        for (i in 1..7 + 27) {
+            if (i == 8) sb.append('.')
+            else sb.append(chars.random())
+        }
+
+        return sb.toString()
     }
 
     override fun stop(context: Context) = commands.unregisterAll()

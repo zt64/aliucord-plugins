@@ -14,7 +14,7 @@ class helper {
             "b" to arrayListOf("\uD83C\uDDE7", "\uD83C\uDD71"),
             "c" to arrayListOf("\uD83C\uDDE8", "©"),
             "d" to arrayListOf("\uD83C\uDDE9"),
-            "e" to arrayListOf("\uD83C\uDDEA", "\uD83D\uDCE7"),
+            "e" to arrayListOf("\uD83C\uDDEA", "\uD83D\uDCE7", "🎼"),
             "f" to arrayListOf("\uD83C\uDDEB"),
             "g" to arrayListOf("\uD83C\uDDEC"),
             "h" to arrayListOf("\uD83C\uDDED", "♓"),

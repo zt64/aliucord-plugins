@@ -48,7 +48,7 @@ class TextReact : Plugin() {
                         try {
                             val fragmentManager = (callFrame.thisObject as WidgetChatListActions).parentFragmentManager
                             val inDialog = InputDialog()
-                                .setTitle("Text react!")
+                                .setTitle("Text React!")
                                 .setDescription("Enter some text to send as reactions.")
                                 .setPlaceholderText("Enter text...")
                             inDialog.setOnOkListener {
@@ -58,7 +58,7 @@ class TextReact : Plugin() {
                                 if (result.second) {
                                     // show prompt that the text is incomplete
                                     val coDialog = ConfirmDialog()
-                                        .setTitle("Text react!")
+                                        .setTitle("Text React!")
                                         .setDescription("Warning: The given input could not be 100% translated to reactions, do you still want to continue?")
                                     coDialog.setOnOkListener {
                                         coDialog.dismiss()
@@ -103,7 +103,7 @@ class TextReact : Plugin() {
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
                 val textReact = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
-                    text = "Text react"
+                    text = "Text React"
                     id = textReactId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }

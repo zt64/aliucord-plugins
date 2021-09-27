@@ -39,7 +39,7 @@ class Token : Plugin() {
 
         val chars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + '_' + '-'
 
-        for (i in 1..7 + 27) {
+        for (i in 1..7 + 28) {
             if (i == 8) sb.append('.')
             else sb.append(chars.random())
         }

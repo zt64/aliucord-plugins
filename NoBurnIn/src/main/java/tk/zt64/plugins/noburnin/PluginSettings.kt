@@ -28,7 +28,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
 
         val extraSettings = listOf(
                 addCheckedSetting("Channel Icon", "Whether the channel icon is hidden", "hideChannelIcon", false),
-                addCheckedSetting("Toolbar Title", "Whether the toolbar title is hidden", "hideTitle", false),
+                addCheckedSetting("Toolbar Text", "Whether the toolbar text is hidden", "hideText", false),
                 addCheckedSetting("Unread Counter", "Whether the unread counter is hidden", "hideUnread", true),
                 addCheckedSetting("Drawer Button", "Whether the drawer button is hidden", "hideDrawerButton", true),
                 addCheckedSetting("Threads Button", "Whether the threads button is hidden", "hideThreadsButton", true),

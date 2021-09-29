@@ -78,7 +78,12 @@ class PluginSettings(private val settingsAPI: SettingsAPI) : SettingsPage() {
         addView(timeoutSection)
         addView(Divider(ctx))
 
-        val radios = listOf(Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.RADIO, "Status bar", null), Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.RADIO, "Navigation bar", null), Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.RADIO, "Both bars", null))
+        val radios = listOf(
+                Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.RADIO, "Status bar", null),
+                Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.RADIO, "Navigation bar", null),
+                Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.RADIO, "Both bars", null)
+        )
+
         val radioManager = RadioManager(radios)
         val radioGroup = RadioGroup(ctx).apply { visibility = if (settingsAPI.getBool("immersiveModeState", true)) View.VISIBLE else View.GONE }
         for (i in radios.indices) {
@@ -91,7 +96,7 @@ class PluginSettings(private val settingsAPI: SettingsAPI) : SettingsPage() {
             if (i == settingsAPI.getInt("immersiveModeType", 0)) radioManager.a(radio)
         }
 
-        addView(createCheckedSetting(ctx, "Immersive mode", "Hide the status bar, navigation bar, " + "or both when viewing media", "immersiveModeState", false).apply {
+        addView(createCheckedSetting(ctx, "Immersive mode", "Hide the status bar, navigation bar, or both when viewing media", "immersiveModeState", false).apply {
             setOnCheckedListener {
                 settingsAPI.setBool("immersiveModeState", it)
                 radioGroup.visibility = if (it) View.VISIBLE else View.GONE

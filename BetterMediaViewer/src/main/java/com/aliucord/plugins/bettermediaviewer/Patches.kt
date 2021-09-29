@@ -23,6 +23,7 @@ import com.discord.widgets.media.WidgetMedia
 import com.discord.widgets.media.`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`
 import com.discord.widgets.media.`WidgetMedia$showControls$1`
 import com.discord.widgets.media.`WidgetMedia$showControls$2`
+import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.material.appbar.AppBarLayout
 import top.canyie.pine.callback.MethodReplacement
 import java.util.concurrent.TimeUnit
@@ -32,10 +33,15 @@ class Patches(private val patcher: PatcherAPI) {
 
     fun patchMenu() {
         val downloadManager = Utils.appContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val shareItemId = Utils.getResId("menu_media_share", "id")
+        val browserItemId = Utils.getResId("menu_media_browser", "id")
+        val appBarLayoutId = Utils.getResId("action_bar_toolbar_layout", "id")
+
         patcher.patch(WidgetMedia::class.java.getDeclaredMethod("onViewBoundOrOnResume"), PinePatchFn {
             val ctx = Utils.appContext
             val widgetMedia = it.thisObject as WidgetMedia
-            val menu = (widgetMedia.binding.root.findViewById<AppBarLayout>(Utils.getResId("action_bar_toolbar_layout", "id")).getChildAt(0) as Toolbar).menu
+            val menu = (widgetMedia.binding.root.findViewById<AppBarLayout>(appBarLayoutId).getChildAt(0) as Toolbar).menu
+
             with(menu, {
 //                findItem(Utils.getResId("menu_media_download", "id")).setOnMenuItemClickListener {
 //                    val uri = Uri.parse(settingsAPI?.getString("downloadDir", ctx.getExternalFilesDir("Downloads")
@@ -49,29 +55,20 @@ class Patches(private val patcher: PatcherAPI) {
 //                    false
 //                }
 
-                findItem(Utils.getResId("menu_media_share", "id"))?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-
-                with(Utils.getResId("menu_media_browser", "id"), {
-                    if (settingsAPI.getBool("showOpenInBrowser", true)) {
-                        findItem(this)?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-                    } else {
-                        removeItem(this)
-                    }
-                })
+                findItem(shareItemId)?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                findItem(browserItemId)?.isVisible = settingsAPI.getBool("showOpenInBrowser", true)
             })
         })
     }
 
     fun patchControls() {
+        val playerControlViewId = Utils.getResId("media_player_control_view", "id")
         patcher.patch(WidgetMedia::class.java.getDeclaredMethod("showControls"), PineInsteadFn {
             with(it.thisObject as WidgetMedia) {
                 if (settingsAPI.getBool("autoHideControls", true)) {
-                    binding.f.h()
-                    controlsVisibilitySubscription?.unsubscribe()
+                    binding.root.findViewById<PlayerControlView>(playerControlViewId).h()
                     val timer = RxUtils.timer(settingsAPI.getInt("controlsTimeout", 3000).toLong(), TimeUnit.MILLISECONDS)
-                    ObservableExtensionsKt.`appSubscribe$default`(ObservableExtensionsKt.`ui$default`(timer, this, null, 2, null), WidgetMedia::class.java, null as Context?, `WidgetMedia$showControls$1`(this), null as Function1<*, *>?, null as Function0<*>?, null as Function0<*>?, `WidgetMedia$showControls$2`(this), 58, null as Any?)
-                } else {
-                    binding.f.c()
+                    ObservableExtensionsKt.`appSubscribe$default`(ObservableExtensionsKt.`ui$default`(timer, this, null, 2, null), WidgetMedia::class.java, null, `WidgetMedia$showControls$1`(this), null, null, null, `WidgetMedia$showControls$2`(this), 58, null)
                 }
 
                 val controlsAnimationAction2 = WidgetMedia.ControlsAnimationAction.SHOW
@@ -80,22 +77,23 @@ class Patches(private val patcher: PatcherAPI) {
                     controlsAnimator?.cancel()
 
                     with(ValueAnimator.ofFloat(getToolbarTranslationY(), 0.0f)) {
-                        configureAndStartControlsAnimationMethod(this)
+                        configureAndStartControlsAnimation(this)
                         controlsAnimator = this
                     }
                 }
             }
-
         })
     }
 
+    @Suppress("DEPRECATION")
     fun patchImmersiveMode() {
         patcher.patch(WidgetMedia::class.java.getDeclaredMethod("onViewBoundOrOnResume"), PinePatchFn {
             val root = (it.thisObject as WidgetMedia).binding.root
-            when (settingsAPI.getInt("immersiveModeType", 0)) {
-                0 -> root.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
-                1 -> root.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE
-                2 -> root.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE
+            root.systemUiVisibility = when (settingsAPI.getInt("immersiveModeType", 0)) {
+                0 -> View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
+                1 -> View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE
+                2 -> View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE
+                else -> return@PinePatchFn
             }
         })
     }

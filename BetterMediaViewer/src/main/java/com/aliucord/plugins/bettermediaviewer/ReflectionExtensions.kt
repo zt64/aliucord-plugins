@@ -37,14 +37,14 @@ var WidgetMedia.controlsAnimationAction: WidgetMedia.ControlsAnimationAction
     get() = WidgetMedia.`access$getControlsAnimationAction$p`(this)
     set(v) = controlsAnimationActionField.set(this, v)
 
-private val getToolbarTranslationYMethod: Method =
+private val getToolbarTranslationY: Method =
         WidgetMedia::class.java.getDeclaredMethod("getToolbarTranslationY")
                 .apply { isAccessible = true }
-fun WidgetMedia.getToolbarTranslationY() = getToolbarTranslationYMethod.invoke(this) as Float
+fun WidgetMedia.getToolbarTranslationY() = getToolbarTranslationY.invoke(this) as Float
 
-private val configureAndStartControlsAnimationMethod: Method =
+private val configureAndStartControlsAnimation: Method =
         WidgetMedia::class.java.getDeclaredMethod("configureAndStartControlsAnimation", ValueAnimator::class.java)
                 .apply { isAccessible = true }
-fun WidgetMedia.configureAndStartControlsAnimationMethod(valueAnimator: ValueAnimator): Any? = configureAndStartControlsAnimationMethod.invoke(this, valueAnimator)
+fun WidgetMedia.configureAndStartControlsAnimation(valueAnimator: ValueAnimator): Any? = configureAndStartControlsAnimation.invoke(this, valueAnimator)
 
 fun WidgetMedia.isVideo(): Boolean = WidgetMedia.`access$isVideo`(this)

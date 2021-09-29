@@ -26,7 +26,7 @@ class MediaSheet(private val widgetMedia: WidgetMedia) : BottomSheet() {
 
         val ctx = requireContext()
 
-        addView(createTextView(ctx, "Copy link", R.d.ic_link_white_24dp) {
+        addView(createTextView(ctx, "Copy URL", R.d.ic_link_white_24dp) {
             val parse = Uri.parse(widgetMedia.mostRecentIntent.getStringExtra("INTENT_MEDIA_URL"))
             Snackbar.make(widgetMedia.requireView(), "Copied to clipboard", Snackbar.LENGTH_SHORT).setAction("Dismiss") {
                 dismiss()

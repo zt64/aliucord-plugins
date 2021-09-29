@@ -33,7 +33,7 @@ val WidgetMedia.binding: WidgetMediaBinding
 
 private val controlsAnimationActionField: Field = WidgetMedia::class.java.getDeclaredField("controlsAnimationAction")
         .apply { isAccessible = true }
-var WidgetMedia.controlsAnimationAction
+var WidgetMedia.controlsAnimationAction: WidgetMedia.ControlsAnimationAction
     get() = WidgetMedia.`access$getControlsAnimationAction$p`(this)
     set(v) = controlsAnimationActionField.set(this, v)
 

@@ -1,2 +1,13 @@
-version = "1.1.0"
+version = "1.2.0"
 description = "Adds a variety of new features to the media viewer"
+
+aliucord {
+    changelog.set(
+        """
+                
+            # 1.2.0
+            * Support V96
+
+        """.trimIndent()
+    )
+}

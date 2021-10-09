@@ -1,4 +1,4 @@
-version = "1.2.1"
+version = "1.3.0"
 description = "Adds a token slash command to tell you your account token"
 
 aliucord {
@@ -6,6 +6,9 @@ aliucord {
 
     changelog.set(
             """
+                
+            # 1.3.0
+            * Support V96
                 
             # 1.2.0
             * Add 'send' option - Ven

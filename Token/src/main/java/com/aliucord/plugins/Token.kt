@@ -3,19 +3,19 @@ package com.aliucord.plugins
 import android.content.Context
 import android.util.Base64
 import com.aliucord.Logger
+import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.CommandsAPI.CommandResult
 import com.aliucord.entities.Plugin
 import com.aliucord.utils.ReflectUtils
 import com.discord.api.commands.ApplicationCommandType
-import com.discord.models.commands.ApplicationCommandOption
 import com.discord.stores.StoreStream
 
 @AliucordPlugin
 class Token : Plugin() {
     override fun start(context: Context) {
         val options = listOf(
-                ApplicationCommandOption(ApplicationCommandType.BOOLEAN, "send", "Send visible to everyone", null, false, true, null, null)
+                Utils.createCommandOption(ApplicationCommandType.BOOLEAN, "send", "Send visible to everyone")
         )
 
         commands.registerCommand("token", "Tells you your token", options) {

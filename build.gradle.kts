@@ -50,16 +50,6 @@ subprojects {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
         }
-
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "11"
-                freeCompilerArgs = freeCompilerArgs +
-                        "-Xno-call-assertions" +
-                        "-Xno-param-assertions" +
-                        "-Xno-receiver-assertions"
-            }
-        }
     }
 
     repositories {
@@ -70,10 +60,10 @@ subprojects {
 
     dependencies {
         val discord by configurations
-        val api by configurations
+        val compileOnly by configurations
 
         discord("com.discord:discord:aliucord-SNAPSHOT")
-        api("com.github.Aliucord:Aliucord:main-SNAPSHOT")
+        compileOnly("com.github.Aliucord:Aliucord:main-SNAPSHOT")
     }
 }
 

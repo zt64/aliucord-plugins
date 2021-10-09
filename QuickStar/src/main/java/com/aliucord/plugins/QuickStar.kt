@@ -11,7 +11,7 @@ import androidx.core.widget.NestedScrollView
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.Hook
 import com.discord.databinding.WidgetChatListActionsBinding
 import com.discord.models.domain.emoji.Emoji
 import com.discord.stores.StoreStream
@@ -21,9 +21,8 @@ import com.lytefast.flexinput.R
 
 @AliucordPlugin
 class QuickStar : Plugin() {
-    private val getBindingMethod = WidgetChatListActions::class.java.getDeclaredMethod("getBinding").apply {
-        isAccessible = true
-    }
+    private val getBindingMethod = WidgetChatListActions::class.java.getDeclaredMethod("getBinding")
+            .apply { isAccessible = true }
 
     private fun WidgetChatListActions.getBinding(): WidgetChatListActionsBinding =
             getBindingMethod.invoke(this) as WidgetChatListActionsBinding
@@ -37,21 +36,21 @@ class QuickStar : Plugin() {
         val quickStarId = View.generateViewId()
 
         with(WidgetChatListActions::class.java, {
-            patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn {
-                with (it.thisObject as WidgetChatListActions) {
+            patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), Hook {
+                with(it.thisObject as WidgetChatListActions) {
                     val root = getBinding().root.findViewById<LinearLayout>(Utils.getResId("dialog_chat_actions_container", "id"))
-                    val quickStar = root.findViewById<TextView>(quickStarId).apply {
-                        visibility = if ((it.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
-                    }
 
-                    quickStar.setOnClickListener {
-                        addReaction(StoreStream.getEmojis().unicodeEmojisNamesMap["star"]!!)
-                        dismiss()
+                    root.findViewById<TextView>(quickStarId).apply {
+                        visibility = if ((it.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
+                        setOnClickListener {
+                            addReaction(StoreStream.getEmojis().unicodeEmojisNamesMap["star"]!!)
+                            dismiss()
+                        }
                     }
                 }
             })
 
-            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn {
+            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook {
                 val linearLayout = (it.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
                 val ctx = linearLayout.context
 

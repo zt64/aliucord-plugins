@@ -9,7 +9,7 @@ import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.SettingsPage
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.Hook
 import com.aliucord.views.TextInput
 import com.discord.databinding.WidgetChatListBinding
 import com.discord.widgets.chat.list.WidgetChatList
@@ -53,7 +53,7 @@ class RotatedChat : Plugin() {
     }
 
     override fun start(context: Context) {
-        patcher.patch(WidgetChatList::class.java.getDeclaredMethod("configureUI", WidgetChatListModel::class.java), PinePatchFn {
+        patcher.patch(WidgetChatList::class.java.getDeclaredMethod("configureUI", WidgetChatListModel::class.java), Hook {
             with(it.thisObject as WidgetChatList) {
                 getBinding().root.rotation = settings.getFloat("degrees", 0f)
             }

@@ -18,25 +18,14 @@ class WeatherResponse(
         val windspeedMiles: String
     )
 
-    class WeatherDesc (
-        val value: String
-    )
-
     class NearestArea (
         val areaName: Array<AreaName>,
         val country: Array<Country>,
         val region: Array<Region>
     )
 
-    class AreaName (
-        val value: String
-    )
-
-    class Country (
-        val value: String
-    )
-
-    class Region (
-        val value: String
-    )
+    class WeatherDesc (val value: String)
+    class AreaName (val value: String)
+    class Country (val value: String)
+    class Region (val value: String)
 }

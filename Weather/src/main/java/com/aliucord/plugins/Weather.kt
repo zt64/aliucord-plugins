@@ -3,13 +3,13 @@ package com.aliucord.plugins
 import android.content.Context
 import com.aliucord.Http
 import com.aliucord.Logger
+import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.CommandsAPI.CommandResult
 import com.aliucord.entities.MessageEmbedBuilder
 import com.aliucord.entities.Plugin
 import com.aliucord.plugins.weather.WeatherResponse
 import com.discord.api.commands.ApplicationCommandType
-import com.discord.models.commands.ApplicationCommandOption
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.*
@@ -24,7 +24,8 @@ class Weather : Plugin() {
     private val windEmoji = "\uD83D\uDCA8"
 
     override fun start(context: Context) {
-        val arguments = listOf(ApplicationCommandOption(ApplicationCommandType.STRING, "location", "The location to query", null, false, true, null, null))
+        val arguments = listOf(Utils.createCommandOption(ApplicationCommandType.STRING, "location", "The location to query"))
+
         commands.registerCommand("weather", "Get the weather for the current location, or a specific location", arguments) {
             val location = it.getString("location")
             val weather: WeatherResponse = try {

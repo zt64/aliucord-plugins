@@ -4,7 +4,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.Hook
 import com.discord.widgets.notice.NoticePopup
 import tk.zt64.plugins.customnoticetime.PluginSettings
 
@@ -15,7 +15,7 @@ class CustomNoticeDuration: Plugin() {
     }
 
     override fun start(context: Context) {
-        patcher.patch(NoticePopup::class.java.getDeclaredMethod("getAutoDismissAnimator", Integer::class.javaObjectType, Function0::class.java), PinePatchFn {
+        patcher.patch(NoticePopup::class.java.getDeclaredMethod("getAutoDismissAnimator", Integer::class.javaObjectType, Function0::class.java), Hook {
             val result = it.result as ValueAnimator
             if (settings.getBool("autoDismissNotice", true))
                 result.duration = settings.getLong("noticeDuration", 5000)

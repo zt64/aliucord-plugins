@@ -13,7 +13,7 @@ import com.discord.stores.StoreStream
 @AliucordPlugin
 class DataSaver : Plugin() {
     private val storeUserSettings = StoreStream.getUserSettings()
-    private val connectivityManager = Utils.getAppContext().getSystemService(ConnectivityManager::class.java)
+    private val connectivityManager = Utils.appContext.getSystemService(ConnectivityManager::class.java)
     private val networkCallback: NetworkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
             with(connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)

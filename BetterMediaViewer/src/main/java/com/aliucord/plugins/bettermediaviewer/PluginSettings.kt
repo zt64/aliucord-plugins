@@ -113,7 +113,7 @@ class PluginSettings(private val settingsAPI: SettingsAPI) : SettingsPage() {
         addView(createCheckedSetting(ctx, "Show Open In Browser", "Shows the open in browser button on the toolbar", "showOpenInBrowser", true))
         addView(Divider(ctx))
         val downloadDir = TextView(ctx, null, 0, R.h.UiKit_TextView_Subtext).apply {
-            text = "Current Directory: " + settingsAPI.getString("downloadDir", Environment.getExternalStorageDirectory().absolutePath + "/Downloads")
+            text = "Current Directory: " + settingsAPI.getString("downloadDir", context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath)
         }
 
         if (launcher == null) launcher = requireActivity().registerForActivityResult(StartActivityForResult()) { res: ActivityResult ->

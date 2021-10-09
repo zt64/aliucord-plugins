@@ -6,7 +6,7 @@ import android.view.View
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.Hook
 import com.aliucord.utils.RxUtils.createActionSubscriber
 import com.aliucord.utils.RxUtils.subscribe
 import com.discord.models.domain.NonceGenerator
@@ -26,7 +26,7 @@ class RandomEmote : Plugin() {
             .map { it.reactionKey }
             .collect(Collectors.toList())
 
-        patcher.patch(FlexInputFragment::class.java.getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn {
+        patcher.patch(FlexInputFragment::class.java.getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook {
             (it.thisObject as FlexInputFragment).j().i.setOnLongClickListener {
                 val message = RestAPIParams.Message(
                         emojis[rand.nextInt(emojis.size)],

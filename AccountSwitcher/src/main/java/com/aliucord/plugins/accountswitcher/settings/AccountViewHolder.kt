@@ -18,9 +18,10 @@ import com.discord.utilities.color.ColorCompat
 import com.facebook.drawee.view.SimpleDraweeView
 import com.lytefast.flexinput.R
 
-class AccountViewHolder(private val adapter: AccountAdapter, layout: LinearLayout) : RecyclerView.ViewHolder(layout) {
+class AccountViewHolder(private val adapter: AccountAdapter, layout: LinearLayout, isSettings: Boolean) : RecyclerView.ViewHolder(layout) {
     val avatar: SimpleDraweeView
     val name: TextView
+    // val id: TextView
 
     init {
         val ctx = layout.context
@@ -50,26 +51,38 @@ class AccountViewHolder(private val adapter: AccountAdapter, layout: LinearLayou
             layout.addView(this)
         }
 
-        ToolbarButton(ctx).run {
-            setPadding(p, p, p * 4, p)
-            layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT)
-            ContextCompat.getDrawable(ctx, R.d.ic_edit_24dp)!!.mutate().let {
-                Utils.tintToTheme(it)
-                setImageDrawable(it, false)
-            }
-            setOnClickListener { adapter.onEdit(adapterPosition) }
-            layout.addView(this)
-        }
+//        id = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_SubText).apply {
+//            layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+//                weight = 0.6f
+//            }
+//            gravity = Gravity.CENTER_VERTICAL
+//            layout.addView(this)
+//        }
 
-        ToolbarButton(ctx).run {
-            setPadding(p * 4, p, p, p)
-            layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT)
-            ContextCompat.getDrawable(ctx, R.d.ic_delete_24dp)!!.mutate().let {
-                Utils.tintToTheme(it)
-                setImageDrawable(it, false)
+        if (isSettings) {
+            ToolbarButton(ctx).run {
+                setPadding(p, p, p * 4, p)
+                layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT)
+                ContextCompat.getDrawable(ctx, R.d.ic_edit_24dp)!!.mutate().let {
+                    Utils.tintToTheme(it)
+                    setImageDrawable(it, false)
+                }
+                setOnClickListener { adapter.onEdit(adapterPosition) }
+                layout.addView(this)
             }
-            setOnClickListener { adapter.onRemove(adapterPosition) }
-            layout.addView(this)
+
+            ToolbarButton(ctx).run {
+                setPadding(p * 4, p, p, p)
+                layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT)
+                ContextCompat.getDrawable(ctx, R.d.ic_delete_24dp)!!.mutate().let {
+                    Utils.tintToTheme(it)
+                    setImageDrawable(it, false)
+                }
+                setOnClickListener { adapter.onRemove(adapterPosition) }
+                layout.addView(this)
+            }
+        } else {
+            layout.setOnClickListener { adapter.onClick(ctx, adapterPosition) }
         }
     }
 }

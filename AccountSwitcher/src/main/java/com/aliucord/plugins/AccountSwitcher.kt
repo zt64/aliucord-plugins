@@ -7,13 +7,13 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.PineInsteadFn
+import com.aliucord.patcher.InsteadHook
+import com.aliucord.plugins.accountswitcher.SwitcherPage
 import com.aliucord.plugins.accountswitcher.authToken
+import com.aliucord.plugins.accountswitcher.getAccounts
 import com.aliucord.plugins.accountswitcher.settings.PluginSettings
-import com.aliucord.plugins.accountswitcher.switchermodal.SwitcherModal
 import com.discord.stores.StoreStream
 import com.discord.widgets.settings.WidgetSettings
-import com.google.gson.reflect.TypeToken
 
 @AliucordPlugin
 class AccountSwitcher : Plugin() {
@@ -24,32 +24,22 @@ class AccountSwitcher : Plugin() {
     companion object {
         lateinit var mSettings: SettingsAPI
 
-        private val accountsType = TypeToken.getParameterized(LinkedHashMap::class.javaObjectType, String::class.javaObjectType, Long::class.javaObjectType).getType()
-
         val logger = Logger("AccountSwitcher")
-        var accounts: LinkedHashMap<String, Long>
-            get() = mSettings.getObject("accounts", LinkedHashMap(), accountsType)
-            set(v) = mSettings.setObject("accounts", v)
-
-        fun addAccount(token: String, id: Long) {
-            accounts = accounts.apply { put(token, id) }
-        }
-
-        fun removeAccount(token: String) {
-            accounts = accounts.apply { accounts.remove(token) }
-        }
     }
 
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         mSettings = settings
 
-        StoreStream.getUsers().fetchUsers(accounts.values.toList())
+        StoreStream.getUsers().fetchUsers(getAccounts().map { it.id })
 
-        patcher.patch(WidgetSettings::class.java.getDeclaredMethod("showLogoutDialog", Context::class.java), PineInsteadFn {
-            Utils.openPageWithProxy(Utils.appActivity, SwitcherModal(accounts.apply { remove(StoreStream.getAuthentication().authToken) }))
+        patcher.patch(WidgetSettings::class.java.getDeclaredMethod("showLogoutDialog", Context::class.java), InsteadHook {
+            Utils.openPageWithProxy(Utils.appActivity, SwitcherPage(getAccounts().apply {
+                removeIf { it.token == StoreStream.getAuthentication().authToken }
+            }))
         })
 
+        // Eventually add a switcher button to the login page
 //        patcher.patch(WidgetAuthLanding::class.java.getDeclaredMethod("onViewBound", View::class.java), PinePatchFn {
 //            val ctx = (it.thisObject as WidgetAuthLanding).requireContext()
 //            val view = it.args[0] as RelativeLayout

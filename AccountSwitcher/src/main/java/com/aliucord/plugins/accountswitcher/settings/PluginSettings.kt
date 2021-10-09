@@ -4,21 +4,25 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aliucord.Utils
 import com.aliucord.api.SettingsAPI
 import com.aliucord.fragments.SettingsPage
-import com.aliucord.plugins.AccountSwitcher
+import com.aliucord.plugins.accountswitcher.SwitcherPage
 import com.aliucord.plugins.accountswitcher.authToken
+import com.aliucord.plugins.accountswitcher.getAccounts
 import com.aliucord.utils.DimenUtils
 import com.aliucord.views.Button
 import com.aliucord.views.Divider
 import com.discord.stores.StoreStream
+import com.lytefast.flexinput.R
 
 class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
     @SuppressLint("SetTextI18n")
@@ -28,9 +32,20 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
         setActionBarTitle("Account Switcher")
 
         val ctx = requireContext()
+        val accountAdapter = AccountAdapter(this@PluginSettings, getAccounts())
 
-        val recycler = RecyclerView(ctx).apply {
-            adapter = AccountAdapter(this@PluginSettings, AccountSwitcher.accounts)
+        headerBar.menu.add("Switcher")
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                .setIcon(Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.d.ic_my_account_24dp)!!.mutate()))
+                .setOnMenuItemClickListener {
+                    Utils.openPageWithProxy(ctx, SwitcherPage(getAccounts().apply {
+                        removeIf { it.token == StoreStream.getAuthentication().authToken}
+                    }))
+                    false
+                }
+
+        RecyclerView(ctx).apply {
+            adapter = accountAdapter
             layoutManager = LinearLayoutManager(ctx)
             layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
                 weight = 1f
@@ -51,19 +66,19 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
         addView(Button(ctx).apply {
             text = "Add Account"
             setOnClickListener {
-                AccountDialog(recycler.adapter as AccountAdapter).show(parentFragmentManager, "Add Account")
+                AccountDialog(accountAdapter).show(parentFragmentManager, "Add Account")
             }
         })
 
         if (StoreStream.getAuthentication().isAuthed) {
             val token = StoreStream.getAuthentication().authToken
 
-            if (!AccountSwitcher.accounts.containsKey(token)) {
+            if (getAccounts().none { it.token == token }) {
                 addView(Button(ctx).apply {
                     text = "Add Current Account"
                     setOnClickListener {
-                        AccountSwitcher.addAccount(token, StoreStream.getUsers().me.id)
-                        Utils.showToast(context, "Added Current Account")
+                        accountAdapter.addAccount(token, StoreStream.getUsers().me.id)
+                        Utils.showToast("Added Current Account")
                         linearLayout.removeView(this)
                     }
                 })

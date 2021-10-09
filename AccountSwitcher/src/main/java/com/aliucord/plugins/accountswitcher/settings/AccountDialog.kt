@@ -1,18 +1,18 @@
 package com.aliucord.plugins.accountswitcher.settings
 
 import android.content.res.ColorStateList
-import android.text.Editable
-import android.text.TextWatcher
+import android.text.*
 import android.view.View
 import com.aliucord.Utils
 import com.aliucord.fragments.InputDialog
-import com.aliucord.plugins.AccountSwitcher
+import com.aliucord.plugins.accountswitcher.Account
 import com.aliucord.plugins.accountswitcher.fetchUser
+import com.discord.stores.StoreStream
 import com.lytefast.flexinput.R
 import java.util.regex.Pattern
 
-class AccountDialog(private val adapter: AccountAdapter, private val token: String? = null): InputDialog() {
-    private val accounts = adapter.accounts.apply { remove(token) }
+class AccountDialog(private val adapter: AccountAdapter, private val account: Account? = null): InputDialog() {
+    private val token = account?.token
 
     private val buttonStates = arrayOf(
             intArrayOf(android.R.attr.state_enabled), // enabled
@@ -32,18 +32,22 @@ class AccountDialog(private val adapter: AccountAdapter, private val token: Stri
         setOnOkListener {
             val inputToken = input.trim()
 
-            if (accounts.containsKey(inputToken)) {
-                return@setOnOkListener Utils.showToast(context, "An account with this token already exists")
+            if (adapter.accounts.any { it != account && it.token == inputToken }) {
+                return@setOnOkListener Utils.showToast("An account with this token already exists")
             }
 
+            if (account?.token == inputToken) return@setOnOkListener dismiss()
+
             Utils.threadPool.execute {
-                if (token == inputToken) return@execute dismiss()
-                val id = fetchUser(inputToken)?.id ?: return@execute Utils.showToast(Utils.appContext, "Invalid Token")
+                val user = fetchUser(inputToken) ?: return@execute Utils.showToast("Invalid token")
 
-                if (token != null) AccountSwitcher.removeAccount(token)
+                if (user.isBot) return@execute Utils.showToast("Bot tokens cannot be used")
+                if (account?.token != null) adapter.removeAccount(account.token)
 
-                AccountSwitcher.addAccount(inputToken, id)
-                Utils.mainThread.post { adapter.notifyItemChanged(accounts.keys.indexOf(inputToken)) }
+                adapter.addAccount(inputToken, user.id)
+                StoreStream.getUsers().fetchUsers(listOf(user.id))
+
+                Utils.mainThread.post { adapter.notifyItemChanged(adapter.accounts.indexOfFirst { it.token == inputToken }) }
 
                 dismiss()
             }
@@ -71,5 +75,6 @@ class AccountDialog(private val adapter: AccountAdapter, private val token: Stri
                 okButton.isEnabled = pattern.matcher(s?.trim().toString()).matches()
             }
         })
+        inputLayout.editText?.inputType = InputType.TYPE_CLASS_TEXT
     }
 }

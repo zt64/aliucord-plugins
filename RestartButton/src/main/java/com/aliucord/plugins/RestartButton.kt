@@ -16,7 +16,10 @@ class RestartButton : Plugin() {
     override fun start(context: Context) {
         val icon = ContextCompat.getDrawable(context, com.yalantis.ucrop.R.c.ucrop_rotate)?.mutate()
 
-        patcher.patch(WidgetSettings::class.java.getDeclaredMethod("onTabSelected"), Hook {
+        // Might fix restart button not showing up for some users
+        patcher.patch(WidgetSettings::class.java.getDeclaredMethod("onTabSelected"), Hook { })
+
+        patcher.patch(WidgetSettings::class.java.getDeclaredMethod("configureToolbar"), Hook {
             with(it.thisObject as WidgetSettings) {
                 icon?.setTint(ColorCompat.getThemedColor(requireContext(), R.b.colorInteractiveNormal))
 

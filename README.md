@@ -34,7 +34,7 @@ Click on a plugin name to download, and then move the downloaded file to the `Al
 - [CharCounter](https://github.com/zt64/aliucord-plugins/raw/builds/CharCounter.zip)
   Adds a character counter to the chat input box, with support for nitro char limit
 
-- [DataSaver](https://github.com/zt64/aliucord-plugins/raw/builds/DataSaver.zip)
+- [DisablePreviewsOnData](https://github.com/zt64/aliucord-plugins/raw/builds/DisablePreviewsOnData.zip)
   Disables media previews when on mobile data to limit data usage. Consider disabling `Sync across clients` in your `Text & Images` settings so that it doesn't sync to other devices
 
 - [RotatedChat](https://github.com/zt64/aliucord-plugins/raw/builds/RotatedChat.zip)

@@ -11,7 +11,7 @@ import com.aliucord.entities.Plugin
 import com.discord.stores.StoreStream
 
 @AliucordPlugin
-class DataSaver : Plugin() {
+class DisablePreviewsOnData : Plugin() {
     private val storeUserSettings = StoreStream.getUserSettings()
     private val connectivityManager = Utils.appContext.getSystemService(ConnectivityManager::class.java)
     private val networkCallback: NetworkCallback = object : NetworkCallback() {

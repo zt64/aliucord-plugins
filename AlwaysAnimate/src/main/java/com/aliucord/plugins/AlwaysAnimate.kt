@@ -10,6 +10,7 @@ import android.widget.ImageView
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.Hook
+import com.aliucord.patcher.PreHook
 import com.aliucord.plugins.alwaysanimate.PluginSettings
 import com.aliucord.utils.DimenUtils
 import com.discord.models.presence.Presence
@@ -30,13 +31,13 @@ class AlwaysAnimate : Plugin() {
         if (settings.getBool("batterySaver", false) && powerManager.isPowerSaveMode) return
 
         if (settings.getBool("guildIcons", true)) {
-            patcher.patch(IconUtils::class.java.getDeclaredMethod("getForGuild", Long::class.javaObjectType, String::class.javaObjectType, String::class.javaObjectType, Boolean::class.java, Int::class.javaObjectType), Hook {
+            patcher.patch(IconUtils::class.java.getDeclaredMethod("getForGuild", Long::class.javaObjectType, String::class.javaObjectType, String::class.javaObjectType, Boolean::class.java, Int::class.javaObjectType), PreHook {
                 it.args[3] = true
             })
         }
 
         if (settings.getBool("avatars", true)) {
-            patcher.patch(IconUtils::class.java.getDeclaredMethod("getForUser", Long::class.javaObjectType, String::class.javaObjectType, Int::class.javaObjectType, Boolean::class.javaPrimitiveType, Int::class.javaObjectType), Hook {
+            patcher.patch(IconUtils::class.java.getDeclaredMethod("getForUser", Long::class.javaObjectType, String::class.javaObjectType, Int::class.javaObjectType, Boolean::class.javaPrimitiveType, Int::class.javaObjectType), PreHook {
                 it.args[3] = true
             })
 
@@ -59,7 +60,7 @@ class AlwaysAnimate : Plugin() {
         }
 
         if (settings.getBool("status", true)) {
-            patcher.patch(PresenceUtils::class.java.getDeclaredMethod("getStatusDraweeSpanStringBuilder", Context::class.java, Presence::class.java, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType), Hook {
+            patcher.patch(PresenceUtils::class.java.getDeclaredMethod("getStatusDraweeSpanStringBuilder", Context::class.java, Presence::class.java, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType), PreHook {
                 it.args[5] = true
             })
         }

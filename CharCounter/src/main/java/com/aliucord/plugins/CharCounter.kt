@@ -33,6 +33,8 @@ class CharCounter : Plugin() {
                 id = View.generateViewId()
                 visibility = View.GONE
                 gravity = Gravity.CENTER_VERTICAL
+                setPadding(DimenUtils.dpToPx(4), 0, DimenUtils.dpToPx(8), 0)
+                maxLines = 1
                 layoutParams = ConstraintLayout.LayoutParams(WRAP_CONTENT, DimenUtils.dpToPx(24)).apply {
                     rightToRight = ConstraintLayout.LayoutParams.PARENT_ID
                     bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
@@ -42,11 +44,14 @@ class CharCounter : Plugin() {
                 root.addView(this)
             }
 
-            (root.findViewById<RelativeLayout>(Utils.getResId("chat_overlay_typing", "id"))
-                .layoutParams as ConstraintLayout.LayoutParams).apply {
-                    rightToLeft = counter!!.id
+            root.findViewById<RelativeLayout>(Utils.getResId("chat_overlay_typing", "id")).apply {
+                setPadding(DimenUtils.dpToPx(8), 0, DimenUtils.dpToPx(4), 0)
+                (layoutParams as ConstraintLayout.LayoutParams).apply {
                     width = WRAP_CONTENT
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    rightToLeft = counter!!.id
                 }
+            }
         })
 
         patcher.patch(AppFlexInputViewModel::class.java.getDeclaredMethod("onInputTextChanged", String::class.java, Boolean::class.javaObjectType), Hook {

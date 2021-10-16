@@ -8,10 +8,12 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.Hook
+import com.aliucord.plugins.charcounter.PluginSettings
 import com.aliucord.utils.DimenUtils
 import com.discord.api.premium.PremiumTier
 import com.discord.databinding.WidgetChatOverlayBinding
@@ -23,6 +25,10 @@ import com.lytefast.flexinput.R
 
 @AliucordPlugin
 class CharCounter : Plugin() {
+    init {
+        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+    }
+
     override fun start(context: Context) {
         var counter: TextView? = null
 
@@ -33,24 +39,21 @@ class CharCounter : Plugin() {
                 id = View.generateViewId()
                 visibility = View.GONE
                 gravity = Gravity.CENTER_VERTICAL
-                setPadding(DimenUtils.dpToPx(4), 0, DimenUtils.dpToPx(8), 0)
                 maxLines = 1
                 layoutParams = ConstraintLayout.LayoutParams(WRAP_CONTENT, DimenUtils.dpToPx(24)).apply {
-                    rightToRight = ConstraintLayout.LayoutParams.PARENT_ID
-                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    rightToRight = PARENT_ID
+                    bottomToBottom = PARENT_ID
                 }
+                setPadding(DimenUtils.dpToPx(8), 0, DimenUtils.dpToPx(8), 0)
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, root.resources.getDimension(Utils.getResId("uikit_textsize_small", "dimen")))
                 setBackgroundColor(ColorCompat.getThemedColor(root.context, R.b.primary_630))
                 root.addView(this)
             }
 
-            root.findViewById<RelativeLayout>(Utils.getResId("chat_overlay_typing", "id")).apply {
-                setPadding(DimenUtils.dpToPx(8), 0, DimenUtils.dpToPx(4), 0)
-                (layoutParams as ConstraintLayout.LayoutParams).apply {
-                    width = WRAP_CONTENT
-                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                    rightToLeft = counter!!.id
-                }
+            (root.findViewById<RelativeLayout>(Utils.getResId("chat_overlay_typing", "id")).layoutParams as ConstraintLayout.LayoutParams).apply {
+                startToStart = PARENT_ID
+                endToStart = counter!!.id
+                width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
             }
         })
 
@@ -59,7 +62,7 @@ class CharCounter : Plugin() {
             val maxChars = if (StoreStream.getUsers().me.premiumTier == PremiumTier.TIER_2) "4000" else "2000"
 
             counter?.apply {
-                visibility = if (str == "") View.GONE else View.VISIBLE
+                visibility = if (str.isEmpty() && !settings.getBool("alwaysVisible", false)) View.GONE else View.VISIBLE
                 text = String.format("%s/%s", str.length, maxChars)
             }
         })

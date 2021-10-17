@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.aliucord.Utils
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.plugins.accountswitcher.settings.AccountAdapter
 import com.aliucord.utils.DimenUtils
@@ -23,17 +24,9 @@ class SwitcherPage(private val accounts: ArrayList<Account>): SettingsPage() {
         super.onViewBound(view)
 
         setActionBarTitle("Account Switcher")
-        setActionBarSubtitle("${accounts.size} account(s)")
+        setActionBarSubtitle(Utils.pluralise(accounts.size, "account"))
 
         val ctx = requireContext()
-
-//        headerBar.menu.add("Settings")
-//                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
-//                .setIcon(Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.d.ic_settings_24dp)!!.mutate()))
-//                .setOnMenuItemClickListener {
-//                    Utils.openPageWithProxy(ctx, PluginSettings(AccountSwitcher.mSettings))
-//                    false
-//                }
 
         RecyclerView(ctx).apply {
             adapter = AccountAdapter(this@SwitcherPage, accounts, false)

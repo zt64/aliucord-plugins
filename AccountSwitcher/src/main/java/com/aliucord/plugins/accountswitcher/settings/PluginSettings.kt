@@ -31,18 +31,18 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
 
         setActionBarTitle("Account Switcher")
 
+        val accounts = getAccounts()
         val ctx = requireContext()
-        val accountAdapter = AccountAdapter(this@PluginSettings, getAccounts())
+        val accountAdapter = AccountAdapter(this@PluginSettings, accounts)
 
-        headerBar.menu.add("Switcher")
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
-                .setIcon(Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.d.ic_my_account_24dp)!!.mutate()))
-                .setOnMenuItemClickListener {
-                    Utils.openPageWithProxy(ctx, SwitcherPage(getAccounts().apply {
-                        removeIf { it.token == StoreStream.getAuthentication().authToken}
-                    }))
-                    false
-                }
+        headerBar.menu.add("Switcher").setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            .setIcon(Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.d.ic_my_account_24dp)!!.mutate()))
+            .setOnMenuItemClickListener {
+                Utils.openPageWithProxy(ctx, SwitcherPage(getAccounts().apply {
+                    removeIf { it.token == StoreStream.getAuthentication().authToken }
+                }))
+                false
+            }
 
         RecyclerView(ctx).apply {
             adapter = accountAdapter
@@ -77,8 +77,12 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
                 addView(Button(ctx).apply {
                     text = "Add Current Account"
                     setOnClickListener {
-                        accountAdapter.addAccount(token, StoreStream.getUsers().me.id)
-                        Utils.showToast("Added Current Account")
+                        if (getAccounts().any { it.token == token }) Utils.showToast("Account already added")
+                        else {
+                            accountAdapter.addAccount(token, StoreStream.getUsers().me.id)
+                            Utils.showToast("Added current account")
+                        }
+
                         linearLayout.removeView(this)
                     }
                 })

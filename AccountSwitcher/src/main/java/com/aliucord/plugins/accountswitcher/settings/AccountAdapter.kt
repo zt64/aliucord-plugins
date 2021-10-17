@@ -35,9 +35,11 @@ class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: AccountViewHolder, position: Int) = accounts[position].let {
         val user = StoreStream.getUsers().users[it.id]
-        holder.name.text = if (user == null) "Failed to load user" else {
+        holder.name.text = if (user == null) "Failed to load user" else
             UserUtils.INSTANCE.getUserNameWithDiscriminator(user, null, null)
-        }
+
+        holder.userId.text = "ID: ${user?.id.toString()}"
+
         IconUtils.setIcon(holder.avatar, user)
     }
 
@@ -65,6 +67,7 @@ class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList
             fetchUser(it.token) ?: return@execute Utils.showToast("Invalid token")
 
             StoreStream.getAuthentication().handleLoginResult(ModelLoginResult(false, null, it.token, null))
+
             Utils.mainThread.postDelayed({
                 val intent = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)
                 ctx.startActivity(Intent.makeRestartActivityTask(intent?.component))

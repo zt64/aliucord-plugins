@@ -21,7 +21,8 @@ import com.lytefast.flexinput.R
 class AccountViewHolder(private val adapter: AccountAdapter, layout: LinearLayout, isSettings: Boolean) : RecyclerView.ViewHolder(layout) {
     val avatar: SimpleDraweeView
     val name: TextView
-    // val id: TextView
+    private val info: LinearLayout
+    val userId: TextView
 
     init {
         val ctx = layout.context
@@ -37,27 +38,30 @@ class AccountViewHolder(private val adapter: AccountAdapter, layout: LinearLayou
         DimenUtils.dpToPx(8).let { layout.setPadding(it, it, it, it) }
 
         avatar = SimpleDraweeView(ctx).apply {
-            layoutParams = LinearLayout.LayoutParams(DimenUtils.dpToPx(48), DimenUtils.dpToPx(48))
+            layoutParams = LinearLayout.LayoutParams(DimenUtils.dpToPx(52), DimenUtils.dpToPx(52))
             clipToOutline = true
             background = ShapeDrawable(OvalShape()).apply { paint.color = Color.TRANSPARENT }
             layout.addView(this)
         }
 
         name = TextView(ctx, null, 0, R.h.UiKit_Settings_Item).apply {
+            setPadding(p, p, p, p)
+        }
+
+        userId = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_SubText).apply {
+            setPadding(p, p, p, p)
+        }
+
+        info = LinearLayout(ctx, null, 0, R.h.UiKit_Settings_Item).apply {
             layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                 weight = 0.6f
             }
+            orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_VERTICAL
+            addView(name)
+            addView(userId)
             layout.addView(this)
         }
-
-//        id = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_SubText).apply {
-//            layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
-//                weight = 0.6f
-//            }
-//            gravity = Gravity.CENTER_VERTICAL
-//            layout.addView(this)
-//        }
 
         if (isSettings) {
             ToolbarButton(ctx).run {

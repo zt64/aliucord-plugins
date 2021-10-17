@@ -23,18 +23,16 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
         if (token == null) {
             setTitle("Add Account")
             setDescription("Please input the account token")
-        } else {
+        } else
             setTitle("Edit Account")
-        }
 
         setPlaceholderText("Token")
 
         setOnOkListener {
             val inputToken = input.trim()
 
-            if (adapter.accounts.any { it != account && it.token == inputToken }) {
+            if (adapter.accounts.any { it != account && it.token == inputToken })
                 return@setOnOkListener Utils.showToast("An account with this token already exists")
-            }
 
             if (account?.token == inputToken) return@setOnOkListener dismiss()
 

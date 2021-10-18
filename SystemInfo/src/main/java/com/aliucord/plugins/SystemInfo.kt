@@ -2,33 +2,93 @@ package com.aliucord.plugins
 
 import android.app.ActivityManager
 import android.content.Context
-import android.os.Build
+import android.os.Build.*
+import android.os.Build.VERSION.*
 import android.os.SystemClock
 import android.text.format.DateUtils
+import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.CommandsAPI.CommandResult
 import com.aliucord.entities.MessageEmbedBuilder
 import com.aliucord.entities.Plugin
-import kotlin.math.ceil
+import com.discord.api.commands.ApplicationCommandType
+import java.io.File
+
+val Long.GB
+    get() = (this / 1e+9).toFixed()
+
+fun Double.toFixed() = "%.2f".format(this)
+
+val isRooted get() =
+    System.getenv("PATH")?.split(':')?.any {
+        File(it, "su").exists()
+    }
+
+fun getArch(): String {
+    SUPPORTED_ABIS.forEach {
+        when (it) {
+            "arm64-v8a" -> return "aarch64"
+            "armeabi-v7a" -> return "arm"
+            "x86_64" -> return "x86_64"
+            "x86" -> return "i686"
+        }
+    }
+    return System.getProperty("os.arch") ?: System.getProperty("ro.product.cpu.abi")
+    ?: "Unknown Architecture"
+}
 
 @AliucordPlugin
 class SystemInfo : Plugin() {
     override fun start(context: Context) {
-        val memInfo = ActivityManager.MemoryInfo()
-        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memInfo)
-        commands.registerCommand("system-info", "Get system information", emptyList()) {
-            val uptime = DateUtils.formatElapsedTime(SystemClock.elapsedRealtime() / 1000)
-            val embedBuilder = MessageEmbedBuilder().setColor(0x00FFA200)
-                .setTitle("System Information")
-                .addField("Brand:", Build.BRAND, true)
-                .addField("Product:", Build.PRODUCT, true)
-                .addField("Bootloader:", Build.BOOTLOADER, true)
-                .addField("Board:", Build.BOARD, true)
-                .addField("OS Version:", Build.VERSION.RELEASE, true)
-                .addField("OS Codename:", Build.VERSION.CODENAME, true)
-                .addField("Total Memory:", ceil(memInfo.totalMem / 1e+9).toString() + " GB", true)
-                .addField("Uptime:", uptime, true)
-            CommandResult(null, listOf(embedBuilder.build()), false)
+        commands.registerCommand(
+            "system-info",
+            "Get system information",
+            Utils.createCommandOption(ApplicationCommandType.BOOLEAN, "send", "send result visible to everyone")
+        ) {
+            val memInfo = ActivityManager.MemoryInfo()
+            (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memInfo)
+
+            val totalMem = memInfo.totalMem
+            val availMem = memInfo.availMem
+            val usedMem = totalMem - availMem
+            val percentAvail = ((availMem / totalMem.toDouble()) * 100).toFixed()
+
+            val info = linkedMapOf(
+                "Brand" to BRAND,
+                "Product" to PRODUCT,
+                "Board" to BOARD,
+                "Architecture" to getArch(),
+                "Bootloader" to BOOTLOADER,
+                "Rooted" to isRooted.toString(),
+                "OS Version" to "$CODENAME $RELEASE (SDK v${SDK_INT})",
+                "Memory Usage" to "${usedMem.GB}/${totalMem.GB}GB (${availMem.GB}GB / $percentAvail% free)",
+                "Uptime" to DateUtils.formatElapsedTime(SystemClock.elapsedRealtime() / 1000)
+            )
+
+            if (it.getBoolOrDefault("send", false)) {
+                StringBuilder("**__System Info:__**\n\n").run {
+                    info.forEach { (k, v) ->
+                        append("**")
+                        append(k)
+                        append(':')
+                        append("** ")
+                        append(v)
+                        append('\n')
+                    }
+
+                    CommandResult(toString(), null, true)
+                }
+            } else {
+                MessageEmbedBuilder().run {
+                    setColor(0x00FFA200)
+                    setTitle("System Info")
+                    info.forEach { (k, v) ->
+                        addField(k, v, true)
+                    }
+
+                    CommandResult(null, listOf(build()), false)
+                }
+            }
         }
     }
 

@@ -1,10 +1,13 @@
-version = "2.2.0"
+version = "2.3.0"
 description = "Adds many options to hide items from the top bar in an attempt to prevent screen burn-in"
 
 aliucord {
     changelog.set(
             """
-                
+            
+            # 2.3.0
+            * Made search button always shown in the members list
+            
             # 2.2.0
             * Support V96
             * Added option to hide search button

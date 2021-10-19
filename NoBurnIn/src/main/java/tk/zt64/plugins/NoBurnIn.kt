@@ -11,7 +11,9 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.Hook
+import com.aliucord.patcher.PreHook
 import com.discord.databinding.WidgetHomeBinding
+import com.discord.views.channelsidebar.GuildChannelSideBarActionsView
 import com.discord.widgets.home.WidgetHome
 import com.discord.widgets.home.WidgetHomeHeaderManager
 import com.discord.widgets.home.WidgetHomeModel
@@ -75,6 +77,11 @@ class NoBurnIn : Plugin() {
                     if (settings.getBool("hideVideoButton", true)) menu.findItem(videoButtonId)?.isVisible = false
                 }
             }
+        })
+
+        // Show the search button in members list instead of the threads button
+        patcher.patch(GuildChannelSideBarActionsView::class.java.getDeclaredMethod("a", Function1::class.java, Function1::class.java, Function1::class.java, Function1::class.java, Function1::class.java, Boolean::class.java, Boolean::class.java, Boolean::class.java, Boolean::class.java), PreHook {
+            it.args[8] = true
         })
     }
 

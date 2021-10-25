@@ -16,6 +16,8 @@ import com.aliucord.entities.Plugin
 import com.aliucord.patcher.Hook
 import com.aliucord.utils.DimenUtils
 import com.aliucord.views.Divider
+import com.discord.models.domain.emoji.ModelEmojiCustom
+import com.discord.models.domain.emoji.ModelEmojiUnicode
 import com.discord.stores.StoreStream
 import com.discord.widgets.user.WidgetUserSetCustomStatus
 import com.discord.widgets.user.WidgetUserSetCustomStatusViewModel
@@ -62,14 +64,16 @@ class CustomStatusPresets : Plugin() {
 
             rootView.findViewById<FloatingActionButton>(saveButtonId).setOnLongClickListener {
                 val formState = (WidgetUserSetCustomStatus.`access$getViewModel$p`(widgetUserSetCustomStatus).viewState as WidgetUserSetCustomStatusViewModel.ViewState.Loaded).formState
-                if (formState.emoji == null && formState.text.isEmpty())
-                    return@setOnLongClickListener false
 
-                val emoji = if (formState.emoji != null) {
-                    StoreStream.getEmojis().getCustomEmojiInternal(formState.emoji.uniqueId.toLong()).let { emoji ->
+                if (formState.emoji == null && formState.text.isEmpty()) return@setOnLongClickListener false
+
+                val emoji = when (formState.emoji) {
+                    is ModelEmojiUnicode -> UserStatusPresenceCustomView.Emoji(null, (formState.emoji as ModelEmojiUnicode).surrogates, false)
+                    is ModelEmojiCustom -> StoreStream.getEmojis().getCustomEmojiInternal(formState.emoji.uniqueId.toLong()).let { emoji ->
                         UserStatusPresenceCustomView.Emoji(emoji.id.toString(), emoji.name, emoji.isAnimated)
                     }
-                } else null
+                    else -> null
+                }
 
                 Utils.showToast("Added Current Status")
 

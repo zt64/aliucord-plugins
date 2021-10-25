@@ -69,7 +69,13 @@ class PresetAdapter(private val widgetUserSetCustomStatus: WidgetUserSetCustomSt
         with (WidgetUserSetCustomStatus.`access$getViewModel$p`(widgetUserSetCustomStatus)) {
             clearStatusTextAndEmoji()
             if (it.statusText != null) setStatusText(it.statusText)
-            if (it.emoji != null) setStatusEmoji(StoreStream.getEmojis().getCustomEmojiInternal(it.emoji.id.toLong()))
+            if (it.emoji != null)
+                setStatusEmoji(
+                    if (it.emoji.id == null)
+                        StoreStream.getEmojis().unicodeEmojiSurrogateMap[it.emoji.name]
+                    else
+                        StoreStream.getEmojis().getCustomEmojiInternal(it.emoji.id.toLong())
+                )
         }
     }
 

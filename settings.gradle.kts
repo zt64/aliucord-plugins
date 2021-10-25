@@ -1,5 +1,6 @@
 rootProject.name = "plugins"
 
+include(":CustomStatusPresets")
 include(":RestartButton")
 include(":FolderOpacity")
 include(":BetterMediaViewer")

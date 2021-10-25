@@ -1,6 +1,9 @@
 ## Plugins for [Aliucord](https://github.com/Aliucord)
 
 Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
+- [CustomStatusPresets](https://github.com/zt64/aliucord-plugins/raw/builds/CustomStatusPresets.zip)
+  Adds presets to the custom status menu. Long press on the save button to save a preset
+
 - [AccountSwitcher](https://github.com/zt64/aliucord-plugins/raw/builds/AccountSwitcher.zip)
   Adds an account switcher to the app, with a simple user interface to add and edit accounts. The switcher can be accessed through the logout button
   

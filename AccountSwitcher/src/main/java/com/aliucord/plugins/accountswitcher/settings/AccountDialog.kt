@@ -23,8 +23,7 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
         if (token == null) {
             setTitle("Add Account")
             setDescription("Please input the account token")
-        } else
-            setTitle("Edit Account")
+        } else setTitle("Edit Account")
 
         setPlaceholderText("Token")
 
@@ -37,13 +36,12 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
             if (account?.token == inputToken) return@setOnOkListener dismiss()
 
             Utils.threadPool.execute {
-                val user = fetchUser(inputToken) ?: return@execute Utils.showToast("Invalid token")
+                val userId = fetchUser(inputToken)?.id ?: return@execute Utils.showToast("Invalid token")
 
-                if (user.isBot) return@execute Utils.showToast("Bot tokens cannot be used")
                 if (account?.token != null) adapter.removeAccount(account.token)
 
-                adapter.addAccount(inputToken, user.id)
-                StoreStream.getUsers().fetchUsers(listOf(user.id))
+                adapter.addAccount(inputToken, userId)
+                StoreStream.getUsers().fetchUsers(listOf(userId))
 
                 Utils.mainThread.post { adapter.notifyItemChanged(adapter.accounts.indexOfFirst { it.token == inputToken }) }
 

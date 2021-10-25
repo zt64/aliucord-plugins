@@ -14,6 +14,7 @@ import com.aliucord.fragments.SettingsPage
 import com.aliucord.plugins.AccountSwitcher
 import com.aliucord.plugins.accountswitcher.Account
 import com.aliucord.plugins.accountswitcher.fetchUser
+import com.aliucord.plugins.accountswitcher.getAccounts
 import com.discord.models.domain.auth.ModelLoginResult
 import com.discord.stores.StoreStream
 import com.discord.utilities.icon.IconUtils
@@ -44,7 +45,7 @@ class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList
     }
 
     fun onEdit(position: Int) {
-        AccountDialog(this, accounts[position]).show(fragment.parentFragmentManager, "Edit Account")
+        AccountDialog(this, getAccounts()[position]).show(fragment.parentFragmentManager, "Edit Account")
     }
 
     fun onRemove(position: Int) = accounts[position].let { account ->

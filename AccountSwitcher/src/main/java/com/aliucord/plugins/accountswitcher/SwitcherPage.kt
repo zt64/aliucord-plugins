@@ -37,7 +37,7 @@ class SwitcherPage(private val accounts: ArrayList<Account>): SettingsPage() {
 
             addItemDecoration(DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {
                 setDrawable(ShapeDrawable(RectShape()).apply {
-                    intrinsicHeight = DimenUtils.getDefaultPadding()
+                    intrinsicHeight = DimenUtils.defaultPadding
                     setTint(Color.TRANSPARENT)
                 })
             })

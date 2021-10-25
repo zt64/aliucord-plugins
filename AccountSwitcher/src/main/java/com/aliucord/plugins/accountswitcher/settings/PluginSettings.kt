@@ -53,7 +53,7 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
 
             addItemDecoration(DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {
                 setDrawable(ShapeDrawable(RectShape()).apply {
-                    intrinsicHeight = DimenUtils.getDefaultPadding()
+                    intrinsicHeight = DimenUtils.defaultPadding
                     setTint(Color.TRANSPARENT)
                 })
             })
@@ -77,7 +77,8 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
                 addView(Button(ctx).apply {
                     text = "Add Current Account"
                     setOnClickListener {
-                        if (getAccounts().any { it.token == token }) Utils.showToast("Account already added")
+                        if (getAccounts().any { it.token == token })
+                            Utils.showToast("Account already added")
                         else {
                             accountAdapter.addAccount(token, StoreStream.getUsers().me.id)
                             Utils.showToast("Added current account")

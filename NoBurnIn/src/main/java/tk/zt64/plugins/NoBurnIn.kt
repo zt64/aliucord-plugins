@@ -3,10 +3,8 @@ package tk.zt64.plugins
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.aliucord.Logger
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
@@ -21,8 +19,6 @@ import tk.zt64.plugins.noburnin.PluginSettings
 
 @AliucordPlugin
 class NoBurnIn : Plugin() {
-    private val logger = Logger("NoBurnIn")
-
     init {
         settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
     }
@@ -48,20 +44,13 @@ class NoBurnIn : Plugin() {
 
         patcher.patch(WidgetHomeHeaderManager::class.java.getDeclaredMethod("configure", WidgetHome::class.java, WidgetHomeModel::class.java, WidgetHomeBinding::class.java), Hook {
             with(it.args[0] as WidgetHome) {
-                val menu = toolbar.menu
-
                 if (settings.getBool("hideToolbar", false)) {
                     toolbar.visibility = View.GONE
                     unreadCountView.visibility = View.GONE
                 } else {
-                    if (settings.getBool("hideChannelIcon", false)) {
-                        val root = actionBarTitleLayout?.i?.root
+                    val menu = toolbar.menu
 
-                        if (root == null)
-                            logger.warn("Unable to get binding for toolbar title, so the icon will not be hidden. Please let the plugin developer know")
-                        else
-                            root.findViewById<ImageView>(toolbarIconId)?.visibility = View.GONE
-                    }
+                    if (settings.getBool("hideChannelIcon", false)) actionBarTitleLayout.findViewById<View>(toolbarIconId)?.visibility = View.GONE
 
                     if (settings.getBool("hideText", false)) {
                         setActionBarTitle("")

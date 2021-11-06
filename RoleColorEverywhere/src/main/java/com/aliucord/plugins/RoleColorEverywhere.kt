@@ -66,6 +66,8 @@ class RoleColorEverywhere : Plugin() {
         val guildStore = StoreStream.getGuilds()
 
         if (settings.getBool("typingText", true)) {
+            val typingUsersTextViewId = Utils.getResId("chat_typing_users_typing", "id")
+
             patcher.patch(`ChatTypingModel$Companion$getTypingUsers$1$1`::class.java.getDeclaredMethod("call", Map::class.java, Map::class.java), Hook {
                 typingUsers.clear()
 
@@ -84,7 +86,7 @@ class RoleColorEverywhere : Plugin() {
 
             patcher.patch(WidgetChatOverlay.TypingIndicatorViewHolder::class.java.getDeclaredMethod("configureTyping", ChatTypingModel.Typing::class.java), Hook {
                 val binding = (it.thisObject as WidgetChatOverlay.TypingIndicatorViewHolder).binding
-                val textView = binding.root.findViewById<TextView>(Utils.getResId("chat_typing_users_typing", "id"))
+                val textView = binding.root.findViewById<TextView>(typingUsersTextViewId)
 
                 textView.apply {
                     text = SpannableString(text).apply {
@@ -134,13 +136,18 @@ class RoleColorEverywhere : Plugin() {
         }
 
         if (settings.getBool("voiceChannel", true)) {
+            val voiceUserNameId = Utils.getResId("channels_item_voice_user_name", "id")
+            val voiceUserListId = Utils.getResId("voice_user_list_item_user_name", "id")
+            val stageAudienceNameId = Utils.getResId("voice_user_list_item_user_name", "id")
+            val stageSpeakerNameId = Utils.getResId("stage_channel_audience_member_name", "id")
+
             patcher.patch(WidgetChannelsListAdapter.ItemVoiceUser::class.java.getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), Hook {
                 val channelListItemVoiceUser = it.args[1] as ChannelListItemVoiceUser
                 val color = channelListItemVoiceUser.computed.color
 
                 if (color != Color.BLACK) {
                     val root = (it.thisObject as WidgetChannelsListAdapter.ItemVoiceUser).binding.root
-                    root.findViewById<TextView>(Utils.getResId("channels_item_voice_user_name", "id")).setTextColor(color)
+                    root.findViewById<TextView>(voiceUserNameId).setTextColor(color)
                 }
             })
 
@@ -150,7 +157,7 @@ class RoleColorEverywhere : Plugin() {
 
                 if (color != Color.BLACK) {
                     val root = (it.thisObject as CallParticipantsAdapter.ViewHolderUser).binding.root
-                    root.findViewById<TextView>(Utils.getResId("voice_user_list_item_user_name", "id")).setTextColor(color)
+                    root.findViewById<TextView>(voiceUserListId).setTextColor(color)
                 }
             })
 
@@ -160,7 +167,7 @@ class RoleColorEverywhere : Plugin() {
 
                 if (color != Color.BLACK) {
                     val root = (it.thisObject as AudienceViewHolder).binding.root
-                    root.findViewById<TextView>(Utils.getResId("stage_channel_audience_member_name", "id")).setTextColor(color)
+                    root.findViewById<TextView>(stageAudienceNameId).setTextColor(color)
                 }
             })
 
@@ -170,31 +177,34 @@ class RoleColorEverywhere : Plugin() {
 
                 if (color != Color.BLACK) {
                     val root = (it.thisObject as SpeakerViewHolder).binding.root
-                    root.findViewById<TextView>(Utils.getResId("stage_channel_speaker_name", "id")).setTextColor(color)
+                    root.findViewById<TextView>(stageSpeakerNameId).setTextColor(color)
                 }
             })
         }
 
         if (settings.getBool("userMentionList", true)) {
+            val mentionNameId = Utils.getResId("chat_input_item_name", "id")
+
             patcher.patch(AutocompleteItemViewHolder::class.java.getDeclaredMethod("bindUser", UserAutocompletable::class.java), Hook {
                 val userAutocompletable = it.args[0] as UserAutocompletable
                 val color = userAutocompletable.guildMember?.color ?: return@Hook
 
                 if (color != Color.BLACK) {
                     val root = (it.thisObject as AutocompleteItemViewHolder).binding.root
-                    root.findViewById<TextView>(Utils.getResId("chat_input_item_name", "id")).setTextColor(color)
+                    root.findViewById<TextView>(mentionNameId).setTextColor(color)
                 }
             })
         }
 
         if (settings.getBool("profileName", true)) {
+            val usernameTextId = Utils.getResId("username_text", "id")
             patcher.patch(UserProfileHeaderView::class.java.getDeclaredMethod("configurePrimaryName", UserProfileHeaderViewModel.ViewState.Loaded::class.java), Hook {
                 val loaded = it.args[0] as UserProfileHeaderViewModel.ViewState.Loaded
                 val guildMember = loaded.guildMember ?: return@Hook
 
                 if (guildMember.color != Color.BLACK) {
                     val textView = UserProfileHeaderView.`access$getBinding$p`(it.thisObject as UserProfileHeaderView).root
-                            .findViewById<com.facebook.drawee.span.SimpleDraweeSpanTextView>(Utils.getResId("username_text", "id"))
+                            .findViewById<com.facebook.drawee.span.SimpleDraweeSpanTextView>(usernameTextId)
 
                     textView.apply {
                         val end = if (guildMember.nick == null && !settings.getBool("profileTag", true))
@@ -225,13 +235,16 @@ class RoleColorEverywhere : Plugin() {
         }
 
         if (settings.getBool("status", true)) {
+            val statusGameId = Utils.getResId("channel_members_list_item_game", "id")
+            val customStatusId = Utils.getResId("user_profile_header_custom_status", "id")
+
             patcher.patch(ChannelMembersListViewHolderMember::class.java.getDeclaredMethod("bind", ChannelMembersListAdapter.Item.Member::class.java, Function0::class.java), Hook {
                 val member = it.args[0] as ChannelMembersListAdapter.Item.Member
                 val color = member.color ?: return@Hook
 
                 if (color != Color.BLACK) {
                     val root = (it.thisObject as ChannelMembersListViewHolderMember).binding.root
-                    val textView = root.findViewById<SimpleDraweeSpanTextView>(Utils.getResId("channel_members_list_item_game", "id"))
+                    val textView = root.findViewById<SimpleDraweeSpanTextView>(statusGameId)
 
                     textView.mDraweeStringBuilder?.apply {
                         setSpan(ForegroundColorSpan(color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -240,12 +253,12 @@ class RoleColorEverywhere : Plugin() {
                 }
             })
 
-            patcher.patch(UserProfileHeaderView::class.java.getDeclaredMethod("updateViewState", UserProfileHeaderViewModel.ViewState.Loaded::class.java), Hook { callFrame ->
-                val guildMember = (callFrame.args[0] as UserProfileHeaderViewModel.ViewState.Loaded).guildMember ?: return@Hook
+            patcher.patch(UserProfileHeaderView::class.java.getDeclaredMethod("updateViewState", UserProfileHeaderViewModel.ViewState.Loaded::class.java), Hook {
+                val guildMember = (it.args[0] as UserProfileHeaderViewModel.ViewState.Loaded).guildMember ?: return@Hook
 
                 if (guildMember.color != Color.BLACK) {
-                    val textView = UserProfileHeaderView.`access$getBinding$p`(callFrame.thisObject as UserProfileHeaderView).root
-                            .findViewById<SimpleDraweeSpanTextView>(Utils.getResId("user_profile_header_custom_status", "id"))
+                    val textView = UserProfileHeaderView.`access$getBinding$p`(it.thisObject as UserProfileHeaderView).root
+                            .findViewById<SimpleDraweeSpanTextView>(customStatusId)
 
                     textView.mDraweeStringBuilder?.apply {
                         setSpan(ForegroundColorSpan(guildMember.color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)

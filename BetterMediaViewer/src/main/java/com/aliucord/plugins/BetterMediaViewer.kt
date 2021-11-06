@@ -19,11 +19,9 @@ class BetterMediaViewer : Plugin() {
 
     override fun start(context: Context) {
         with(Patches(patcher), {
-            patchMenu()
+            patchWidget()
             patchControls()
 
-            if (settings.getBool("immersiveModeState", false)) patchImmersiveMode()
-            if (settings.getBool("hideBackButton", false)) patchBackButton()
             if (settings.getBool("bottomToolbar", false)) patchToolbar()
             if (settings.getBool("removeZoomLimit", true)) patchZoomLimit()
         })

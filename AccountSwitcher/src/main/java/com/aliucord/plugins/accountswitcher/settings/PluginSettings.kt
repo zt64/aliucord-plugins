@@ -36,7 +36,7 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
         val accountAdapter = AccountAdapter(this@PluginSettings, accounts)
 
         headerBar.menu.add("Switcher").setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
-            .setIcon(Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.d.ic_my_account_24dp)!!.mutate()))
+            .setIcon(Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.e.ic_my_account_24dp)!!.mutate()))
             .setOnMenuItemClickListener {
                 Utils.openPageWithProxy(ctx, SwitcherPage(getAccounts().apply {
                     removeIf { it.token == StoreStream.getAuthentication().authToken }

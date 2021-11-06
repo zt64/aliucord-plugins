@@ -12,6 +12,7 @@ class BanCount: Plugin() {
     override fun start(context: Context) {
         patcher.patch(WidgetServerSettingsBans::class.java.getDeclaredMethod("configureUI", WidgetServerSettingsBans.Model::class.java), Hook {
             val model = it.args[0] as WidgetServerSettingsBans.Model
+
             with(it.thisObject as WidgetServerSettingsBans) {
                 actionBarTitleLayout.setSubtitle("${model.guildName} (${Utils.pluralise(model.totalBannedUsers, "ban")})")
             }

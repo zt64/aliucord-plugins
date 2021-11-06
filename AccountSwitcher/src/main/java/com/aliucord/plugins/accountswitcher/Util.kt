@@ -11,7 +11,7 @@ private val accountsType =
     TypeToken.getParameterized(ArrayList::class.java, Account::class.javaObjectType).getType()
 
 val StoreAuthentication.authToken: String
-    get() = this.`authToken$app_productionBetaRelease`
+    get() = this.`authToken$app_productionCanaryRelease`
 
 fun fetchUser(token: String): MeUser? = try {
     Http.Request("https://discord.com/api/v9/users/@me")

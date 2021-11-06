@@ -21,29 +21,26 @@ import com.lytefast.flexinput.R
 
 @AliucordPlugin
 class QuickStar : Plugin() {
-    private val getBindingMethod = WidgetChatListActions::class.java.getDeclaredMethod("getBinding")
-            .apply { isAccessible = true }
-
-    private fun WidgetChatListActions.getBinding(): WidgetChatListActionsBinding =
-            getBindingMethod.invoke(this) as WidgetChatListActionsBinding
-
-    private fun WidgetChatListActions.addReaction(emoji: Emoji) =
-            WidgetChatListActions.`access$addReaction`(this, emoji)
+    private val getBindingMethod = WidgetChatListActions::class.java.getDeclaredMethod("getBinding").apply { isAccessible = true }
+    private fun WidgetChatListActions.getBinding() = getBindingMethod.invoke(this) as WidgetChatListActionsBinding
+    private fun WidgetChatListActions.addReaction(emoji: Emoji) = WidgetChatListActions.`access$addReaction`(this, emoji)
 
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
-        val icon = ContextCompat.getDrawable(context, R.d.ic_star_24dp)
+        val actionsContainerId = Utils.getResId("dialog_chat_actions_container", "id")
         val quickStarId = View.generateViewId()
+        val starEmoji = StoreStream.getEmojis().unicodeEmojisNamesMap["star"]!!
+        val icon = ContextCompat.getDrawable(context, R.e.ic_star_24dp)
 
         with(WidgetChatListActions::class.java, {
             patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), Hook {
                 with(it.thisObject as WidgetChatListActions) {
-                    val root = getBinding().root.findViewById<LinearLayout>(Utils.getResId("dialog_chat_actions_container", "id"))
+                    val root = getBinding().root.findViewById<LinearLayout>(actionsContainerId)
 
                     root.findViewById<TextView>(quickStarId).apply {
                         visibility = if ((it.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
                         setOnClickListener {
-                            addReaction(StoreStream.getEmojis().unicodeEmojisNamesMap["star"]!!)
+                            addReaction(starEmoji)
                             dismiss()
                         }
                     }
@@ -56,7 +53,7 @@ class QuickStar : Plugin() {
 
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
-                val quickStar = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+                val quickStar = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
                     text = "Quick Star"
                     id = quickStarId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)

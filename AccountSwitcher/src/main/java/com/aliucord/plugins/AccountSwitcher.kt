@@ -2,7 +2,6 @@ package com.aliucord.plugins
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.aliucord.Logger
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
@@ -23,8 +22,6 @@ class AccountSwitcher : Plugin() {
 
     companion object {
         lateinit var mSettings: SettingsAPI
-
-        val logger = Logger("AccountSwitcher")
     }
 
     @SuppressLint("SetTextI18n")

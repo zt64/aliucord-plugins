@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.aliucord.Utils
 import com.aliucord.api.SettingsAPI
 import com.aliucord.utils.DimenUtils
+import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.widgets.BottomSheet
 import com.discord.views.CheckedSetting
 import com.lytefast.flexinput.R
@@ -23,19 +24,19 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
         val ctx = requireContext()
 
         val noticeDuration = settings.getLong("noticeDuration", 5000)
-        val currentTimeout = TextView(ctx, null, 0, R.h.UiKit_TextView).apply {
+        val currentTimeout = TextView(ctx, null, 0, R.i.UiKit_TextView).apply {
             text = "$noticeDuration ms"
             width = DimenUtils.dpToPx(72)
         }
 
         val offset = 1000
         val autoDismissNotice = settings.getBool("autoDismissNotice", true)
-        val seekBar = SeekBar(ctx, null, 0, R.h.UiKit_SeekBar).apply {
+        val seekBar = SeekBar(ctx, null, 0, R.i.UiKit_SeekBar).apply {
             isEnabled = autoDismissNotice
             layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
             max = 9000
             progress = (noticeDuration - offset).toInt()
-            setPadding(DimenUtils.dpToPx(12), 0, DimenUtils.dpToPx(12), 0)
+            12.dp.let { setPadding(it, 0, it, 0) }
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                     with((progress / 100) * 100) {
@@ -52,7 +53,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
             })
         }
 
-        addView(TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Label).apply {
+        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
             text = "Custom Notice Duration"
         })
 
@@ -64,7 +65,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
             }
         })
 
-        addView(LinearLayout(ctx, null, 0, R.h.UiKit_Settings_Item).apply {
+        addView(LinearLayout(ctx, null, 0, R.i.UiKit_Settings_Item).apply {
             addView(currentTimeout)
             addView(seekBar)
         })

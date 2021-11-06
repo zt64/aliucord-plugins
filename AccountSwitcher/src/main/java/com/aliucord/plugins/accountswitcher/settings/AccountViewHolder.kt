@@ -44,15 +44,15 @@ class AccountViewHolder(private val adapter: AccountAdapter, layout: LinearLayou
             layout.addView(this)
         }
 
-        name = TextView(ctx, null, 0, R.h.UiKit_Settings_Item).apply {
+        name = TextView(ctx, null, 0, R.i.UiKit_Settings_Item).apply {
             setPadding(p, p, p, p)
         }
 
-        userId = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_SubText).apply {
+        userId = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_SubText).apply {
             setPadding(p, p, p, p)
         }
 
-        info = LinearLayout(ctx, null, 0, R.h.UiKit_Settings_Item).apply {
+        info = LinearLayout(ctx, null, 0, R.i.UiKit_Settings_Item).apply {
             layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                 weight = 0.6f
             }
@@ -67,7 +67,7 @@ class AccountViewHolder(private val adapter: AccountAdapter, layout: LinearLayou
             ToolbarButton(ctx).run {
                 setPadding(p, p, p * 4, p)
                 layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT)
-                ContextCompat.getDrawable(ctx, R.d.ic_edit_24dp)!!.mutate().let {
+                ContextCompat.getDrawable(ctx, R.e.ic_edit_24dp)!!.mutate().let {
                     Utils.tintToTheme(it)
                     setImageDrawable(it, false)
                 }
@@ -78,7 +78,7 @@ class AccountViewHolder(private val adapter: AccountAdapter, layout: LinearLayou
             ToolbarButton(ctx).run {
                 setPadding(p * 4, p, p, p)
                 layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT)
-                ContextCompat.getDrawable(ctx, R.d.ic_delete_24dp)!!.mutate().let {
+                ContextCompat.getDrawable(ctx, R.e.ic_delete_24dp)!!.mutate().let {
                     Utils.tintToTheme(it)
                     setImageDrawable(it, false)
                 }

@@ -26,23 +26,22 @@ class MediaSheet(private val widgetMedia: WidgetMedia) : BottomSheet() {
 
         val ctx = requireContext()
 
-        addView(createTextView(ctx, "Copy URL", R.d.ic_link_white_24dp) {
+        addView(createTextView(ctx, "Copy URL", R.e.ic_link_white_24dp) {
             val parse = Uri.parse(widgetMedia.mostRecentIntent.getStringExtra("INTENT_MEDIA_URL"))
             Snackbar.make(widgetMedia.requireView(), "Copied to clipboard", Snackbar.LENGTH_SHORT).setAction("Dismiss") {
                 dismiss()
             }.show()
             Utils.setClipboard("Media link", parse.toString()).also { dismiss() }
         })
-        if (widgetMedia.isVideo()) addView(createTextView(ctx, "Google image search", R.d.ic_search_white_24dp) {
+        if (widgetMedia.isVideo()) addView(createTextView(ctx, "Google image search", R.e.ic_search_white_24dp) {
             val parse = Uri.parse(widgetMedia.mostRecentIntent.getStringExtra("INTENT_MEDIA_URL"))
             UriHandler.`handleOrUntrusted$default`(it.context, "https://www.google.com/searchbyimage?site=search&sa=X&image_url=$parse", null, 4, null)
         })
         addView(Divider(ctx))
-        addView(createTextView(ctx, "BetterMediaViewer Settings", R.d.ic_settings_24dp) {
+        addView(createTextView(ctx, "BetterMediaViewer Settings", R.e.ic_settings_24dp) {
             with(PluginManager.plugins["BetterMediaViewer"]!!) {
                 try {
-                    Utils.openPageWithProxy(view.context, ReflectUtils.invokeConstructorWithArgs(this.settingsTab.page,
-                        this.settings))
+                    Utils.openPageWithProxy(view.context, ReflectUtils.invokeConstructorWithArgs(settingsTab.page, settings))
                 } catch (e: Throwable) {
                     logger.error(e)
                 }
@@ -50,13 +49,13 @@ class MediaSheet(private val widgetMedia: WidgetMedia) : BottomSheet() {
         })
     }
 
-    private fun createTextView(ctx: Context, text: String, resID: Int, onClickListener: View.OnClickListener): TextView {
-        val icon = ContextCompat.getDrawable(ctx, resID)?.apply {
+    private fun createTextView(ctx: Context, buttonText: String, resID: Int, onClickListener: View.OnClickListener): TextView {
+        val icon = ContextCompat.getDrawable(ctx, resID)?.mutate()!!.apply {
             setTint(ColorCompat.getThemedColor(requireContext(), R.b.colorInteractiveNormal))
         }
 
-        return TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
-            this.text = text
+        return TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
+            text = text
             setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
             setOnClickListener(onClickListener)
         }

@@ -14,7 +14,7 @@ import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.Hook
 import com.aliucord.plugins.charcounter.PluginSettings
-import com.aliucord.utils.DimenUtils
+import com.aliucord.utils.DimenUtils.dp
 import com.discord.api.premium.PremiumTier
 import com.discord.databinding.WidgetChatOverlayBinding
 import com.discord.stores.StoreStream
@@ -30,27 +30,29 @@ class CharCounter : Plugin() {
     }
 
     override fun start(context: Context) {
+        val textSizeDimenId = Utils.getResId("uikit_textsize_small", "dimen")
+        val typingOverlayId = Utils.getResId("chat_overlay_typing", "id")
         var counter: TextView? = null
 
         patcher.patch(`WidgetChatOverlay$binding$2`::class.java.getDeclaredMethod("invoke", View::class.java), Hook {
             val root = (it.result as WidgetChatOverlayBinding).root as ConstraintLayout
 
-            counter = TextView(root.context, null, 0, R.h.UiKit_TextView).apply {
+            counter = TextView(root.context, null, 0, R.i.UiKit_TextView).apply {
                 id = View.generateViewId()
                 visibility = View.GONE
                 gravity = Gravity.CENTER_VERTICAL
                 maxLines = 1
-                layoutParams = ConstraintLayout.LayoutParams(WRAP_CONTENT, DimenUtils.dpToPx(24)).apply {
+                layoutParams = ConstraintLayout.LayoutParams(WRAP_CONTENT, 24.dp).apply {
                     rightToRight = PARENT_ID
                     bottomToBottom = PARENT_ID
                 }
-                setPadding(DimenUtils.dpToPx(8), 0, DimenUtils.dpToPx(8), 0)
-                setTextSize(TypedValue.COMPLEX_UNIT_PX, root.resources.getDimension(Utils.getResId("uikit_textsize_small", "dimen")))
+                8.dp.let { dp -> setPadding(dp, 0, dp, 0) }
+                setTextSize(TypedValue.COMPLEX_UNIT_PX, root.resources.getDimension(textSizeDimenId))
                 setBackgroundColor(ColorCompat.getThemedColor(root.context, R.b.primary_630))
                 root.addView(this)
             }
 
-            (root.findViewById<RelativeLayout>(Utils.getResId("chat_overlay_typing", "id")).layoutParams as ConstraintLayout.LayoutParams).apply {
+            (root.findViewById<RelativeLayout>(typingOverlayId).layoutParams as ConstraintLayout.LayoutParams).apply {
                 startToStart = PARENT_ID
                 endToStart = counter!!.id
                 width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT

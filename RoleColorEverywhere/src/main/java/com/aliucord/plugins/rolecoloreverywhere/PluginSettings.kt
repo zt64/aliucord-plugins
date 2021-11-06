@@ -18,7 +18,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
         super.onViewCreated(view, bundle)
 
         with(requireContext()) {
-            addView(TextView(this, null, 0, R.h.UiKit_Settings_Item_SubText).apply {
+            addView(TextView(this, null, 0, R.i.UiKit_Settings_Item_SubText).apply {
                 text = "Note: Some of these options will require a restart to colorize already rendered elements"
             })
             addView(createCheckedSetting(this, "User mentions", "Whether mentions are colored", "userMentions"))

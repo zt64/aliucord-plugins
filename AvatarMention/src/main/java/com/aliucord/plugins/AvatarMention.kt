@@ -15,7 +15,7 @@ class AvatarMention : Plugin() {
             val thisObject = it.thisObject as `WidgetChatListAdapterItemMessage$onConfigure$5`
 
             WidgetChatListAdapterItemMessage.`access$getAdapter$p`(thisObject.`this$0`)
-                    .apply { eventHandler.onMessageAuthorNameClicked(thisObject.`$message`, this.data.guildId) }
+                    .apply { eventHandler.onMessageAuthorNameClicked(thisObject.`$message`, data.guildId) }
         })
     }
 

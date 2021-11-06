@@ -14,9 +14,7 @@ import com.discord.stores.StoreStream
 @AliucordPlugin
 class Token : Plugin() {
     override fun start(context: Context) {
-        val options = listOf(
-                Utils.createCommandOption(ApplicationCommandType.BOOLEAN, "send", "Send visible to everyone")
-        )
+        val options = listOf(Utils.createCommandOption(ApplicationCommandType.BOOLEAN, "send", "Send visible to everyone"))
 
         commands.registerCommand("token", "Tells you your token", options) {
             if (it.getBoolOrDefault("send", false)) {

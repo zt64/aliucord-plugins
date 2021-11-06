@@ -17,7 +17,7 @@ class CursorInput: Plugin() {
 
     override fun start(context: Context) {
         patcher.patch(`FlexInputFragment$c`::class.java.getDeclaredMethod("invoke", Object::class.java), Hook {
-            flexEditText = (it.result as a).root.findViewById(R.e.text_input)
+            flexEditText = (it.result as a).root.findViewById(R.f.text_input)
         })
 
         patcher.patch(AppFlexInputViewModel::class.java.getDeclaredMethod("onInputTextAppended", String::class.java), InsteadHook {

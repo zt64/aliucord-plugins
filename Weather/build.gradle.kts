@@ -1,4 +1,4 @@
-version = "1.2.0"
+version = "1.3.0"
 description = "Adds a weather slash command to get information for the current location or one that's provided"
 
 aliucord {

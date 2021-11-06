@@ -1,4 +1,4 @@
-version = "1.2.2"
+version = "1.3.2"
 description = "Adds a character counter to the message box"
 
 aliucord {

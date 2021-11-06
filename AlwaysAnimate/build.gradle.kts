@@ -1,4 +1,4 @@
-version = "1.6.1"
+version = "1.7.1"
 description = "Allows making server icons and user avatars always animate"
 
 aliucord {

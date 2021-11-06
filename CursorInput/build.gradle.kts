@@ -1,4 +1,4 @@
-version = "1.2.2"
+version = "1.3.2"
 description = "Makes it so that emojis, mentions and others are added at the cursor position instead of the end of the message"
 
 aliucord {

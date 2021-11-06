@@ -1,4 +1,4 @@
-version = "2.3.0"
+version = "2.4.0"
 description = "Adds many options to hide items from the top bar in an attempt to prevent screen burn-in"
 
 aliucord {

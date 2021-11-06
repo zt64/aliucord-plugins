@@ -1,4 +1,4 @@
-version = "1.1.0"
+version = "1.2.0"
 description = "Allows setting the dismiss time of notices (in-app notifications)"
 
 aliucord {

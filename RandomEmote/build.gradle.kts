@@ -1,4 +1,4 @@
-version = "1.1.0"
+version = "1.2.0"
 description = "Makes long pressing on the emoji button send a random emote"
 
 aliucord {

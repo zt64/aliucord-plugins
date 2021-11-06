@@ -1,4 +1,4 @@
-version = "1.0.1"
+version = "1.1.1"
 description = "Adds the ability to quickly switch accounts"
 
 aliucord {

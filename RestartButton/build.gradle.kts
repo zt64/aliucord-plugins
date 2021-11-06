@@ -1,4 +1,4 @@
-version = "1.2.1"
+version = "1.3.1"
 description = "Adds a button to restart Aliucord to the settings page"
 
 aliucord {

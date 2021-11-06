@@ -1,4 +1,4 @@
-version = "1.3.0"
+version = "1.4.0"
 description = "Adds a token slash command to tell you your account token"
 
 aliucord {

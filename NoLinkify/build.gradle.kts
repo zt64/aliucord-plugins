@@ -1,4 +1,4 @@
-version = "1.1.0"
+version = "1.2.0"
 description = "Disables highlighting for phone numbers and addresses in messages"
 
 aliucord {

@@ -1,4 +1,4 @@
-version = "1.1.0"
+version = "1.2.0"
 description = "Shows the total number of banned users on the bans page in the server settings"
 
 aliucord {

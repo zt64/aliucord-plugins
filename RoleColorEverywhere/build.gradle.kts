@@ -5,8 +5,8 @@ aliucord {
     changelog.set(
         """
              
-            # 1.7.0
-            * Support V96
+            # 1.8.0
+            * Added color to reaction username list
 
         """.trimIndent()
     )

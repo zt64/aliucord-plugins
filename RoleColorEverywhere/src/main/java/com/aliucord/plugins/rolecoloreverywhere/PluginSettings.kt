@@ -24,6 +24,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
             addView(createCheckedSetting(this, "User mentions", "Whether mentions are colored", "userMentions"))
             addView(createCheckedSetting(this, "Typing text", "Whether typing users are colored", "typingText"))
             addView(createCheckedSetting(this, "Voice users", "Whether usernames in voice channels are colored", "voiceChannel"))
+            addView(createCheckedSetting(this, "Reaction lists", "Whether usernames on reaction lists are colored", "reactionList"))
             addView(createCheckedSetting(this, "Profile name", "Whether usernames on profiles are colored", "profileName"))
             addView(createCheckedSetting(this, "Profile name tag", "Whether tags on profiles are colored", "profileTag"))
             addView(createCheckedSetting(this, "Statuses", "Whether statuses on sidebars and profiles are colored", "status"))

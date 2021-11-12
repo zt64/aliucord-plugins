@@ -35,6 +35,7 @@ import com.discord.widgets.chat.input.autocomplete.adapter.AutocompleteItemViewH
 import com.discord.widgets.chat.input.models.MentionInputModel
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
 import com.discord.widgets.chat.list.entries.MessageEntry
+import com.discord.widgets.chat.managereactions.ManageReactionsResultsAdapter
 import com.discord.widgets.chat.overlay.ChatTypingModel
 import com.discord.widgets.chat.overlay.WidgetChatOverlay
 import com.discord.widgets.chat.overlay.`ChatTypingModel$Companion$getTypingUsers$1$1`
@@ -264,6 +265,22 @@ class RoleColorEverywhere : Plugin() {
                         setSpan(ForegroundColorSpan(guildMember.color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textView.setDraweeSpanStringBuilder(this)
                     }
+                }
+            })
+        }
+
+        if (settings.getBool("reactionList", true)) {
+            val reactionUsersTextViewId = Utils.getResId("manage_reactions_result_user_name", "id")
+
+            patcher.patch(ManageReactionsResultsAdapter.ReactionUserViewHolder::class.java.getDeclaredMethod("onConfigure", Int::class.javaPrimitiveType, MGRecyclerDataPayload::class.java), Hook {
+                if (it.args[1] !is ManageReactionsResultsAdapter.ReactionUserItem) return@Hook
+
+                val reactionItem = it.args[1] as ManageReactionsResultsAdapter.ReactionUserItem
+                val color = reactionItem.guildMember.color
+
+                if (color != Color.BLACK) {
+                    val root = (it.thisObject as ManageReactionsResultsAdapter.ReactionUserViewHolder).binding.root
+                    root.findViewById<TextView>(reactionUsersTextViewId).setTextColor(color)
                 }
             })
         }

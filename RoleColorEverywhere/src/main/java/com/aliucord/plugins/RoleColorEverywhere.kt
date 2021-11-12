@@ -275,12 +275,11 @@ class RoleColorEverywhere : Plugin() {
             patcher.patch(ManageReactionsResultsAdapter.ReactionUserViewHolder::class.java.getDeclaredMethod("onConfigure", Int::class.javaPrimitiveType, MGRecyclerDataPayload::class.java), Hook {
                 if (it.args[1] !is ManageReactionsResultsAdapter.ReactionUserItem) return@Hook
 
-                val reactionItem = it.args[1] as ManageReactionsResultsAdapter.ReactionUserItem
-                val color = reactionItem.guildMember.color
+                val guildMember = (it.args[1] as ManageReactionsResultsAdapter.ReactionUserItem).guildMember ?: return@Hook
 
-                if (color != Color.BLACK) {
+                if (guildMember.color != Color.BLACK) {
                     val root = (it.thisObject as ManageReactionsResultsAdapter.ReactionUserViewHolder).binding.root
-                    root.findViewById<TextView>(reactionUsersTextViewId).setTextColor(color)
+                    root.findViewById<TextView>(reactionUsersTextViewId).setTextColor(guildMember.color)
                 }
             })
         }

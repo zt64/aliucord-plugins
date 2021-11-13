@@ -11,34 +11,33 @@ import androidx.core.widget.NestedScrollView
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.InputDialog
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.Hook 
 import com.discord.databinding.WidgetChatListActionsBinding
 import com.discord.models.domain.emoji.Emoji
 import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.chat.list.actions.WidgetChatListActions
 import com.lytefast.flexinput.R
-import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 import com.aliucord.plugins.textReactHelper.helper
 import com.discord.stores.StoreStream
 import com.aliucord.fragments.ConfirmDialog
 import com.aliucord.Utils
+import com.aliucord.Constants
+import androidx.core.content.res.ResourcesCompat
 
 @AliucordPlugin
 class TextReact : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
-        val icon = ContextCompat.getDrawable(context, R.d.ic_keyboard_black_24dp)
+        val icon = ContextCompat.getDrawable(context, R.e.ic_keyboard_black_24dp)
         val textReactId = View.generateViewId()
 
         with(WidgetChatListActions::class.java, {
             val getBinding = getDeclaredMethod("getBinding").apply { isAccessible = true }
             val addReaction = getDeclaredMethod("addReaction", Emoji::class.java).apply { isAccessible = true }
 
-            patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn { callFrame: CallFrame ->
+            patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), Hook  { callFrame ->
                 try {
-                    val message = (callFrame.args[0] as WidgetChatListActions.Model).message
-
                     val binding = getBinding.invoke(callFrame.thisObject) as WidgetChatListActionsBinding
                     val textReact = binding.a.findViewById<TextView>(textReactId).apply {
                         visibility = if ((callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
@@ -72,7 +71,7 @@ class TextReact : Plugin() {
                                     }
                                     coDialog.setOnCancelListener {
                                         coDialog.dismiss()
-                                        Utils.showToast(context, "Action cancelled by the user.")
+                                        Utils.showToast("Action cancelled by the user.")
                                     }
                                     coDialog.show(fragmentManager, "bbbbbb")
                                 } else {
@@ -96,15 +95,16 @@ class TextReact : Plugin() {
                 }
             })
 
-            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn { callFrame: CallFrame ->
+            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook  { callFrame ->
                 val linearLayout = (callFrame.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
                 val ctx = linearLayout.context
 
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
-                val textReact = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+                val textReact = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
                     text = "Text React"
                     id = textReactId
+                    typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }
 

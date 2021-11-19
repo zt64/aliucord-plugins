@@ -8,24 +8,23 @@ buildscript {
         maven("https://jitpack.io")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
+        classpath("com.android.tools.build:gradle:7.0.3")
         classpath("com.github.Aliucord:gradle:main-SNAPSHOT")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0-RC2")
     }
 }
 
 allprojects {
     repositories {
         google()
-        mavenCentral()
+        mavenCentral() //        mavenLocal()
+        maven("https://jitpack.io")
     }
 }
 
-fun Project.android(configuration: BaseExtension.() -> Unit) =
-        extensions.getByName<BaseExtension>("android").configuration()
+fun Project.android(configuration: BaseExtension.() -> Unit) = extensions.getByName<BaseExtension>("android").configuration()
 
-fun Project.aliucord(configuration: AliucordExtension.() -> Unit) =
-        extensions.getByName<AliucordExtension>("aliucord").configuration()
+fun Project.aliucord(configuration: AliucordExtension.() -> Unit) = extensions.getByName<AliucordExtension>("aliucord").configuration()
 
 subprojects {
     apply(plugin = "com.android.library")
@@ -50,6 +49,13 @@ subprojects {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
         }
+
+        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+            kotlinOptions {
+                jvmTarget = "11"
+                freeCompilerArgs = freeCompilerArgs + "-Xno-call-assertions" + "-Xno-param-assertions" + "-Xno-receiver-assertions"
+            }
+        }
     }
 
     repositories {
@@ -64,6 +70,7 @@ subprojects {
 
         discord("com.discord:discord:aliucord-SNAPSHOT")
         compileOnly("com.github.Aliucord:Aliucord:main-SNAPSHOT")
+        //        compileOnly("com.github.Aliucord:Aliucord:unspecified")
     }
 }
 

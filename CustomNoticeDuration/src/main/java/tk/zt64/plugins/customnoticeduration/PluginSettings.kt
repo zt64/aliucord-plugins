@@ -1,4 +1,4 @@
-package tk.zt64.plugins.customnoticetime
+package tk.zt64.plugins.customnoticeduration
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -10,7 +10,6 @@ import android.widget.SeekBar
 import android.widget.TextView
 import com.aliucord.Utils
 import com.aliucord.api.SettingsAPI
-import com.aliucord.utils.DimenUtils
 import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.widgets.BottomSheet
 import com.discord.views.CheckedSetting
@@ -26,7 +25,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
         val noticeDuration = settings.getLong("noticeDuration", 5000)
         val currentTimeout = TextView(ctx, null, 0, R.i.UiKit_TextView).apply {
             text = "$noticeDuration ms"
-            width = DimenUtils.dpToPx(72)
+            width = 72.dp
         }
 
         val offset = 1000
@@ -57,13 +56,14 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
             text = "Custom Notice Duration"
         })
 
-        addView(Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH,"Auto-Dismiss Notice", "Whether the notice should automatically dismiss").apply {
-            isChecked = autoDismissNotice
-            setOnCheckedListener {
-                settings.setBool("autoDismissNotice", it)
-                seekBar.isEnabled = it
-            }
-        })
+        addView(
+            Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, "Auto-Dismiss Notice", "Whether the notice should automatically dismiss").apply {
+                isChecked = autoDismissNotice
+                setOnCheckedListener {
+                    settings.setBool("autoDismissNotice", it)
+                    seekBar.isEnabled = it
+                }
+            })
 
         addView(LinearLayout(ctx, null, 0, R.i.UiKit_Settings_Item).apply {
             addView(currentTimeout)

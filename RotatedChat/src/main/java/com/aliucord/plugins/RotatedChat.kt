@@ -32,7 +32,7 @@ class RotatedChat : Plugin() {
             setActionBarTitle("Rotated Chat")
 
             val textInput = TextInput(requireContext()) // .apply { hint = "Rotation of chat in degrees" }
-            textInput.editText?.apply {
+            textInput.editText.apply {
                 maxLines = 1
                 inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
                 setText(settings.getFloat("degrees", 0f).toString())

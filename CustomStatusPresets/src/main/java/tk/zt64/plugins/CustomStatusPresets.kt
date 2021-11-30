@@ -29,8 +29,7 @@ import tk.zt64.plugins.customstatuspresets.PresetAdapter
 
 @AliucordPlugin
 class CustomStatusPresets : Plugin() {
-    private val presetType =
-        TypeToken.getParameterized(ArrayList::class.java, UserStatusPresenceCustomView.ViewState.WithStatus::class.javaObjectType).getType()
+    private val presetType = TypeToken.getParameterized(ArrayList::class.java, UserStatusPresenceCustomView.ViewState.WithStatus::class.javaObjectType).getType()
 
     companion object {
         lateinit var mSettings: SettingsAPI

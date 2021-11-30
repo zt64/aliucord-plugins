@@ -36,7 +36,7 @@ class WiderScrollbar : Plugin() {
             setActionBarTitle("Wider Scrollbar")
 
             val textInput = TextInput(requireContext()) // .apply { hint = "Scrollbar width in DP" }
-            textInput.editText?.apply {
+            textInput.editText.apply {
                 maxLines = 1
                 inputType = InputType.TYPE_CLASS_NUMBER
                 setText(settings.getInt("scrollbarWidth", 50).toString())

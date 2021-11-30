@@ -11,7 +11,6 @@ import androidx.core.widget.NestedScrollView
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.Hook
 import com.discord.databinding.WidgetChatListActionsBinding
 import com.discord.models.domain.emoji.Emoji
 import com.discord.stores.StoreStream
@@ -32,8 +31,8 @@ class QuickStar : Plugin() {
         val starEmoji = StoreStream.getEmojis().unicodeEmojisNamesMap["star"]!!
         val icon = ContextCompat.getDrawable(context, R.e.ic_star_24dp)
 
-        with(WidgetChatListActions::class.java, {
-            patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), Hook {
+        with(WidgetChatListActions::class.java) {
+            patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java)) {
                 with(it.thisObject as WidgetChatListActions) {
                     val root = getBinding().root.findViewById<LinearLayout>(actionsContainerId)
 
@@ -45,23 +44,23 @@ class QuickStar : Plugin() {
                         }
                     }
                 }
-            })
+            }
 
-            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook {
+            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java)) {
                 val linearLayout = (it.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
                 val ctx = linearLayout.context
 
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
                 val quickStar = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-                    text = "Quick Star"
                     id = quickStarId
+                    text = "Quick Star"
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }
 
                 linearLayout.addView(quickStar, 1)
-            })
-        })
+            }
+        }
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()

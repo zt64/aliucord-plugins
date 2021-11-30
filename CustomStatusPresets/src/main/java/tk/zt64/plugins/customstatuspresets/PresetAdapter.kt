@@ -40,7 +40,7 @@ class PresetAdapter(private val widgetUserSetCustomStatus: WidgetUserSetCustomSt
             if (modelEmojiUnicode != null) str = ModelEmojiUnicode.getImageUri(modelEmojiUnicode.codePoints, ctx)
         }
 
-        MGImages.`setImage$default`(customEmoji, str, 0, 0, false, null, null, 124, null)
+        MGImages.setImage(customEmoji, str)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -89,6 +89,6 @@ class PresetAdapter(private val widgetUserSetCustomStatus: WidgetUserSetCustomSt
             addPreset(it.copy(emoji, it.statusText))
             Unit.a
         }
-        EmojiPickerNavigator.`launchBottomSheet$default`(Utils.appActivity.supportFragmentManager, function, EmojiPickerContextType.Global.INSTANCE, null, 8, null)
+        EmojiPickerNavigator.launchBottomSheet(Utils.appActivity.supportFragmentManager, function, EmojiPickerContextType.Global.INSTANCE, null)
     }
 }

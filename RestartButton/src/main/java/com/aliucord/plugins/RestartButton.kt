@@ -6,7 +6,6 @@ import android.view.MenuItem
 import androidx.core.content.ContextCompat
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.Hook
 import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.settings.WidgetSettings
 import com.lytefast.flexinput.R
@@ -16,7 +15,7 @@ class RestartButton : Plugin() {
     override fun start(context: Context) {
         val icon = ContextCompat.getDrawable(context, com.yalantis.ucrop.R.c.ucrop_rotate)?.mutate()
 
-        patcher.patch(WidgetSettings::class.java.getDeclaredMethod("configureToolbar"), Hook {
+        patcher.patch(WidgetSettings::class.java.getDeclaredMethod("configureToolbar")) {
             with(it.thisObject as WidgetSettings) {
                 icon?.setTint(ColorCompat.getThemedColor(requireContext(), R.b.colorInteractiveNormal))
 
@@ -30,7 +29,7 @@ class RestartButton : Plugin() {
                         false
                     }
             }
-        })
+        }
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()

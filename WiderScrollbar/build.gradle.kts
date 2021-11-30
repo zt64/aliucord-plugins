@@ -1,13 +1,2 @@
-version = "1.3.0"
+version = "1.4.0"
 description = "Allows changing the scrollbar width to make it easier to drag"
-
-aliucord {
-    changelog.set(
-        """
-                
-            # 1.2.0
-            * Support V96
-
-        """.trimIndent()
-    )
-}

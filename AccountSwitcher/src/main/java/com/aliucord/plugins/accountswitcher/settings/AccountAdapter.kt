@@ -44,9 +44,7 @@ class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList
         IconUtils.setIcon(holder.avatar, user)
     }
 
-    fun onEdit(position: Int) {
-        AccountDialog(this, getAccounts()[position]).show(fragment.parentFragmentManager, "Edit Account")
-    }
+    fun onEdit(position: Int) = AccountDialog(this, getAccounts()[position]).show(fragment.parentFragmentManager, "Edit Account")
 
     fun onRemove(position: Int) = accounts[position].let { account ->
         val dialog = ConfirmDialog().setIsDangerous(true)
@@ -67,7 +65,7 @@ class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList
         Utils.threadPool.execute {
             fetchUser(it.token) ?: return@execute Utils.showToast("Invalid token")
 
-            StoreStream.getAuthentication().handleLoginResult(ModelLoginResult(false, null, it.token, null))
+            StoreStream.getAuthentication().handleLoginResult(ModelLoginResult(it.token.lowercase().startsWith("mfa"), null, it.token, null))
 
             Utils.mainThread.postDelayed({
                 val intent = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)

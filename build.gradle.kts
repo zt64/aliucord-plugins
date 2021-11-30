@@ -17,7 +17,8 @@ buildscript {
 allprojects {
     repositories {
         google()
-        mavenCentral() //        mavenLocal()
+        mavenCentral()
+        mavenLocal()
         maven("https://jitpack.io")
     }
 }
@@ -69,8 +70,8 @@ subprojects {
         val compileOnly by configurations
 
         discord("com.discord:discord:aliucord-SNAPSHOT")
-        compileOnly("com.github.Aliucord:Aliucord:main-SNAPSHOT")
-        //        compileOnly("com.github.Aliucord:Aliucord:unspecified")
+//        compileOnly("com.github.Aliucord:Aliucord:main-SNAPSHOT")
+        compileOnly("com.github.Aliucord:Aliucord:unspecified")
     }
 }
 

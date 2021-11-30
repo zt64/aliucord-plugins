@@ -9,21 +9,18 @@ import androidx.core.content.ContextCompat
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.Hook
 import com.aliucord.utils.DimenUtils.dp
-import com.aliucord.utils.RxUtils.createActionSubscriber
 import com.aliucord.utils.RxUtils.subscribe
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
-import com.discord.api.message.Message
+import com.aliucord.wrappers.ChannelWrapper.Companion.name
 import com.discord.databinding.WidgetChannelsListItemChannelBinding
 import com.discord.stores.StoreStream
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.list.items.ChannelListItem
 import com.discord.widgets.channels.list.items.ChannelListItemTextChannel
 import com.lytefast.flexinput.R
-import rx.Subscription
+import rx.Subscriber
 import java.lang.reflect.Field
-import java.util.concurrent.atomic.AtomicReference
 
 @AliucordPlugin
 class UnreadCounter : Plugin() {
@@ -37,7 +34,7 @@ class UnreadCounter : Plugin() {
         val unreadCounterId = View.generateViewId()
         val mentionsCounterId = Utils.getResId("channels_item_channel_mentions", "id")
 
-        patcher.patch(WidgetChannelsListAdapter.ItemChannelText::class.java.getDeclaredMethod("onConfigure", Int::class.javaPrimitiveType, ChannelListItem::class.java), Hook {
+        patcher.patch(WidgetChannelsListAdapter.ItemChannelText::class.java.getDeclaredMethod("onConfigure", Int::class.javaPrimitiveType, ChannelListItem::class.java)) {
             val textChannel = it.args[1] as ChannelListItemTextChannel
             val itemChannelText = it.thisObject as WidgetChannelsListAdapter.ItemChannelText
             val root = itemChannelText.binding.root as RelativeLayout
@@ -59,21 +56,31 @@ class UnreadCounter : Plugin() {
                 root.addView(this)
             }
 
-            val subscriptionReference = AtomicReference<Subscription>()
-            subscriptionReference.set(StoreStream.getReadStates().getUnreadMarker(textChannel.channel.id).subscribe(createActionSubscriber({ unread ->
-                subscriptionReference.get()?.unsubscribe()
-                counter.visibility = if (unread.count > 0) View.VISIBLE else View.GONE
-                counter.text = unread.count.toString()
-            })))
-        })
+//            counter.visibility = if (this > 0) View.VISIBLE else View.GONE
+//            counter.text = this.toString()
+            StoreStream.getReadStates().observeUnreadCountForChannel(textChannel.channel.id).subscribe(object : Subscriber<Int>() {
+                override fun onCompleted() { }
 
-        patcher.patch(StoreStream::class.java.getDeclaredMethod("handleMessageCreate", Message::class.java), Hook {
-            val message = com.discord.models.message.Message(it.args[0] as Message)
+                override fun onError(e: Throwable?) { }
 
-            if (message.guildId != StoreStream.getGuildSelected().selectedGuildId) return@Hook
+                override fun onNext(count: Int) {
+                    unsubscribe()
+                    Utils.showToast("${textChannel.channel.name} ${textChannel.isUnread} $count")
+                    counter.visibility = if (count > 0) View.VISIBLE else View.GONE
+                    counter.text = count.toString()
+                }
+            })
+        }
 
-            StoreStream.getChannels().markChanged()
-        })
+//        patcher.patch(StoreStream::class.java.getDeclaredMethod("handleMessageCreate", Message::class.java)) {
+//            val message = com.discord.models.message.Message(it.args[0] as Message)
+//
+//            if (message.guildId != StoreStream.getGuildSelected().selectedGuildId) return@patch
+//
+//            StoreStream.`access$getDispatcher$p`(StoreStream.getPresences().stream).schedule {
+//                StoreStream.getChannels().markChanged()
+//            }
+//        }
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()

@@ -22,21 +22,17 @@ import com.discord.widgets.channels.list.WidgetChannelListModel
 import com.discord.widgets.channels.list.WidgetChannelsList
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions
-import com.discord.widgets.channels.list.items.ChannelListItem
 import com.discord.widgets.channels.list.items.ChannelListItemPrivate
 import com.google.gson.reflect.TypeToken
 import com.lytefast.flexinput.R
 import tk.zt64.plugins.pindms.DMGroup
-import tk.zt64.plugins.pindms.ItemDMGroup
+import tk.zt64.plugins.pindms.items.ChannelListItemDMGroup
+import tk.zt64.plugins.pindms.items.ItemDMGroup
+import tk.zt64.plugins.pindms.items.ItemDivider
 import tk.zt64.plugins.pindms.sheets.GroupsSheet
 import java.lang.reflect.Method
 import java.util.*
 import kotlin.collections.ArrayList
-
-class ChannelListItemDMGroup(val group: DMGroup) : ChannelListItem {
-    override fun getKey(): String = ""
-    override fun getType(): Int = 400
-}
 
 @AliucordPlugin
 class PinDMs : Plugin() {
@@ -64,6 +60,7 @@ class PinDMs : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         val categoryLayoutId = Utils.getResId("widget_channels_list_item_category", "layout")
+        val headerLayoutId = Utils.getResId("widget_channels_list_item_header", "layout")
 
         mSettings = settings
         groups = settings.getObject("groups", ArrayList(), groupType)
@@ -83,6 +80,7 @@ class PinDMs : Plugin() {
                         dismiss()
 
                         group.channelIds.remove(model.channel.id)
+
                         StoreStream.`access$getDispatcher$p`(StoreStream.getPresences().stream).schedule {
                             StoreStream.getChannels().markChanged()
                         }
@@ -110,20 +108,25 @@ class PinDMs : Plugin() {
 
             if (model.selectedGuild != null) return@before
 
-            settings.getObject("groups", ArrayList<DMGroup>(), groupType).forEach { group ->
+            settings.getObject("groups", ArrayList<DMGroup>(), groupType).reversed().forEach { group ->
                 val items = model.items.filterIsInstance<ChannelListItemPrivate>().filter { item ->
-                    (group.channelIds.contains(item.channel.id) && !group.collapsed).also {
-                        if (group.channelIds.contains(item.channel.id) && group.collapsed) model.items.remove(item)
-                    }
+                    group.channelIds.contains(item.channel.id)
                 }
 
                 model.items.removeAll(items)
+
+                if (group.collapsed) return@forEach run { model.items.add(0, ChannelListItemDMGroup(group)) }
+
                 model.items.addAll(0, listOf(ChannelListItemDMGroup(group)) + items)
             }
         }
 
         patcher.after<WidgetChannelsListAdapter>("onCreateViewHolder", ViewGroup::class.java, Int::class.java) {
-            if (it.args[1] as Int == 400) it.result = ItemDMGroup(categoryLayoutId, this)
+            it.result = when (it.args[1]) {
+                400 -> ItemDMGroup(categoryLayoutId, this)
+                401 -> ItemDivider(headerLayoutId, this)
+                else -> it.result
+            }
         }
     }
 

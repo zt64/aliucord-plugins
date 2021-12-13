@@ -85,8 +85,6 @@ class AccountViewHolder(private val adapter: AccountAdapter, layout: LinearLayou
                 setOnClickListener { adapter.onRemove(adapterPosition) }
                 layout.addView(this)
             }
-        } else {
-            layout.setOnClickListener { adapter.onClick(ctx, adapterPosition) }
-        }
+        } else layout.setOnClickListener { adapter.onClick(ctx, adapterPosition) }
     }
 }

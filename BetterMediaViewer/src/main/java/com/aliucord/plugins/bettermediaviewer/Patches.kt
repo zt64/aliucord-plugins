@@ -18,9 +18,7 @@ import com.aliucord.PluginManager
 import com.aliucord.Utils
 import com.aliucord.api.PatcherAPI
 import com.aliucord.api.SettingsAPI
-import com.aliucord.patcher.Hook
 import com.aliucord.patcher.InsteadHook
-import com.aliucord.utils.ReflectUtils
 import com.aliucord.utils.RxUtils
 import com.discord.utilities.rx.ObservableExtensionsKt
 import com.discord.widgets.media.WidgetMedia
@@ -32,31 +30,23 @@ import com.google.android.material.appbar.AppBarLayout
 import com.lytefast.flexinput.R
 import java.util.concurrent.TimeUnit
 
-
-
-
-class Patches(private val patcher: PatcherAPI) {
+object Patches {
     private var settings: SettingsAPI = PluginManager.plugins["BetterMediaViewer"]?.settings!!
 
-    fun patchWidget() {
+    fun PatcherAPI.patchWidget() {
         val downloadManager = Utils.appContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val downloadItemId = Utils.getResId("menu_media_download", "id")
         val browserItemId = Utils.getResId("menu_media_browser", "id")
 
-        patcher.patch(WidgetMedia::class.java.getDeclaredMethod("onViewBoundOrOnResume"), Hook {
-            val widgetMedia = it.thisObject as WidgetMedia
-            val ctx = widgetMedia.context
-            val root = widgetMedia.binding.root
+        patch(WidgetMedia::class.java.getDeclaredMethod("onViewBoundOrOnResume")) { with(it.thisObject as WidgetMedia) {
             val toolbar = Utils.appActivity.findViewById<Toolbar>(R.f.action_bar_toolbar)
 
             with(toolbar.menu) {
                 findItem(downloadItemId).setOnMenuItemClickListener {
-                    val uri = if (widgetMedia.isVideo()) widgetMedia.mediaSource?.i else ReflectUtils.getField(widgetMedia, "imageUri") as Uri
-                    val title = widgetMedia.mostRecentIntent.getStringExtra("INTENT_TITLE")
+                    val uri = if (isVideo()) mediaSource?.j else Uri.parse(mostRecentIntent.getStringExtra("INTENT_IMAGE_URL"))
+                    val title = mostRecentIntent.getStringExtra("INTENT_TITLE")
 
-                    val request = DownloadManager.Request(uri)
-                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-                        .setTitle(title)
+                    val request = DownloadManager.Request(uri).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED).setTitle(title)
                         .setDestinationUri(Uri.withAppendedPath(Uri.fromFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)), title))
 
                     Utils.threadPool.execute {
@@ -65,11 +55,12 @@ class Patches(private val patcher: PatcherAPI) {
                         val receiver: BroadcastReceiver = object : BroadcastReceiver() {
                             override fun onReceive(context: Context, intent: Intent) {
                                 if (intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) == reference) {
-                                    Utils.showToast("Done!")
+                                    Utils.showToast("Finished downloading $title")
                                     Utils.appActivity.unregisterReceiver(this)
                                 }
                             }
                         }
+
                         Utils.appActivity.registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
                     }
 
@@ -80,57 +71,54 @@ class Patches(private val patcher: PatcherAPI) {
             }
 
             // immersive mode
-            if (settings.getBool("immersiveModeState", false))
-                WindowInsetsControllerCompat(Utils.appActivity.window, root).hide(
-                    when (settings.getInt("immersiveModeType", 0)) {
-                        0 -> WindowInsetsCompat.Type.statusBars()
-                        1 -> WindowInsetsCompat.Type.navigationBars()
-                        2 -> WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.statusBars()
-                        else -> return@Hook
-                    }
-                )
+            if (settings.getBool("immersiveModeState", false)) WindowInsetsControllerCompat(Utils.appActivity.window, binding.root).hide(
+                when (settings.getInt("immersiveModeType", 0)) {
+                    0 -> WindowInsetsCompat.Type.statusBars()
+                    1 -> WindowInsetsCompat.Type.navigationBars()
+                    2 -> WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.statusBars()
+                    else -> return@patch
+                }
+            )
 
             // hide back button
-            if (settings.getBool("hideBackButton", false)) widgetMedia.setActionBarDisplayHomeAsUpEnabled(false)
-
-            if (settings.getBool("bottomToolbar", false))
-                if (widgetMedia.mediaSource == null) (widgetMedia.binding.b.layoutParams as FrameLayout.LayoutParams).gravity = Gravity.BOTTOM
-        })
+            if (settings.getBool("hideBackButton", false)) setActionBarDisplayHomeAsUpEnabled(false)
+            if (settings.getBool("bottomToolbar", false) && mediaSource == null)
+                (binding.root.findViewById<AppBarLayout>(R.f.action_bar_toolbar_layout).layoutParams as FrameLayout.LayoutParams).gravity = Gravity.BOTTOM
+        } }
     }
 
-    fun patchControls() {
+    fun PatcherAPI.patchControls() {
         val playerControlViewId = Utils.getResId("media_player_control_view", "id")
 
-        patcher.patch(WidgetMedia::class.java.getDeclaredMethod("showControls"), InsteadHook {
-            with(it.thisObject as WidgetMedia) {
-                if (settings.getBool("autoHideControls", true)) {
-                    binding.root.findViewById<PlayerControlView>(playerControlViewId).h()
-                    val timer = RxUtils.timer(settings.getInt("controlsTimeout", 3000).toLong(), TimeUnit.MILLISECONDS)
-                    ObservableExtensionsKt.`appSubscribe$default`(ObservableExtensionsKt.`ui$default`(timer, this, null, 2, null), WidgetMedia::class.java, null, `WidgetMedia$showControls$1`(this), null, null, null, `WidgetMedia$showControls$2`(this), 58, null)
-                }
+        patch(WidgetMedia::class.java.getDeclaredMethod("showControls"), InsteadHook { with(it.thisObject as WidgetMedia) {
+            if (settings.getBool("autoHideControls", true)) {
+                binding.root.findViewById<PlayerControlView>(playerControlViewId).h()
+                val timer = RxUtils.timer(settings.getInt("controlsTimeout", 3000).toLong(), TimeUnit.MILLISECONDS)
+                ObservableExtensionsKt.appSubscribe(ObservableExtensionsKt.ui(timer, this, null), WidgetMedia::class.java, null, `WidgetMedia$showControls$1`(this), null, {  }, {  }, `WidgetMedia$showControls$2`(this))
+            }
 
-                val controlsAnimationAction2 = WidgetMedia.ControlsAnimationAction.SHOW
-                if (controlsAnimationAction != controlsAnimationAction2) {
-                    controlsAnimationAction = controlsAnimationAction2
-                    controlsAnimator?.cancel()
+            val controlsAnimationAction2 = WidgetMedia.ControlsAnimationAction.SHOW
+            if (controlsAnimationAction != controlsAnimationAction2) {
+                controlsAnimationAction = controlsAnimationAction2
+                controlsAnimator?.cancel()
 
-                    controlsAnimator = ValueAnimator.ofFloat(getToolbarTranslationY(), 0.0f).also { animator -> configureAndStartControlsAnimation(animator) }
+                controlsAnimator = ValueAnimator.ofFloat(getToolbarTranslationY(), 0.0f).also {
+                        animator -> configureAndStartControlsAnimation(animator)
                 }
             }
-        })
+        } })
     }
 
-    fun patchToolbar() {
+    fun PatcherAPI.patchToolbar() {
         val actionBarId = Utils.getResId("action_bar_toolbar_layout", "id")
         val mediaPlayerViewId = Utils.getResId("media_player_control_view", "id")
 
-        patcher.patch(WidgetMedia::class.java.getDeclaredMethod("getToolbarTranslationY"), Hook {
-            with(it.thisObject as WidgetMedia) {
+        patch(WidgetMedia::class.java.getDeclaredMethod("getToolbarTranslationY")) { with(it.thisObject as WidgetMedia) {
                 if (mediaSource == null) it.result = -binding.root.findViewById<AppBarLayout>(actionBarId).translationY
             }
-        })
+        }
 
-        patcher.patch(`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`::class.java.getDeclaredMethod("onAnimationUpdate", ValueAnimator::class.java), InsteadHook {
+        patch(`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`::class.java.getDeclaredMethod("onAnimationUpdate", ValueAnimator::class.java), InsteadHook {
             val widgetMedia = (it.thisObject as `WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`).`this$0`
             val floatValue = ((it.args[0] as ValueAnimator).animatedValue) as Float
             val root = widgetMedia.binding.root
@@ -142,22 +130,22 @@ class Patches(private val patcher: PatcherAPI) {
         })
     }
 
-    fun patchZoomLimit() {
-        patcher.patch(WidgetMedia::class.java.getDeclaredMethod("getFormattedUrl", Context::class.java, Uri::class.java), Hook {
+    fun PatcherAPI.patchZoomLimit() {
+        patch(WidgetMedia::class.java.getDeclaredMethod("getFormattedUrl", Context::class.java, Uri::class.java)) {
             val res = it.result as String
             if (res.contains(".discordapp.net/")) {
                 val arr = res.split("\\?").toTypedArray()
 
-                it.result = arr[0] + if (arr[1].contains("format=")) "?format=" + arr[1].split("format=").toTypedArray()[1] else ""
+                it.result = "$arr[0]${if ("format=" in arr[1]) "?format=${arr[1].split("format=").toTypedArray()[1]}" else ""}"
             }
-        })
+        }
 
-        patcher.patch(c.f.l.b.c::class.java.getDeclaredMethod("f", Matrix::class.java, Float::class.javaPrimitiveType, Float::class.javaPrimitiveType, Int::class.javaPrimitiveType), InsteadHook.returnConstant(false))
+        patch(c.f.l.b.c::class.java.getDeclaredMethod("f", Matrix::class.java, Float::class.javaPrimitiveType, Float::class.javaPrimitiveType, Int::class.javaPrimitiveType), InsteadHook.returnConstant(false))
 
         for (m in c.c.a.a0.d::class.java.declaredMethods) {
             val params = m.parameterTypes
             if (params.size == 4 && params[0] == c.f.j.d.f::class.java && params[1] == c.f.j.d.e::class.java && params[3] == Int::class.javaPrimitiveType) {
-                patcher.patch(m, InsteadHook.returnConstant(1))
+                patch(m, InsteadHook.returnConstant(1))
                 break
             }
         }

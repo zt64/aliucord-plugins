@@ -2,7 +2,6 @@ package com.aliucord.plugins.bettermediaviewer
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Environment
 import android.view.View
@@ -17,7 +16,7 @@ import com.aliucord.PluginManager
 import com.aliucord.Utils
 import com.aliucord.api.SettingsAPI
 import com.aliucord.fragments.SettingsPage
-import com.aliucord.utils.DimenUtils
+import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.views.Button
 import com.aliucord.views.Divider
 import com.discord.views.CheckedSetting
@@ -33,22 +32,33 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 
-        setActionBarTitle("Better Media Viewer")
-
         val ctx = requireContext()
+
+        fun createCheckedSetting(title: String, subtitle: String, setting: String, defValue: Boolean): CheckedSetting {
+            return Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, subtitle).apply {
+                isChecked = settings.getBool(setting, defValue)
+                setOnCheckedListener {
+                    settings.setBool(setting, it)
+                    PluginManager.stopPlugin("BetterMediaViewer")
+                    PluginManager.startPlugin("BetterMediaViewer")
+                }
+            }
+        }
+
+        setActionBarTitle("Better Media Viewer")
 
         // Create settings for changing auto hiding behaviour
         val offset = 500
         val controlsTimeout = settings.getInt("controlsTimeout", 3000)
         val currentTimeout = TextView(ctx, null, 0, R.i.UiKit_TextView).apply {
             text = "$controlsTimeout ms"
-            width = DimenUtils.dpToPx(72)
+            width = 72.dp
         }
         val seekbar = SeekBar(ctx, null, 0, R.i.UiKit_SeekBar).apply {
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             max = 4500
             progress = controlsTimeout - offset
-            setPadding(DimenUtils.dpToPx(12), 0, DimenUtils.dpToPx(12), 0)
+            12.dp.let { setPadding(it, 0, it, 0) }
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) = with((progress / 100) * 100) {
                     seekBar.progress = this
@@ -66,7 +76,7 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
             addView(seekbar)
         }
 
-        addView(createCheckedSetting(ctx, "Auto-hide controls", "Hide the top and bottom bar after a delay", "autoHideControls", true).apply {
+        addView(createCheckedSetting("Auto-hide controls", "Hide the top and bottom bar after a delay", "autoHideControls", true).apply {
             setOnCheckedListener {
                 settings.setBool("autoHideControls", it)
                 timeoutSection.visibility = if (it) View.VISIBLE else View.GONE
@@ -93,7 +103,7 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
             if (i == settings.getInt("immersiveModeType", 0)) radioManager.a(radio)
         }
 
-        addView(createCheckedSetting(ctx, "Immersive mode", "Hide the status bar, navigation bar, or both when viewing media", "immersiveModeState", false).apply {
+        addView(createCheckedSetting("Immersive mode", "Hide the status bar, navigation bar, or both when viewing media", "immersiveModeState", false).apply {
             setOnCheckedListener {
                 settings.setBool("immersiveModeState", it)
                 radioGroup.visibility = if (it) View.VISIBLE else View.GONE
@@ -101,10 +111,10 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
         })
         addView(radioGroup)
         addView(Divider(ctx))
-        addView(createCheckedSetting(ctx, "Hide back button", "Hide the back button from the toolbar", "hideBackButton", false))
-        addView(createCheckedSetting(ctx, "Bottom toolbar", "Moves the bar to the bottom of the screen for easier one handed use. Only supports images", "bottomToolbar", false))
-        addView(createCheckedSetting(ctx, "Remove zoom limit", "Removes the zoom limit for images", "removeZoomLimit", true))
-        addView(createCheckedSetting(ctx, "Show Open In Browser", "Shows the open in browser button on the toolbar", "showOpenInBrowser", true))
+        addView(createCheckedSetting("Hide back button", "Hide the back button from the toolbar", "hideBackButton", false))
+        addView(createCheckedSetting("Bottom toolbar", "Moves the bar to the bottom of the screen for easier one handed use. Only supports images", "bottomToolbar", false))
+        addView(createCheckedSetting("Remove zoom limit", "Removes the zoom limit for images", "removeZoomLimit", true))
+        addView(createCheckedSetting("Show Open In Browser", "Shows the open in browser button on the toolbar", "showOpenInBrowser", true))
         addView(Divider(ctx))
         val downloadDir = TextView(ctx, null, 0, R.i.UiKit_TextView_Subtext).apply {
             text = "Current Directory: " + settings.getString("downloadDir", context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath)
@@ -130,16 +140,5 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
             }
         })
         addView(downloadDir)
-    }
-
-    private fun createCheckedSetting(ctx: Context, title: String, subtitle: String, setting: String, defValue: Boolean): CheckedSetting {
-        return Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, subtitle).apply {
-            isChecked = settings.getBool(setting, defValue)
-            setOnCheckedListener {
-                settings.setBool(setting, it)
-                PluginManager.stopPlugin("BetterMediaViewer")
-                PluginManager.startPlugin("BetterMediaViewer")
-            }
-        }
     }
 }

@@ -211,10 +211,10 @@ class RoleColorEverywhere : Plugin() {
                         val end = if (guildMember.nick == null && !settings.getBool("profileTag", true))
                             loaded.user.username.length
                         else
-                            i.length
+                            j.length
 
-                        i.setSpan(ForegroundColorSpan(guildMember.color), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        setDraweeSpanStringBuilder(i)
+                        j.setSpan(ForegroundColorSpan(guildMember.color), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        setDraweeSpanStringBuilder(j)
                     }
                 }
             })

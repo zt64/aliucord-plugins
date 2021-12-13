@@ -13,7 +13,6 @@ import androidx.core.graphics.ColorUtils
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.Hook
 import com.aliucord.patcher.InsteadHook
 import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.views.Divider
@@ -60,23 +59,23 @@ class FolderOpacity : Plugin() {
         patcher.patch(GuildListViewHolder.FolderViewHolder::class.java.getDeclaredMethod("shouldDrawDecoration"), InsteadHook.returnConstant(false))
 
         // Set the background color with alpha
-        patcher.patch(GuildListViewHolder.FolderViewHolder::class.java.getDeclaredMethod("configure", GuildListItem.FolderItem::class.java), Hook {
+        patcher.patch(GuildListViewHolder.FolderViewHolder::class.java.getDeclaredMethod("configure", GuildListItem.FolderItem::class.java)) {
             val thisObject = it.thisObject as GuildListViewHolder.FolderViewHolder
             val folderItem = it.args[0] as GuildListItem.FolderItem
 
             folderViewHolderMap[folderItem.folderId] = thisObject
 
             setAlpha(thisObject, settings.getInt(folderItem.folderId.toString() + "opacity", 30))
-        })
+        }
 
         // Patch folder settings
-        patcher.patch(WidgetGuildFolderSettings::class.java.getDeclaredMethod("configureUI", WidgetGuildFolderSettingsViewModel.ViewState::class.java), Hook {
+        patcher.patch(WidgetGuildFolderSettings::class.java.getDeclaredMethod("configureUI", WidgetGuildFolderSettingsViewModel.ViewState::class.java)) {
             val thisObject = it.thisObject as WidgetGuildFolderSettings
 
             val root = thisObject.getBinding().root
             val ctx = thisObject.requireContext()
             val linearLayout = root.findViewById<RelativeLayout>(folderColorPickerId).parent as LinearLayout
-            if (linearLayout.findViewById<View>(seekBarId) != null) return@Hook
+            if (linearLayout.findViewById<View>(seekBarId) != null) return@patch
 
             val opacity = settings.getInt(WidgetGuildFolderSettings.`access$getViewModel$p`(thisObject).folderId.toString() + "opacity", 30)
             val currentOpacity = TextView(ctx, null, 0, R.i.UiKit_TextView).apply {
@@ -110,10 +109,10 @@ class FolderOpacity : Plugin() {
                     })
                 })
             }
-        })
+        }
 
         // Patch save button
-        patcher.patch(`WidgetGuildFolderSettings$configureUI$3`::class.java.getDeclaredMethod("onClick", View::class.java), Hook {
+        patcher.patch(`WidgetGuildFolderSettings$configureUI$3`::class.java.getDeclaredMethod("onClick", View::class.java)) {
             val thisObject = it.thisObject as `WidgetGuildFolderSettings$configureUI$3`
             val widgetGuildFolderSettings = thisObject.`this$0`
             val folderId = WidgetGuildFolderSettings.`access$getViewModel$p`(widgetGuildFolderSettings).folderId
@@ -122,7 +121,7 @@ class FolderOpacity : Plugin() {
             settings.setInt(folderId.toString() + "opacity", seekBar.progress)
 
             setAlpha(folderViewHolderMap[folderId]!!, seekBar.progress)
-        })
+        }
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()

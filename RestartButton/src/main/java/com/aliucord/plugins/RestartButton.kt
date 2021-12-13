@@ -19,7 +19,7 @@ class RestartButton : Plugin() {
             with(it.thisObject as WidgetSettings) {
                 icon?.setTint(ColorCompat.getThemedColor(requireContext(), R.b.colorInteractiveNormal))
 
-                requireAppActivity().t.menu.add("Restart")
+                requireAppActivity().u.menu.add("Restart")
                     .setIcon(icon)
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
                     .setOnMenuItemClickListener {

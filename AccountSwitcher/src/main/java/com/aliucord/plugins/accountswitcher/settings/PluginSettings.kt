@@ -29,13 +29,14 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 
-        setActionBarTitle("Account Switcher")
-
         val accounts = getAccounts()
         val ctx = requireContext()
         val accountAdapter = AccountAdapter(this@PluginSettings, accounts)
 
-        headerBar.menu.add("Switcher").setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        setActionBarTitle("Account Switcher")
+
+        headerBar.menu.add("Switcher")
+            .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
             .setIcon(Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.e.ic_my_account_24dp)!!.mutate()))
             .setOnMenuItemClickListener {
                 Utils.openPageWithProxy(ctx, SwitcherPage(getAccounts().apply {
@@ -77,11 +78,13 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
                 addView(Button(ctx).apply {
                     text = "Add Current Account"
                     setOnClickListener {
-                        if (getAccounts().any { it.token == token })
-                            Utils.showToast("Account already added")
-                        else {
-                            accountAdapter.addAccount(token, StoreStream.getUsers().me.id)
-                            Utils.showToast("Added current account")
+                        when {
+                            getAccounts().any { it.token == token } -> Utils.showToast("Account already added")
+                            token != null -> {
+                                accountAdapter.addAccount(token, StoreStream.getUsers().me.id)
+                                Utils.showToast("Added current account")
+                            }
+                            else -> Utils.showToast("Failed to fetch token")
                         }
 
                         linearLayout.removeView(this)

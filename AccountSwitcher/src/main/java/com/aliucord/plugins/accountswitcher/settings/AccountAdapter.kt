@@ -27,8 +27,8 @@ class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList
 
     override fun getItemCount() = accounts.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        AccountViewHolder(this, com.aliucord.widgets.LinearLayout(parent.context).apply {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = AccountViewHolder(
+        this, com.aliucord.widgets.LinearLayout(parent.context).apply {
             layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
         }, isSettings
     )
@@ -36,9 +36,7 @@ class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: AccountViewHolder, position: Int) = accounts[position].let {
         val user = StoreStream.getUsers().users[it.id]
-        holder.name.text = if (user == null) "Failed to load user" else
-            UserUtils.INSTANCE.getUserNameWithDiscriminator(user, null, null)
-
+        holder.name.text = if (user == null) "Failed to load user" else UserUtils.INSTANCE.getUserNameWithDiscriminator(user, null, null)
         holder.userId.text = "ID: ${user?.id.toString()}"
 
         IconUtils.setIcon(holder.avatar, user)
@@ -48,8 +46,8 @@ class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList
 
     fun onRemove(position: Int) = accounts[position].let { account ->
         val dialog = ConfirmDialog().setIsDangerous(true)
-                .setTitle("Delete ${StoreStream.getUsers().users[account.id]?.username ?: "Unknown"}")
-                .setDescription("Are you sure you want to delete this account?")
+            .setTitle("Delete ${StoreStream.getUsers().users[account.id]?.username ?: "Unknown"}")
+            .setDescription("Are you sure you want to delete this account?")
 
         dialog.setOnOkListener {
             dialog.dismiss()

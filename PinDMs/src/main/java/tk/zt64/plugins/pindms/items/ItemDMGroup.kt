@@ -1,18 +1,24 @@
-package tk.zt64.plugins.pindms
+package tk.zt64.plugins.pindms.items
 
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import com.aliucord.Utils
 import com.discord.stores.StoreStream
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.list.items.ChannelListItem
 import com.lytefast.flexinput.R
-import tk.zt64.plugins.ChannelListItemDMGroup
 import tk.zt64.plugins.PinDMs
+import tk.zt64.plugins.pindms.DMGroup
 import tk.zt64.plugins.pindms.sheets.GroupSheet
+
+class ChannelListItemDMGroup(val group: DMGroup) : ChannelListItem {
+    override fun getKey(): String = ""
+    override fun getType(): Int = 400
+}
 
 class ItemDMGroup(@LayoutRes i: Int, adapter: WidgetChannelsListAdapter) : WidgetChannelsListAdapter.Item(i, adapter) {
     private val nameView = itemView.findViewById<TextView>(Utils.getResId("channels_item_category_name", "id"))
@@ -43,6 +49,7 @@ class ItemDMGroup(@LayoutRes i: Int, adapter: WidgetChannelsListAdapter) : Widge
                 else WidgetChannelsListAdapter.ItemChannelCategory.Companion.`access$getAnimation`(WidgetChannelsListAdapter.ItemChannelCategory.Companion, true)
             )
         }
+
         itemView.setOnClickListener {
             group.collapsed = !group.collapsed
 
@@ -55,7 +62,7 @@ class ItemDMGroup(@LayoutRes i: Int, adapter: WidgetChannelsListAdapter) : Widge
             PinDMs.saveGroups()
         }
         itemView.setOnLongClickListener {
-            GroupSheet(group).show(Utils.appActivity.supportFragmentManager, "GroupSheet")
+            GroupSheet(group).show((itemView.context as AppCompatActivity).supportFragmentManager, "GroupSheet")
             true
         }
     }

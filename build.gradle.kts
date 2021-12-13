@@ -5,12 +5,13 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
         maven("https://jitpack.io")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.3")
+        classpath("com.android.tools.build:gradle:7.0.4")
         classpath("com.github.Aliucord:gradle:main-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0-RC2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0")
     }
 }
 
@@ -18,7 +19,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-//        mavenLocal()
+        mavenLocal()
         maven("https://jitpack.io")
     }
 }

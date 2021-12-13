@@ -18,7 +18,7 @@ import com.aliucord.views.Button
 import com.discord.stores.StoreStream
 import com.lytefast.flexinput.R
 
-class SwitcherPage(private val accounts: ArrayList<Account>): SettingsPage() {
+class SwitcherPage(private val accounts: ArrayList<Account>) : SettingsPage() {
     @SuppressLint("SetTextI18n")
     override fun onViewBound(view: View) {
         super.onViewBound(view)

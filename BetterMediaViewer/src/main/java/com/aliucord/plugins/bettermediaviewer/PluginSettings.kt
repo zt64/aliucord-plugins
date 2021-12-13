@@ -34,16 +34,16 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
 
         val ctx = requireContext()
 
-        fun createCheckedSetting(title: String, subtitle: String, setting: String, defValue: Boolean): CheckedSetting {
-            return Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, subtitle).apply {
-                isChecked = settings.getBool(setting, defValue)
-                setOnCheckedListener {
-                    settings.setBool(setting, it)
-                    PluginManager.stopPlugin("BetterMediaViewer")
-                    PluginManager.startPlugin("BetterMediaViewer")
-                }
-            }
-        }
+        fun createCheckedSetting(title: String, subtitle: String, setting: String, defValue: Boolean): CheckedSetting =
+                Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, subtitle)
+                    .apply {
+                        isChecked = settings.getBool(setting, defValue)
+                        setOnCheckedListener {
+                            settings.setBool(setting, it)
+                            PluginManager.stopPlugin("BetterMediaViewer")
+                            PluginManager.startPlugin("BetterMediaViewer")
+                        }
+                    }
 
         setActionBarTitle("Better Media Viewer")
 
@@ -65,7 +65,7 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
                     currentTimeout.text = "${this + offset} ms"
                 }
 
-                override fun onStartTrackingTouch(seekBar: SeekBar) { }
+                override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
                 override fun onStopTrackingTouch(seekBar: SeekBar) = settings.setInt("controlsTimeout", seekBar.progress + offset)
             })

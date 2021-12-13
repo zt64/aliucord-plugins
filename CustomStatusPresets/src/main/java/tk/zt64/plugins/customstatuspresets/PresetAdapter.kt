@@ -14,6 +14,7 @@ import com.discord.utilities.color.ColorCompat
 import com.discord.utilities.icon.IconUtils
 import com.discord.utilities.images.MGImages
 import com.discord.widgets.chat.input.emoji.EmojiPickerContextType
+import com.discord.widgets.chat.input.emoji.EmojiPickerListener
 import com.discord.widgets.chat.input.emoji.EmojiPickerNavigator
 import com.discord.widgets.user.WidgetUserSetCustomStatus
 import com.discord.widgets.user.profile.UserStatusPresenceCustomView
@@ -22,29 +23,30 @@ import com.lytefast.flexinput.R
 import tk.zt64.plugins.CustomStatusPresets
 
 class PresetAdapter(private val widgetUserSetCustomStatus: WidgetUserSetCustomStatus, private val presets: ArrayList<UserStatusPresenceCustomView.ViewState.WithStatus>) : RecyclerView.Adapter<PresetViewHolder>() {
-    private fun saveAccounts() = CustomStatusPresets.mSettings.setObject("presets", presets)
-    fun addPreset(preset: UserStatusPresenceCustomView.ViewState.WithStatus): Boolean = presets.add(preset).also { if (it) saveAccounts() }
-    private fun removePreset(preset: UserStatusPresenceCustomView.ViewState.WithStatus): Boolean = presets.remove(preset).also { if (it) saveAccounts() }
-
     private val statusViewId = Utils.getResId("view_user_status_presence_custom", "layout")
     private val emojiPreviewSize = Utils.getResId("custom_status_emoji_preview_size", "dimen")
 
+    private fun savePresets() = CustomStatusPresets.mSettings.setObject("presets", presets)
+    fun addPreset(preset: UserStatusPresenceCustomView.ViewState.WithStatus): Boolean = presets.add(preset)
+        .also { if (it) savePresets() }
+
+    private fun removePreset(preset: UserStatusPresenceCustomView.ViewState.WithStatus): Boolean = presets.remove(preset)
+        .also { if (it) savePresets() }
+
     private fun setEmoji(customEmoji: SimpleDraweeView, emoji: UserStatusPresenceCustomView.Emoji) {
         val ctx = customEmoji.context
-        var str: String? = null
-
-        if (emoji.id != null)
-            str = ModelEmojiCustom.getImageUri(emoji.id.toLong(), emoji.isAnimated, IconUtils.getMediaProxySize(ctx.resources.getDimensionPixelSize(emojiPreviewSize)))
-        else {
-            val modelEmojiUnicode = StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji.name]
-            if (modelEmojiUnicode != null) str = ModelEmojiUnicode.getImageUri(modelEmojiUnicode.codePoints, ctx)
+        val str = if (emoji.id != null)
+            ModelEmojiCustom.getImageUri(emoji.id.toLong(), emoji.isAnimated, IconUtils.getMediaProxySize(ctx.resources.getDimensionPixelSize(emojiPreviewSize)))
+        else StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji.name]?.let { modelEmojiUnicode ->
+            ModelEmojiUnicode.getImageUri(modelEmojiUnicode.codePoints, ctx)
         }
 
         MGImages.setImage(customEmoji, str)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        PresetViewHolder(this, LayoutInflater.from(parent.context).inflate(statusViewId, parent, false) as LinearLayout)
+            PresetViewHolder(this, LayoutInflater.from(parent.context)
+                .inflate(statusViewId, parent, false) as LinearLayout)
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: PresetViewHolder, position: Int) = presets[position].let {
@@ -66,29 +68,30 @@ class PresetAdapter(private val widgetUserSetCustomStatus: WidgetUserSetCustomSt
     }
 
     fun onClick(position: Int) = presets[position].let {
-        with (WidgetUserSetCustomStatus.`access$getViewModel$p`(widgetUserSetCustomStatus)) {
+        with(WidgetUserSetCustomStatus.`access$getViewModel$p`(widgetUserSetCustomStatus)) {
             clearStatusTextAndEmoji()
             if (it.statusText != null) setStatusText(it.statusText)
-            if (it.emoji != null)
-                setStatusEmoji(
-                    if (it.emoji.id == null)
-                        StoreStream.getEmojis().unicodeEmojiSurrogateMap[it.emoji.name]
-                    else
-                        StoreStream.getEmojis().getCustomEmojiInternal(it.emoji.id.toLong())
-                )
+            if (it.emoji != null) setStatusEmoji(if (it.emoji.id == null)
+                StoreStream.getEmojis().unicodeEmojiSurrogateMap[it.emoji.name]
+            else
+                StoreStream.getEmojis().getCustomEmojiInternal(it.emoji.id.toLong())
+            )
         }
     }
 
     fun editEmoji(customEmoji: SimpleDraweeView, position: Int) = presets[position].let {
-        val function = { modelEmoji: Emoji ->
-            val emoji = StoreStream.getEmojis().getCustomEmojiInternal(modelEmoji.uniqueId.toLong()).let { modelEmojiCustom ->
-                UserStatusPresenceCustomView.Emoji(modelEmojiCustom.id.toString(), modelEmojiCustom.name, modelEmojiCustom.isAnimated)
-            }
+        val emojiPickerListener = EmojiPickerListener { modelEmoji: Emoji ->
+            val emoji = StoreStream.getEmojis()
+                .getCustomEmojiInternal(modelEmoji.uniqueId.toLong())
+                .let { modelEmojiCustom ->
+                    UserStatusPresenceCustomView.Emoji(modelEmojiCustom.id.toString(), modelEmojiCustom.name, modelEmojiCustom.isAnimated)
+                }
+
+            presets[position] = it.copy(emoji, it.statusText)
+            savePresets()
             setEmoji(customEmoji, emoji)
-            removePreset(it)
-            addPreset(it.copy(emoji, it.statusText))
-            Unit.a
         }
-        EmojiPickerNavigator.launchBottomSheet(Utils.appActivity.supportFragmentManager, function, EmojiPickerContextType.Global.INSTANCE, null)
+
+        EmojiPickerNavigator.launchBottomSheet(Utils.appActivity.supportFragmentManager, emojiPickerListener, EmojiPickerContextType.Global.INSTANCE, null)
     }
 }

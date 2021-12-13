@@ -13,7 +13,7 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.Hook
+import com.aliucord.patcher.after
 import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.views.Divider
 import com.discord.models.domain.emoji.ModelEmojiCustom
@@ -29,7 +29,8 @@ import tk.zt64.plugins.customstatuspresets.PresetAdapter
 
 @AliucordPlugin
 class CustomStatusPresets : Plugin() {
-    private val presetType = TypeToken.getParameterized(ArrayList::class.java, UserStatusPresenceCustomView.ViewState.WithStatus::class.javaObjectType).getType()
+    private val presetType = TypeToken.getParameterized(ArrayList::class.java, UserStatusPresenceCustomView.ViewState.WithStatus::class.javaObjectType)
+        .getType()
 
     companion object {
         lateinit var mSettings: SettingsAPI
@@ -42,10 +43,9 @@ class CustomStatusPresets : Plugin() {
         val statusExpirationId = Utils.getResId("set_custom_status_expiration", "id")
         val saveButtonId = Utils.getResId("set_custom_status_save", "id")
 
-        patcher.patch(WidgetUserSetCustomStatus::class.java.getDeclaredMethod("onViewBound", View::class.java), Hook {
+        patcher.after<WidgetUserSetCustomStatus>("onViewBound", View::class.java) {
             val rootView = it.args[0] as CoordinatorLayout
-            val widgetUserSetCustomStatus = it.thisObject as WidgetUserSetCustomStatus
-            val presetAdapter = PresetAdapter(widgetUserSetCustomStatus, settings.getObject("presets", ArrayList(), presetType))
+            val presetAdapter = PresetAdapter(this, settings.getObject("presets", ArrayList(), presetType))
 
             with(rootView.findViewById<RadioGroup>(statusExpirationId).parent as LinearLayout) {
                 val ctx = this.context
@@ -57,20 +57,22 @@ class CustomStatusPresets : Plugin() {
                 addView(RecyclerView(ctx).apply {
                     adapter = presetAdapter
                     layoutManager = LinearLayoutManager(ctx)
-                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 200.dp)
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250.dp)
                 })
             }
 
             rootView.findViewById<FloatingActionButton>(saveButtonId).setOnLongClickListener {
-                val formState = (WidgetUserSetCustomStatus.`access$getViewModel$p`(widgetUserSetCustomStatus).viewState as WidgetUserSetCustomStatusViewModel.ViewState.Loaded).formState
+                val formState = (WidgetUserSetCustomStatus.`access$getViewModel$p`(this).viewState as WidgetUserSetCustomStatusViewModel.ViewState.Loaded).formState
 
                 if (formState.emoji == null && formState.text.isEmpty()) return@setOnLongClickListener false
 
                 val emoji = when (formState.emoji) {
                     is ModelEmojiUnicode -> UserStatusPresenceCustomView.Emoji(null, (formState.emoji as ModelEmojiUnicode).surrogates, false)
-                    is ModelEmojiCustom -> StoreStream.getEmojis().getCustomEmojiInternal(formState.emoji.uniqueId.toLong()).let { emoji ->
-                        UserStatusPresenceCustomView.Emoji(emoji.id.toString(), emoji.name, emoji.isAnimated)
-                    }
+                    is ModelEmojiCustom -> StoreStream.getEmojis()
+                        .getCustomEmojiInternal(formState.emoji.uniqueId.toLong())
+                        .let { emoji ->
+                            UserStatusPresenceCustomView.Emoji(emoji.id.toString(), emoji.name, emoji.isAnimated)
+                        }
                     else -> null
                 }
 
@@ -80,7 +82,10 @@ class CustomStatusPresets : Plugin() {
                 presetAdapter.notifyItemInserted(presetAdapter.itemCount)
                 true
             }
-        })
+
+            // Hide the Wumpus image
+            rootView.getChildAt(2).visibility = View.GONE
+        }
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()

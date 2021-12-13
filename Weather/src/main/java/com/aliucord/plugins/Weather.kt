@@ -16,7 +16,7 @@ import java.util.*
 
 @AliucordPlugin
 class Weather : Plugin() {
-    private val logger = Logger("Weather")
+    private val theLogger = Logger("Weather")
     private val thermometerEmoji = "\uD83C\uDF21"
     private val cloudEmoji = "☁️"
     private val humidityEmoji = "\uD83D\uDCA6"
@@ -29,7 +29,7 @@ class Weather : Plugin() {
         commands.registerCommand("weather", "Get the weather for the current location, or a specific location", arguments) {
             val location = it.getString("location")
             val weather: WeatherResponse = try {
-                Http.simpleJsonGet("http://wttr.in/" + (location
+                Http.simpleJsonGet("https://wttr.in/" + (location
                         ?: "") + "?format=j1", WeatherResponse::class.java)
             } catch (throwable: Throwable) {
                 logger.error(throwable)
@@ -43,7 +43,8 @@ class Weather : Plugin() {
             val country = nearestArea.country[0].value
             val region = nearestArea.region[0].value
 
-            val embed = MessageEmbedBuilder().setTitle("Weather: ${weatherDesc.value}")
+            val embed = MessageEmbedBuilder()
+                    .setTitle("Weather: ${weatherDesc.value}")
                     .setColor(0xEDEDED)
                     .setDescription(
                             "**Temp**:\n" +
@@ -56,12 +57,14 @@ class Weather : Plugin() {
                                     "$cloudEmoji  **Cloud Cover**: `${condition.cloudcover}%`\n" +
                                     "$humidityEmoji **Humidity**: `${condition.humidity}`\n" +
                                     "$uvIndexEmoji **UV Index**: `${condition.uvIndex}`"
-                    ).setFooter("$areaName, $region, $country", null)
+                    )
+                    .setFooter("$areaName, $region, $country", null)
             try {
                 embed.setUrl("http://wttr.in/" + if (location == null) "" else URLEncoder.encode(location, "UTF-8"))
             } catch (e: UnsupportedEncodingException) {
-                logger.error(e)
+                theLogger.error(e)
             }
+
             CommandResult(null, listOf(embed.build()), false)
         }
     }

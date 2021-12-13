@@ -1,4 +1,4 @@
-version = "1.4.0"
+version = "1.5.0"
 description = "Adds an option to the guild folder settings to set the opacity"
 
 aliucord {

@@ -1,9 +1,12 @@
 ## Plugins for [Aliucord](https://github.com/Aliucord)
 
 Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
+- [DMCategories](https://github.com/zt64/aliucord-plugins/raw/builds/DMCategories.zip)
+  Adds the ability to create categories for DMs, which will come first in the channels list
+
 - [MessageWidthFix](https://github.com/zt64/aliucord-plugins/raw/builds/MessageWidthFix.zip)
   Fixes the width on embeds and stickers to make long press work
-  
+
 - [CompactMode](https://github.com/zt64/aliucord-plugins/raw/builds/CompactMode.zip)
   Adds several settings to customize the appearance of chat, for a more compact style
 
@@ -12,7 +15,7 @@ Click on a plugin name to download, and then move the downloaded file to the `Al
 
 - [AccountSwitcher](https://github.com/zt64/aliucord-plugins/raw/builds/AccountSwitcher.zip)
   Adds an account switcher to the app, with a simple user interface to add and edit accounts. The switcher can be accessed through the logout button
-  
+
 - [CursorInput](https://github.com/zt64/aliucord-plugins/raw/builds/CursorInput.zip)
   Makes tapping emojis, usernames, and other similar elements add text at the current cursor position, instead of at the end
 

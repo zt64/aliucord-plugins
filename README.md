@@ -1,6 +1,9 @@
 ## Plugins for [Aliucord](https://github.com/Aliucord)
 
 Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
+- [MessageWidthFix](https://github.com/zt64/aliucord-plugins/raw/builds/MessageWidthFix.zip)
+  Fixes the width on embeds and stickers to make long press work
+  
 - [CompactMode](https://github.com/zt64/aliucord-plugins/raw/builds/CompactMode.zip)
   Adds several settings to customize the appearance of chat, for a more compact style
 

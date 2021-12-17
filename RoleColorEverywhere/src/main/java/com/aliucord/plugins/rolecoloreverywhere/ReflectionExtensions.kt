@@ -11,55 +11,40 @@ import com.discord.widgets.voice.fullscreen.stage.AudienceViewHolder
 import com.discord.widgets.voice.fullscreen.stage.SpeakerViewHolder
 import com.discord.widgets.voice.sheet.CallParticipantsAdapter
 import com.facebook.drawee.span.DraweeSpanStringBuilder
-import java.lang.reflect.Field
 
-object ReflectionExtensions {
-    private lateinit var typingIndicatorBinding: Field
-    private lateinit var itemVoiceBinding: Field
-    private lateinit var autoCompleteBinding: Field
-    private lateinit var memberListBinding: Field
-    private lateinit var voiceListBinding: Field
-    private lateinit var audienceListBinding: Field
-    private lateinit var speakerListBinding: Field
-    private lateinit var reactionListBinding: Field
-    private lateinit var mDraweeStringBuilderField: Field
+private val typingIndicatorBinding = WidgetChatOverlay.TypingIndicatorViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
+private val itemVoiceBinding = WidgetChannelsListAdapter.ItemVoiceUser::class.java.getDeclaredField("binding").apply { isAccessible = true }
+private val autoCompleteBinding = AutocompleteItemViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
+private val memberListBinding = ChannelMembersListViewHolderMember::class.java.getDeclaredField("binding").apply { isAccessible = true }
+private val voiceListBinding = CallParticipantsAdapter.ViewHolderUser::class.java.getDeclaredField("binding").apply { isAccessible = true }
+private val audienceListBinding = AudienceViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
+private val speakerListBinding = SpeakerViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
+private val reactionListBinding = ManageReactionsResultsAdapter.ReactionUserViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
+private val mDraweeStringBuilderField = SimpleDraweeSpanTextView::class.java.getDeclaredField("mDraweeStringBuilder").apply { isAccessible = true }
 
-    fun init() {
-        typingIndicatorBinding = WidgetChatOverlay.TypingIndicatorViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
-        itemVoiceBinding = WidgetChannelsListAdapter.ItemVoiceUser::class.java.getDeclaredField("binding").apply { isAccessible = true }
-        autoCompleteBinding = AutocompleteItemViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
-        memberListBinding = ChannelMembersListViewHolderMember::class.java.getDeclaredField("binding").apply { isAccessible = true }
-        voiceListBinding = CallParticipantsAdapter.ViewHolderUser::class.java.getDeclaredField("binding").apply { isAccessible = true }
-        audienceListBinding = AudienceViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
-        speakerListBinding = SpeakerViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
-        reactionListBinding = ManageReactionsResultsAdapter.ReactionUserViewHolder::class.java.getDeclaredField("binding").apply { isAccessible = true }
-        mDraweeStringBuilderField = SimpleDraweeSpanTextView::class.java.getDeclaredField("mDraweeStringBuilder").apply { isAccessible = true }
-    }
+val WidgetChatOverlay.TypingIndicatorViewHolder.binding: WidgetChatOverlayBinding
+    get() = typingIndicatorBinding[this] as WidgetChatOverlayBinding
 
-    val WidgetChatOverlay.TypingIndicatorViewHolder.binding: WidgetChatOverlayBinding
-        get() = typingIndicatorBinding[this] as WidgetChatOverlayBinding
+val WidgetChannelsListAdapter.ItemVoiceUser.binding: WidgetChannelsListItemVoiceUserBinding
+    get() = itemVoiceBinding[this] as WidgetChannelsListItemVoiceUserBinding
 
-    val WidgetChannelsListAdapter.ItemVoiceUser.binding: WidgetChannelsListItemVoiceUserBinding
-        get() = itemVoiceBinding[this] as WidgetChannelsListItemVoiceUserBinding
+val AutocompleteItemViewHolder.binding: WidgetChatInputAutocompleteItemBinding
+    get() = autoCompleteBinding[this] as WidgetChatInputAutocompleteItemBinding
 
-    val AutocompleteItemViewHolder.binding: WidgetChatInputAutocompleteItemBinding
-        get() = autoCompleteBinding[this] as WidgetChatInputAutocompleteItemBinding
+val ChannelMembersListViewHolderMember.binding: WidgetChannelMembersListItemUserBinding
+    get() = memberListBinding[this] as WidgetChannelMembersListItemUserBinding
 
-    val ChannelMembersListViewHolderMember.binding: WidgetChannelMembersListItemUserBinding
-        get() = memberListBinding[this] as WidgetChannelMembersListItemUserBinding
+val CallParticipantsAdapter.ViewHolderUser.binding: VoiceUserListItemUserBinding
+    get() = voiceListBinding[this] as VoiceUserListItemUserBinding
 
-    val CallParticipantsAdapter.ViewHolderUser.binding: VoiceUserListItemUserBinding
-        get() = voiceListBinding[this] as VoiceUserListItemUserBinding
+val AudienceViewHolder.binding: WidgetStageChannelAudienceBinding
+    get() = audienceListBinding[this] as WidgetStageChannelAudienceBinding
 
-    val AudienceViewHolder.binding: WidgetStageChannelAudienceBinding
-        get() = audienceListBinding[this] as WidgetStageChannelAudienceBinding
+val SpeakerViewHolder.binding: WidgetStageChannelSpeakerBinding
+    get() = speakerListBinding[this] as WidgetStageChannelSpeakerBinding
 
-    val SpeakerViewHolder.binding: WidgetStageChannelSpeakerBinding
-        get() = speakerListBinding[this] as WidgetStageChannelSpeakerBinding
+val ManageReactionsResultsAdapter.ReactionUserViewHolder.binding: WidgetManageReactionsResultUserBinding
+    get() = reactionListBinding[this] as WidgetManageReactionsResultUserBinding
 
-    val ManageReactionsResultsAdapter.ReactionUserViewHolder.binding: WidgetManageReactionsResultUserBinding
-        get() = reactionListBinding[this] as WidgetManageReactionsResultUserBinding
-
-    val SimpleDraweeSpanTextView.mDraweeStringBuilder: DraweeSpanStringBuilder?
-        get() = mDraweeStringBuilderField[this] as DraweeSpanStringBuilder?
-}
+val SimpleDraweeSpanTextView.mDraweeStringBuilder: DraweeSpanStringBuilder?
+    get() = mDraweeStringBuilderField[this] as DraweeSpanStringBuilder?

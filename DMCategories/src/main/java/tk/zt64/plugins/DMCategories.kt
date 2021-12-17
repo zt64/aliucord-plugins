@@ -16,7 +16,6 @@ import com.aliucord.patcher.before
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
 import com.discord.databinding.WidgetChannelsListItemActionsBinding
-import com.discord.stores.StoreStream
 import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.channels.list.WidgetChannelListModel
 import com.discord.widgets.channels.list.WidgetChannelsList
@@ -25,45 +24,41 @@ import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions
 import com.discord.widgets.channels.list.items.ChannelListItemPrivate
 import com.google.gson.reflect.TypeToken
 import com.lytefast.flexinput.R
-import tk.zt64.plugins.pindms.DMGroup
-import tk.zt64.plugins.pindms.items.ChannelListItemDMGroup
-import tk.zt64.plugins.pindms.items.ItemDMGroup
-import tk.zt64.plugins.pindms.items.ItemDivider
-import tk.zt64.plugins.pindms.sheets.GroupsSheet
-import java.lang.reflect.Method
+import tk.zt64.plugins.dmcategories.DMCategory
+import tk.zt64.plugins.dmcategories.Util
+import tk.zt64.plugins.dmcategories.items.ChannelListItemDMCategory
+import tk.zt64.plugins.dmcategories.items.ChannelListItemDivider
+import tk.zt64.plugins.dmcategories.items.ItemDMCategory
+import tk.zt64.plugins.dmcategories.items.ItemDivider
+import tk.zt64.plugins.dmcategories.sheets.CategoriesSheet
 import java.util.*
 import kotlin.collections.ArrayList
 
 @AliucordPlugin
-class PinDMs : Plugin() {
-    private val groupType = TypeToken.getParameterized(ArrayList::class.java, DMGroup::class.javaObjectType).getType()
+class DMCategories : Plugin() {
+    private val categoryType = TypeToken.getParameterized(ArrayList::class.java, DMCategory::class.javaObjectType).getType()
 
-    private val getBindingMethod: Method by lazy {
-        WidgetChannelsListItemChannelActions::class.java.getDeclaredMethod("getBinding").apply {
-            isAccessible = true
-        }
-    }
-
-    private fun WidgetChannelsListItemChannelActions.getBinding() = getBindingMethod.invoke(this) as WidgetChannelsListItemActionsBinding
+    private val getBindingMethod = WidgetChannelsListItemChannelActions::class.java.getDeclaredMethod("getBinding").apply { isAccessible = true }
+    private fun WidgetChannelsListItemChannelActions.getBinding() = getBindingMethod(this) as WidgetChannelsListItemActionsBinding
 
     companion object {
         private lateinit var mSettings: SettingsAPI
-        lateinit var groups: ArrayList<DMGroup>
+        lateinit var categories: ArrayList<DMCategory>
 
-        fun saveGroups() = mSettings.setObject("groups", groups)
-
-        fun addGroup(name: String, channelIds: ArrayList<Long> = ArrayList()) = groups.add(DMGroup(name, channelIds)).also { saveGroups() }
-        fun removeGroup(group: DMGroup) = groups.remove(group).also { saveGroups() }
-        fun getGroup(name: String) = groups.find { dmGroup -> dmGroup.name == name }
+        fun saveCategories() = mSettings.setObject("categories", categories)
+        fun addCategory(name: String, channelIds: ArrayList<Long> = ArrayList()) = categories.add(DMCategory(Util.getCurrentId(), name, channelIds)).also { if (it) saveCategories() }
+        fun removeCategory(category: DMCategory) = categories.remove(category).also { if (it) saveCategories() }
+        fun getCategory(name: String) = categories.find { dmCategory -> dmCategory.name == name }
     }
 
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         val categoryLayoutId = Utils.getResId("widget_channels_list_item_category", "layout")
-        val headerLayoutId = Utils.getResId("widget_channels_list_item_header", "layout")
+        val stageEventsSeparatorId = Utils.getResId("widget_channels_list_item_stage_events_separator", "layout")
 
+        
         mSettings = settings
-        groups = settings.getObject("groups", ArrayList(), groupType)
+        categories = settings.getObject("categories", ArrayList(), categoryType)
 
         patcher.after<WidgetChannelsListItemChannelActions>("configureUI", WidgetChannelsListItemChannelActions.Model::class.java) {
             val model = it.args[0] as WidgetChannelsListItemChannelActions.Model
@@ -74,27 +69,25 @@ class PinDMs : Plugin() {
             val ctx = root.context
 
             (root.getChildAt(0) as LinearLayout).addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-                groups.find { group -> group.channelIds.contains(model.channel.id) }?.let { group ->
-                    text = "Remove from group"
+                categories.find { category -> category.channelIds.contains(model.channel.id) }?.let { category ->
+                    text = "Remove from category"
                     setOnClickListener {
                         dismiss()
 
-                        group.channelIds.remove(model.channel.id)
+                        category.channelIds.remove(model.channel.id)
 
-                        StoreStream.`access$getDispatcher$p`(StoreStream.getPresences().stream).schedule {
-                            StoreStream.getChannels().markChanged()
-                        }
+                        Util.updateChannels()
 
-                        saveGroups()
+                        saveCategories()
                     }
                     setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(ctx, R.e.ic_remove_circle_outline_red_24dp)!!.mutate().apply {
                         setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
                     }, null, null, null)
                 } ?: run {
-                    text = "Set Group"
+                    text = "Set Category"
                     setOnClickListener {
                         dismiss()
-                        GroupsSheet(model.channel.id).show(parentFragmentManager, "Groups")
+                        CategoriesSheet(model.channel.id).show(parentFragmentManager, "Categories")
                     }
                     setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(ctx, R.e.ic_group_add_white_24dp)!!.mutate().apply {
                         setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
@@ -108,23 +101,24 @@ class PinDMs : Plugin() {
 
             if (model.selectedGuild != null) return@before
 
-            settings.getObject("groups", ArrayList<DMGroup>(), groupType).reversed().forEach { group ->
-                val items = model.items.filterIsInstance<ChannelListItemPrivate>().filter { item ->
-                    group.channelIds.contains(item.channel.id)
-                }
+            settings.getObject("categories", ArrayList<DMCategory>(), categoryType).filter { category -> category.userId == Util.getCurrentId() }
+                    .reversed().forEach { category ->
+                        val privateChannels = model.items.filterIsInstance<ChannelListItemPrivate>().filter { item ->
+                            category.channelIds.contains(item.channel.id)
+                        }
 
-                model.items.removeAll(items)
+                        model.items.removeAll(privateChannels)
 
-                if (group.collapsed) return@forEach run { model.items.add(0, ChannelListItemDMGroup(group)) }
+                        if (category.collapsed) return@forEach run { model.items.addAll(0, listOf(ChannelListItemDMCategory(category)) + ChannelListItemDivider) }
 
-                model.items.addAll(0, listOf(ChannelListItemDMGroup(group)) + items)
-            }
+                        model.items.addAll(0, listOf(ChannelListItemDMCategory(category)) + privateChannels + ChannelListItemDivider)
+                    }
         }
 
         patcher.after<WidgetChannelsListAdapter>("onCreateViewHolder", ViewGroup::class.java, Int::class.java) {
             it.result = when (it.args[1]) {
-                400 -> ItemDMGroup(categoryLayoutId, this)
-                401 -> ItemDivider(headerLayoutId, this)
+                400 -> ItemDMCategory(categoryLayoutId, this)
+                401 -> ItemDivider(stageEventsSeparatorId, this)
                 else -> it.result
             }
         }

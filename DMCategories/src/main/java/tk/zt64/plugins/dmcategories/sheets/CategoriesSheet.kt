@@ -1,4 +1,4 @@
-package tk.zt64.plugins.pindms.sheets
+package tk.zt64.plugins.dmcategories.sheets
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -16,10 +16,10 @@ import com.aliucord.views.Divider
 import com.aliucord.widgets.BottomSheet
 import com.discord.utilities.color.ColorCompat
 import com.lytefast.flexinput.R
-import tk.zt64.plugins.PinDMs
-import tk.zt64.plugins.pindms.GroupDialog
+import tk.zt64.plugins.DMCategories
+import tk.zt64.plugins.dmcategories.CategoryDialog
 
-class GroupsSheet(private val channelId: Long) : BottomSheet() {
+class CategoriesSheet(private val channelId: Long) : BottomSheet() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
@@ -27,11 +27,11 @@ class GroupsSheet(private val channelId: Long) : BottomSheet() {
         val ctx = requireContext()
 
         addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-            text = "Groups"
+            text = "Categories"
         })
 
         addView(RecyclerView(ctx).apply {
-            adapter = GroupsSheetAdapter(this@GroupsSheet, channelId, PinDMs.groups)
+            adapter = CategoriesSheetAdapter(this@CategoriesSheet, channelId, DMCategories.categories)
             layoutManager = LinearLayoutManager(ctx)
 
             addItemDecoration(DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {
@@ -45,10 +45,10 @@ class GroupsSheet(private val channelId: Long) : BottomSheet() {
         addView(Divider(ctx))
 
         addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Create Group"
+            text = "Create Category"
             setOnClickListener {
                 dismiss()
-                GroupDialog(channelId).show(parentFragmentManager, "CreateGroup")
+                CategoryDialog(channelId).show(parentFragmentManager, "CreateCategory")
             }
             setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(ctx, R.e.ic_add_24dp)!!.mutate().apply {
                 setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))

@@ -1,4 +1,4 @@
-package tk.zt64.plugins.pindms.sheets
+package tk.zt64.plugins.dmcategories.sheets
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -10,11 +10,12 @@ import com.aliucord.widgets.BottomSheet
 import com.discord.stores.StoreStream
 import com.discord.utilities.color.ColorCompat
 import com.lytefast.flexinput.R
-import tk.zt64.plugins.PinDMs
-import tk.zt64.plugins.pindms.DMGroup
-import tk.zt64.plugins.pindms.GroupDialog
+import tk.zt64.plugins.DMCategories
+import tk.zt64.plugins.dmcategories.DMCategory
+import tk.zt64.plugins.dmcategories.CategoryDialog
+import tk.zt64.plugins.dmcategories.Util
 
-class GroupSheet(private val group: DMGroup) : BottomSheet() {
+class CategorySheet(private val category: DMCategory) : BottomSheet() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
@@ -22,14 +23,14 @@ class GroupSheet(private val group: DMGroup) : BottomSheet() {
         val ctx = requireContext()
 
         addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-            text = group.name
+            text = category.name
         })
 
         addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Rename Group"
+            text = "Rename Category"
             setOnClickListener {
                 dismiss()
-                GroupDialog(group.name).show(Utils.appActivity.supportFragmentManager, "EditGroup")
+                CategoryDialog(category.name).show(parentFragmentManager, "EditCategory")
             }
             setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(ctx, R.e.ic_edit_24dp)!!.mutate().apply {
                 setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
@@ -37,18 +38,14 @@ class GroupSheet(private val group: DMGroup) : BottomSheet() {
         })
 
         addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Delete Group"
+            text = "Delete Category"
             setOnClickListener {
                 dismiss()
-                Utils.showToast("Deleted ${group.name}")
+                Utils.showToast("Removed category: ${category.name}")
 
-                PinDMs.groups.remove(group)
-                PinDMs.saveGroups()
+                DMCategories.removeCategory(category)
 
-                PinDMs.removeGroup(group)
-                StoreStream.`access$getDispatcher$p`(StoreStream.getPresences().stream).schedule {
-                    StoreStream.getMessagesMostRecent().markChanged()
-                }
+                Util.updateChannels()
             }
             setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(ctx, R.e.ic_delete_24dp)!!.mutate().apply {
                 setTint(ColorCompat.getThemedColor(ctx, R.b.colorInfoDangerForeground))

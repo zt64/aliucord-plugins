@@ -20,7 +20,6 @@ import com.aliucord.api.PatcherAPI
 import com.aliucord.api.SettingsAPI
 import com.aliucord.patcher.InsteadHook
 import com.aliucord.patcher.after
-import com.aliucord.patcher.before
 import com.aliucord.patcher.instead
 import com.aliucord.utils.RxUtils
 import com.discord.utilities.rx.ObservableExtensionsKt
@@ -127,7 +126,7 @@ object Patches {
             if (mediaSource == null) it.result = -binding.root.findViewById<AppBarLayout>(actionBarId).translationY
         }
 
-        before<`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`>("onAnimationUpdate", ValueAnimator::class.java) {
+        instead<`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`>("onAnimationUpdate", ValueAnimator::class.java) {
             val widgetMedia = `this$0`
             val floatValue = ((it.args[0] as ValueAnimator).animatedValue) as Float
             val root = widgetMedia.binding.root

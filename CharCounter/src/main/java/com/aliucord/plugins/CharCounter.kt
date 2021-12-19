@@ -1,5 +1,6 @@
 package com.aliucord.plugins
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.TypedValue
 import android.view.Gravity
@@ -11,9 +12,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
+import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.Hook
+import com.aliucord.patcher.after
 import com.aliucord.plugins.charcounter.PluginSettings
+import com.aliucord.settings.delegate
 import com.aliucord.utils.DimenUtils.dp
 import com.discord.api.premium.PremiumTier
 import com.discord.databinding.WidgetChatOverlayBinding
@@ -22,20 +25,31 @@ import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.chat.input.AppFlexInputViewModel
 import com.discord.widgets.chat.overlay.`WidgetChatOverlay$binding$2`
 import com.lytefast.flexinput.R
+import kotlin.properties.Delegates
 
 @AliucordPlugin
 class CharCounter : Plugin() {
+    private var SettingsAPI.reverse: Boolean by settings.delegate(false)
+    private var SettingsAPI.threshold: Int by settings.delegate(0)
+
     init {
         settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         val textSizeDimenId = Utils.getResId("uikit_textsize_small", "dimen")
         val typingOverlayId = Utils.getResId("chat_overlay_typing", "id")
         var counter: TextView? = null
 
-        patcher.patch(`WidgetChatOverlay$binding$2`::class.java.getDeclaredMethod("invoke", View::class.java), Hook {
+        var normalColor: Int by Delegates.notNull()
+        var redColor: Int by Delegates.notNull()
+
+        patcher.after<`WidgetChatOverlay$binding$2`>("invoke", View::class.java) {
             val root = (it.result as WidgetChatOverlayBinding).root as ConstraintLayout
+
+            normalColor = ColorCompat.getThemedColor(root.context, R.b.colorInteractiveNormal)
+            redColor = ColorCompat.getThemedColor(root.context, R.b.colorTextDanger)
 
             counter = TextView(root.context, null, 0, R.i.UiKit_TextView).apply {
                 id = View.generateViewId()
@@ -57,17 +71,18 @@ class CharCounter : Plugin() {
                 endToStart = counter!!.id
                 width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
             }
-        })
+        }
 
-        patcher.patch(AppFlexInputViewModel::class.java.getDeclaredMethod("onInputTextChanged", String::class.java, Boolean::class.javaObjectType), Hook {
-            val str = it.args[0] as String
-            val maxChars = if (StoreStream.getUsers().me.premiumTier == PremiumTier.TIER_2) "4000" else "2000"
+        patcher.after<AppFlexInputViewModel>("onInputTextChanged", String::class.java, Boolean::class.javaObjectType) {
+            val chars = (it.args[0] as String).length
+            val maxChars = if (StoreStream.getUsers().me.premiumTier == PremiumTier.TIER_2) 4000 else 2000
 
             counter?.apply {
-                visibility = if (str.isEmpty() && !settings.getBool("alwaysVisible", false)) View.GONE else View.VISIBLE
-                text = String.format("%s/%s", str.length, maxChars)
+                visibility = if (chars >= settings.threshold) View.VISIBLE else View.GONE
+                text = "${if (settings.reverse) maxChars - chars else chars}/$maxChars"
+                setTextColor(if (chars > maxChars) redColor else normalColor)
             }
-        })
+        }
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()

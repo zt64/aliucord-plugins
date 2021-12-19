@@ -13,6 +13,7 @@ import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
 import com.aliucord.patcher.before
+import com.aliucord.settings.delegate
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
 import com.discord.databinding.WidgetChannelsListItemActionsBinding
@@ -25,6 +26,7 @@ import com.discord.widgets.channels.list.items.ChannelListItemPrivate
 import com.google.gson.reflect.TypeToken
 import com.lytefast.flexinput.R
 import tk.zt64.plugins.dmcategories.DMCategory
+import tk.zt64.plugins.dmcategories.PluginSettings
 import tk.zt64.plugins.dmcategories.Util
 import tk.zt64.plugins.dmcategories.items.ChannelListItemDMCategory
 import tk.zt64.plugins.dmcategories.items.ChannelListItemDivider
@@ -34,16 +36,23 @@ import tk.zt64.plugins.dmcategories.sheets.CategoriesSheet
 import java.util.*
 import kotlin.collections.ArrayList
 
+private val categoryType = TypeToken.getParameterized(ArrayList::class.java, DMCategory::class.javaObjectType).getType()
+
 @AliucordPlugin
 class DMCategories : Plugin() {
-    private val categoryType = TypeToken.getParameterized(ArrayList::class.java, DMCategory::class.javaObjectType).getType()
-
     private val getBindingMethod = WidgetChannelsListItemChannelActions::class.java.getDeclaredMethod("getBinding").apply { isAccessible = true }
     private fun WidgetChannelsListItemChannelActions.getBinding() = getBindingMethod(this) as WidgetChannelsListItemActionsBinding
 
+    private val SettingsAPI.showSelected: Boolean by settings.delegate(true)
+    private val SettingsAPI.showUnread: Boolean by settings.delegate(false)
+
+    init {
+        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+    }
+
     companion object {
         private lateinit var mSettings: SettingsAPI
-        lateinit var categories: ArrayList<DMCategory>
+        val categories: MutableList<DMCategory> by lazy { mSettings.getObject("categories", mutableListOf(), categoryType) }
 
         fun saveCategories() = mSettings.setObject("categories", categories)
         fun addCategory(name: String, channelIds: ArrayList<Long> = ArrayList()) = categories.add(DMCategory(Util.getCurrentId(), name, channelIds)).also { if (it) saveCategories() }
@@ -56,9 +65,7 @@ class DMCategories : Plugin() {
         val categoryLayoutId = Utils.getResId("widget_channels_list_item_category", "layout")
         val stageEventsSeparatorId = Utils.getResId("widget_channels_list_item_stage_events_separator", "layout")
 
-        
         mSettings = settings
-        categories = settings.getObject("categories", ArrayList(), categoryType)
 
         patcher.after<WidgetChannelsListItemChannelActions>("configureUI", WidgetChannelsListItemChannelActions.Model::class.java) {
             val model = it.args[0] as WidgetChannelsListItemChannelActions.Model
@@ -101,18 +108,31 @@ class DMCategories : Plugin() {
 
             if (model.selectedGuild != null) return@before
 
-            settings.getObject("categories", ArrayList<DMCategory>(), categoryType).filter { category -> category.userId == Util.getCurrentId() }
-                    .reversed().forEach { category ->
-                        val privateChannels = model.items.filterIsInstance<ChannelListItemPrivate>().filter { item ->
-                            category.channelIds.contains(item.channel.id)
-                        }
+            // I hate this but it works
+            if (categories.none { category -> category.userId == Util.getCurrentId() }) return@before
 
-                        model.items.removeAll(privateChannels)
+            val privateChannels = model.items.filterIsInstance<ChannelListItemPrivate>()
+            val items = buildList {
+                categories.forEach { category ->
+                    add(ChannelListItemDMCategory(category))
 
-                        if (category.collapsed) return@forEach run { model.items.addAll(0, listOf(ChannelListItemDMCategory(category)) + ChannelListItemDivider) }
-
-                        model.items.addAll(0, listOf(ChannelListItemDMCategory(category)) + privateChannels + ChannelListItemDivider)
+                    val channels = privateChannels.filter { channel ->
+                        category.channelIds.contains(channel.channel.id)
                     }
+
+                    model.items.removeAll(channels)
+
+                    if (category.collapsed) {
+                        if (!settings.showSelected && !settings.showUnread) return@forEach
+
+                        addAll(channels.filter { channel ->
+                            settings.showSelected && channel.selected || settings.showUnread && !channel.muted && channel.mentionCount > 0
+                        })
+                    } else addAll(channels)
+                }
+            } + ChannelListItemDivider
+
+            model.items.addAll(0, items)
         }
 
         patcher.after<WidgetChannelsListAdapter>("onCreateViewHolder", ViewGroup::class.java, Int::class.java) {

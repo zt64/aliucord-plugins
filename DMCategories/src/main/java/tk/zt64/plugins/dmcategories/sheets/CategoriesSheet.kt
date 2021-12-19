@@ -18,6 +18,7 @@ import com.discord.utilities.color.ColorCompat
 import com.lytefast.flexinput.R
 import tk.zt64.plugins.DMCategories
 import tk.zt64.plugins.dmcategories.CategoryDialog
+import tk.zt64.plugins.dmcategories.Util
 
 class CategoriesSheet(private val channelId: Long) : BottomSheet() {
     @SuppressLint("SetTextI18n")
@@ -31,7 +32,7 @@ class CategoriesSheet(private val channelId: Long) : BottomSheet() {
         })
 
         addView(RecyclerView(ctx).apply {
-            adapter = CategoriesSheetAdapter(this@CategoriesSheet, channelId, DMCategories.categories)
+            adapter = CategoriesSheetAdapter(this@CategoriesSheet, channelId, DMCategories.categories.filter { Util.getCurrentId() == it.userId })
             layoutManager = LinearLayoutManager(ctx)
 
             addItemDecoration(DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {

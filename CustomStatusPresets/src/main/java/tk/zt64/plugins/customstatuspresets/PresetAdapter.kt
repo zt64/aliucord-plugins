@@ -34,10 +34,12 @@ class PresetAdapter(private val widgetUserSetCustomStatus: WidgetUserSetCustomSt
         .also { if (it) savePresets() }
 
     private fun setEmoji(customEmoji: SimpleDraweeView, emoji: UserStatusPresenceCustomView.Emoji) {
+        val (id, name, isAnimated) = emoji
         val ctx = customEmoji.context
-        val str = if (emoji.id != null)
-            ModelEmojiCustom.getImageUri(emoji.id.toLong(), emoji.isAnimated, IconUtils.getMediaProxySize(ctx.resources.getDimensionPixelSize(emojiPreviewSize)))
-        else StoreStream.getEmojis().unicodeEmojiSurrogateMap[emoji.name]?.let { modelEmojiUnicode ->
+
+        val str = if (id != null)
+            ModelEmojiCustom.getImageUri(id.toLong(), isAnimated, IconUtils.getMediaProxySize(ctx.resources.getDimensionPixelSize(emojiPreviewSize)))
+        else StoreStream.getEmojis().unicodeEmojiSurrogateMap[name]?.let { modelEmojiUnicode ->
             ModelEmojiUnicode.getImageUri(modelEmojiUnicode.codePoints, ctx)
         }
 
@@ -71,21 +73,22 @@ class PresetAdapter(private val widgetUserSetCustomStatus: WidgetUserSetCustomSt
         with(WidgetUserSetCustomStatus.`access$getViewModel$p`(widgetUserSetCustomStatus)) {
             clearStatusTextAndEmoji()
             if (it.statusText != null) setStatusText(it.statusText)
-            if (it.emoji != null) setStatusEmoji(if (it.emoji.id == null)
-                StoreStream.getEmojis().unicodeEmojiSurrogateMap[it.emoji.name]
-            else
-                StoreStream.getEmojis().getCustomEmojiInternal(it.emoji.id.toLong())
+            val (id, name) = it.emoji ?: return@with
+
+            setStatusEmoji(
+                if (id == null) StoreStream.getEmojis().unicodeEmojiSurrogateMap[name]
+                else StoreStream.getEmojis().getCustomEmojiInternal(id.toLong())
             )
         }
     }
 
     fun editEmoji(customEmoji: SimpleDraweeView, position: Int) = presets[position].let {
         val emojiPickerListener = EmojiPickerListener { modelEmoji: Emoji ->
-            val emoji = StoreStream.getEmojis()
-                .getCustomEmojiInternal(modelEmoji.uniqueId.toLong())
-                .let { modelEmojiCustom ->
-                    UserStatusPresenceCustomView.Emoji(modelEmojiCustom.id.toString(), modelEmojiCustom.name, modelEmojiCustom.isAnimated)
-                }
+            val emoji = when (modelEmoji) {
+                is ModelEmojiUnicode -> UserStatusPresenceCustomView.Emoji(null, modelEmoji.surrogates, false)
+                is ModelEmojiCustom -> UserStatusPresenceCustomView.Emoji(modelEmoji.uniqueId, modelEmoji.name, modelEmoji.isAnimated)
+                else -> return@EmojiPickerListener
+            }
 
             presets[position] = it.copy(emoji, it.statusText)
             savePresets()

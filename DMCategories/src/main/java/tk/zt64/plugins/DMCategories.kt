@@ -112,7 +112,7 @@ class DMCategories : Plugin() {
             if (categories.none { category -> category.userId == Util.getCurrentId() }) return@before
 
             val privateChannels = model.items.filterIsInstance<ChannelListItemPrivate>()
-            val items = buildList {
+            val items = buildList(1000) {
                 categories.forEach { category ->
                     add(ChannelListItemDMCategory(category))
 

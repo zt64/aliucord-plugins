@@ -49,7 +49,7 @@ class SwitcherPage(private val accounts: ArrayList<Account>) : SettingsPage() {
             addView(Button(ctx).apply {
                 text = "Log Out"
                 setBackgroundColor(view.resources.getColor(R.c.uikit_btn_bg_color_selector_red, view.context.theme))
-                setOnClickListener { StoreStream.getAuthentication().logout() }
+                setOnClickListener { StoreStream.getAuthentication().setAuthed(null) }
             })
         }
     }

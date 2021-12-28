@@ -1,2 +1,8 @@
-version = "1.1.0"
-description = "Adds several settings to customize the appearance of chat, for a more compact style"
+version = "1.2.0"
+description = "Modifies chat to have a more compact appearance, with several options to change"
+
+aliucord.changelog.set("""
+    # 1.2.0
+    * Styled failed messages
+    * Updated description
+""".trimIndent())

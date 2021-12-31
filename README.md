@@ -1,6 +1,10 @@
 ## Plugins for [Aliucord](https://github.com/Aliucord)
 
 Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
+
+- [PermissionsSync](https://github.com/zt64/aliucord-plugins/raw/builds/PermissionsSync.zip)
+  Adds the sync permissions option from the Desktop client
+
 - [DMCategories](https://github.com/zt64/aliucord-plugins/raw/builds/DMCategories.zip)
   Adds the ability to create categories for DMs, which will come first in the channels list
 

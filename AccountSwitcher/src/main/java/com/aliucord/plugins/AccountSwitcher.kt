@@ -28,8 +28,6 @@ class AccountSwitcher : Plugin() {
     override fun start(context: Context) {
         mSettings = settings
 
-        StoreStream.getUsers().fetchUsers(getAccounts().map { it.id })
-
         patcher.patch(WidgetSettings::class.java.getDeclaredMethod("showLogoutDialog", Context::class.java), InsteadHook {
             Utils.openPageWithProxy(Utils.appActivity, SwitcherPage(getAccounts().apply {
                 removeIf { it.token == StoreStream.getAuthentication().authToken }

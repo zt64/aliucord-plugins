@@ -15,31 +15,38 @@ import com.aliucord.plugins.AccountSwitcher
 import com.aliucord.plugins.accountswitcher.Account
 import com.aliucord.plugins.accountswitcher.fetchUser
 import com.aliucord.plugins.accountswitcher.getAccounts
+import com.aliucord.utils.RxUtils.await
 import com.discord.models.domain.auth.ModelLoginResult
+import com.discord.models.user.CoreUser
 import com.discord.stores.StoreStream
 import com.discord.utilities.icon.IconUtils
+import com.discord.utilities.rest.RestAPI
 import com.discord.utilities.user.UserUtils
+import com.aliucord.widgets.LinearLayout as ACLinearLayout
 
 class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList<Account>, private val isSettings: Boolean = true) : RecyclerView.Adapter<AccountViewHolder>() {
     private fun saveAccounts() = AccountSwitcher.mSettings.setObject("accounts", accounts)
-    fun addAccount(token: String, id: Long): Boolean = accounts.add(Account(token, id)).also { if (it) saveAccounts() }
-    fun removeAccount(token: String): Boolean = accounts.removeIf { it.token == token }.also { if (it) saveAccounts() }
+    fun addAccount(token: String, id: Long) = accounts.add(Account(token, id)).also { if (it) saveAccounts() }
+    fun removeAccount(token: String) = accounts.removeIf { it.token == token }.also { if (it) saveAccounts() }
 
     override fun getItemCount() = accounts.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = AccountViewHolder(
-        this, com.aliucord.widgets.LinearLayout(parent.context).apply {
+        this, ACLinearLayout(parent.context).apply {
             layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
         }, isSettings
     )
 
     @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: AccountViewHolder, position: Int) = accounts[position].let {
-        val user = StoreStream.getUsers().users[it.id]
-        holder.name.text = if (user == null) "Failed to load user" else UserUtils.INSTANCE.getUserNameWithDiscriminator(user, null, null)
-        holder.userId.text = "ID: ${user?.id.toString()}"
+    override fun onBindViewHolder(holder: AccountViewHolder, position: Int): Unit = accounts[position].let { account ->
+        Utils.threadPool.execute {
+            val user = StoreStream.getUsers().users[account.id] ?: RestAPI.api.userGet(account.id).await().first?.let { user -> CoreUser(user) }
 
-        IconUtils.setIcon(holder.avatar, user)
+            holder.name.text = if (user == null) "Failed to load user" else UserUtils.INSTANCE.getUserNameWithDiscriminator(user, null, null)
+            holder.userId.text = "ID: ${user?.id ?: "Unknown"}"
+
+            IconUtils.setIcon(holder.avatar, user)
+        }
     }
 
     fun onEdit(position: Int) = AccountDialog(this, getAccounts()[position]).show(fragment.parentFragmentManager, "Edit Account")

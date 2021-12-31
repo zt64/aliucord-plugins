@@ -1,7 +1,11 @@
-version = "1.2.1"
+version = "1.2.2"
 description = "Adds the ability to quickly switch accounts"
 
-aliucord.changelog.set("""
+aliucord.changelog.set(
+    """
+    # 1.2.2
+    * Fixed users failing to load bug
+    
     # 1.2.1
     * Switched to alternate method of logging out, that doesn't reset the token
     

@@ -5,7 +5,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-//        mavenLocal()
         maven("https://maven.aliucord.com/snapshots")
         maven("https://jitpack.io")
     }
@@ -57,7 +56,7 @@ subprojects {
         tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
             kotlinOptions {
                 jvmTarget = "11"
-                freeCompilerArgs = freeCompilerArgs + "-Xno-call-assertions" + "-Xno-param-assertions" + "-Xno-receiver-assertions"
+                freeCompilerArgs = freeCompilerArgs + ("-Xno-call-assertions" + "-Xno-param-assertions" + "-Xno-receiver-assertions")
             }
         }
     }

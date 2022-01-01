@@ -1,8 +1,13 @@
-version = "1.5.1"
+version = "1.5.2"
 description = "Adds a variety of new features to the media viewer"
 
 aliucord.excludeFromUpdaterJson.set(true)
-aliucord.changelog.set("""
+aliucord.changelog.set(
+    """
+    # 1.5.2
+    * Fixed null file names
+    * Fixed bottom toolbar on GIFs
+    
     # 1.5.1
     * Fixed bottom bar not moving properly
     

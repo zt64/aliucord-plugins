@@ -22,6 +22,7 @@ import com.aliucord.patcher.InsteadHook
 import com.aliucord.patcher.after
 import com.aliucord.patcher.instead
 import com.aliucord.utils.RxUtils
+import com.discord.player.MediaType
 import com.discord.utilities.rx.ObservableExtensionsKt
 import com.discord.widgets.media.WidgetMedia
 import com.discord.widgets.media.`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`
@@ -46,7 +47,7 @@ object Patches {
             with(toolbar.menu) {
                 findItem(downloadItemId).setOnMenuItemClickListener {
                     val uri = if (isVideo()) mediaSource?.j else Uri.parse(mostRecentIntent.getStringExtra("INTENT_IMAGE_URL"))
-                    val title = mostRecentIntent.getStringExtra("INTENT_TITLE")
+                    val title = mostRecentIntent.getStringExtra("INTENT_TITLE") ?: uri?.lastPathSegment ?: "Unknown"
 
                     val request = DownloadManager.Request(uri)
                         .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -87,7 +88,7 @@ object Patches {
 
             // hide back button
             if (settings.getBool("hideBackButton", false)) setActionBarDisplayHomeAsUpEnabled(false)
-            if (settings.getBool("bottomToolbar", false) && !isVideo())
+            if (settings.getBool("bottomToolbar", false) && (!isVideo() && (mediaSource?.l != MediaType.GIFV)))
                 (binding.root.findViewById<AppBarLayout>(R.f.action_bar_toolbar_layout).layoutParams as FrameLayout.LayoutParams).gravity = Gravity.BOTTOM
         }
     }

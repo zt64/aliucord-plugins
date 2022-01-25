@@ -155,11 +155,11 @@ object Patches {
         }
 
 
-        instead<c.f.l.b.c>("f", Matrix::class.java, Float::class.javaPrimitiveType!!, Float::class.javaPrimitiveType!!, Int::class.javaPrimitiveType!!) { false }
+        instead<b.f.l.b.c>("f", Matrix::class.java, Float::class.javaPrimitiveType!!, Float::class.javaPrimitiveType!!, Int::class.javaPrimitiveType!!) { false }
 
-        for (m in c.c.a.a0.d::class.java.declaredMethods) {
+        for (m in b.c.a.a0.d::class.java.declaredMethods) {
             val params = m.parameterTypes
-            if (params.size == 4 && params[0] == c.f.j.d.f::class.java && params[1] == c.f.j.d.e::class.java && params[3] == Int::class.javaPrimitiveType) {
+            if (params.size == 4 && params[0] == b.f.j.d.f::class.java && params[1] == b.f.j.d.e::class.java && params[3] == Int::class.javaPrimitiveType) {
                 patch(m, InsteadHook.returnConstant(1))
                 break
             }

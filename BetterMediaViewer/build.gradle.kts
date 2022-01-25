@@ -1,9 +1,12 @@
-version = "1.5.2"
+version = "1.5.3"
 description = "Adds a variety of new features to the media viewer"
 
 aliucord.excludeFromUpdaterJson.set(true)
 aliucord.changelog.set(
     """
+    # 1.5.3
+    * Support Discord V112.4
+    
     # 1.5.2
     * Fixed null file names
     * Fixed bottom toolbar on GIFs

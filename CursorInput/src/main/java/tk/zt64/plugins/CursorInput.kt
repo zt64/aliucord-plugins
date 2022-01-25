@@ -1,7 +1,6 @@
 package tk.zt64.plugins
 
 import android.content.Context
-import c.b.a.e.a
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.InsteadHook
@@ -16,7 +15,7 @@ class CursorInput: Plugin() {
 
     override fun start(context: Context) {
         patcher.patch(`FlexInputFragment$c`::class.java.getDeclaredMethod("invoke", Object::class.java)) {
-            flexEditText = (it.result as a).root.findViewById(R.f.text_input)
+            flexEditText = (it.result as b.b.a.e.a).root.findViewById(R.f.text_input)
         }
 
         patcher.patch(AppFlexInputViewModel::class.java.getDeclaredMethod("onInputTextAppended", String::class.java), InsteadHook {

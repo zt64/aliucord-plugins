@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.text.SpannableString
 import android.text.Spanned
-import android.text.style.*
+import android.text.style.ForegroundColorSpan
 import android.widget.TextView
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
@@ -15,12 +15,9 @@ import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
 import com.discord.models.member.GuildMember
 import com.discord.models.user.User
 import com.discord.stores.StoreStream
-import com.discord.widgets.chat.input.autocomplete.*
 import com.discord.widgets.chat.overlay.ChatTypingModel
 import com.discord.widgets.chat.overlay.WidgetChatOverlay
 import com.discord.widgets.chat.overlay.`ChatTypingModel$Companion$getTypingUsers$1$1`
-import java.util.*
-import kotlin.collections.HashMap
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -55,11 +52,11 @@ class RoleColorEverywhere : Plugin() {
             patcher.after<WidgetChatOverlay.TypingIndicatorViewHolder>("configureTyping", ChatTypingModel.Typing::class.java) {
                 val textView = binding.root.findViewById<TextView>(typingUsersTextViewId)
 
-                textView.apply {
+                textView.run {
                     text = SpannableString(text).apply {
                         typingUsers.forEach { (username, color) ->
-                            val start = text.indexOf(username)
-                            if (start != -1) setSpan(ForegroundColorSpan(color), start, start + username.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            val start = text.indexOf(username).takeUnless { it == -1 } ?: return@forEach
+                            setSpan(ForegroundColorSpan(color), start, start + username.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         }
                     }
                 }

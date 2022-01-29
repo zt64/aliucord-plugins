@@ -13,6 +13,7 @@ import com.aliucord.Utils
 import com.aliucord.api.PatcherAPI
 import com.aliucord.patcher.after
 import com.discord.stores.StoreStream
+import com.discord.utilities.color.ColorCompat
 import com.discord.utilities.mg_recycler.MGRecyclerDataPayload
 import com.discord.utilities.textprocessing.FontColorSpan
 import com.discord.utilities.textprocessing.node.UserMentionNode
@@ -36,6 +37,7 @@ import com.discord.widgets.voice.fullscreen.stage.AudienceViewHolder
 import com.discord.widgets.voice.fullscreen.stage.SpeakerViewHolder
 import com.discord.widgets.voice.fullscreen.stage.StageCallItem
 import com.discord.widgets.voice.sheet.CallParticipantsAdapter
+import com.lytefast.flexinput.R
 import de.robv.android.xposed.XC_MethodHook
 
 fun PatcherAPI.patchMentions() {
@@ -87,8 +89,13 @@ fun PatcherAPI.patchVoiceChannels() {
     after<WidgetChannelsListAdapter.ItemVoiceUser>("onConfigure", Int::class.java, ChannelListItem::class.java) {
         val channelListItemVoiceUser = it.args[1] as ChannelListItemVoiceUser
         val color = channelListItemVoiceUser.computed.color
+        val ctx = binding.root.context
 
-        if (color != Color.BLACK) binding.root.findViewById<TextView>(voiceUserNameId).setTextColor(color)
+        binding.root.findViewById<TextView>(voiceUserNameId).setTextColor(
+            if (color == Color.BLACK)
+                ColorCompat.getThemedColor(ctx, R.b.colorChannelDefault)
+            else color
+        )
     }
 
     after<CallParticipantsAdapter.ViewHolderUser>("onConfigure", Int::class.java, MGRecyclerDataPayload::class.java) {
@@ -151,12 +158,13 @@ fun PatcherAPI.patchMessages() {
         val messageEntry = it.args[1] as MessageEntry
         val member = messageEntry.author ?: return@after
 
-        if (member.color != Color.BLACK) {
-            val textView = it.args[0] as SimpleDraweeSpanTextView
-            textView.mDraweeStringBuilder?.apply {
-                setSpan(ForegroundColorSpan(member.color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                textView.setDraweeSpanStringBuilder(this)
-            }
+        if (member.color != Color.BLACK) return@after
+
+        val textView = it.args[0] as SimpleDraweeSpanTextView
+
+        textView.mDraweeStringBuilder?.apply {
+            setSpan(ForegroundColorSpan(member.color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            textView.setDraweeSpanStringBuilder(this)
         }
     }
 }
@@ -180,8 +188,7 @@ fun PatcherAPI.patchMemberStatuses() {
     }
 
     after<UserProfileHeaderView>("updateViewState", UserProfileHeaderViewModel.ViewState.Loaded::class.java) {
-        val guildMember = (it.args[0] as UserProfileHeaderViewModel.ViewState.Loaded).guildMember
-                ?: return@after
+        val guildMember = (it.args[0] as UserProfileHeaderViewModel.ViewState.Loaded).guildMember ?: return@after
 
         if (guildMember.color != Color.BLACK) {
             val textView = UserProfileHeaderView.`access$getBinding$p`(this).root.findViewById<SimpleDraweeSpanTextView>(customStatusId)

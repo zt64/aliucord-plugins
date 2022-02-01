@@ -16,7 +16,6 @@ import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
 import com.aliucord.settings.delegate
 import com.aliucord.utils.DimenUtils.dp
-import com.discord.stores.*
 import com.discord.widgets.chat.list.adapter.*
 import com.discord.widgets.chat.list.entries.ChatListEntry
 import com.google.android.flexbox.FlexboxLayout
@@ -67,7 +66,10 @@ class CompactMode : Plugin() {
                 is WidgetChatListAdapterItemStageInvite,
                 is WidgetChatListAdapterItemSticker,
                 is WidgetChatListAdapterItemUploadProgress,
-                is WidgetChatListAdapterItemSpotifyListenTogether -> (itemView.layoutParams as RecyclerView.LayoutParams).marginStart = contentMargin
+                is WidgetChatListAdapterItemGift,
+                is WidgetChatListAdapterItemGameInvite,
+                is WidgetChatListAdapterItemSpotifyListenTogether -> (itemView.layoutParams as RecyclerView.LayoutParams).marginStart =
+                    contentMargin
 
                 is WidgetChatListAdapterItemBotComponentRow -> (itemView.findViewById<LinearLayout>(componentRowId).layoutParams as ConstraintLayout.LayoutParams).marginStart =
                         contentMargin
@@ -154,6 +156,7 @@ class CompactMode : Plugin() {
                             gravity = Gravity.CENTER_VERTICAL
                             setMargins(4.dp, 0, 0, 0)
                         }
+
                         contentViewLayoutParams.apply {
                             setMargins(0, 2.dp, 8.dp, 0)
                             removeRule(RelativeLayout.END_OF)
@@ -162,6 +165,7 @@ class CompactMode : Plugin() {
 
                         avatarView!!.apply {
                             2.dp.let { dp -> setPadding(dp, dp, dp, dp) }
+
                             (layoutParams as LinearLayout.LayoutParams).apply {
                                 marginStart = settings.headerMargin.dp
                                 marginEnd = 0

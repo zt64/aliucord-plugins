@@ -138,34 +138,34 @@ fun PatcherAPI.patchProfileName(profileTag: Boolean) {
         val loaded = it.args[0] as UserProfileHeaderViewModel.ViewState.Loaded
         val guildMember = loaded.guildMember ?: return@after
 
-        if (guildMember.color != Color.BLACK) {
-            val textView = UserProfileHeaderView.`access$getBinding$p`(this).root
-                    .findViewById<com.facebook.drawee.span.SimpleDraweeSpanTextView>(usernameTextId)
+        if (guildMember.color == Color.BLACK) return@after
 
-            textView.apply {
-                val end = if (guildMember.nick == null && !profileTag) loaded.user.username.length
-                else j.length
+        val textView = UserProfileHeaderView.`access$getBinding$p`(this).root
+            .findViewById<com.facebook.drawee.span.SimpleDraweeSpanTextView>(usernameTextId)
 
-                j.setSpan(ForegroundColorSpan(guildMember.color), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                setDraweeSpanStringBuilder(j)
-            }
+        textView.apply {
+            val end = if (guildMember.nick == null && !profileTag) loaded.user.username.length
+            else j.length
+
+            j.setSpan(ForegroundColorSpan(guildMember.color), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setDraweeSpanStringBuilder(j)
         }
     }
 }
 
 fun PatcherAPI.patchMessages() {
     after<WidgetChatListAdapterItemMessage>("processMessageText", SimpleDraweeSpanTextView::class.java, MessageEntry::class.java) {
-        val messageEntry = it.args[1] as MessageEntry
-        val member = messageEntry.author ?: return@after
+        val member = (it.args[1] as MessageEntry).author ?: return@after
 
-        if (member.color != Color.BLACK) return@after
+        if (member.color == Color.BLACK) return@after
 
         val textView = it.args[0] as SimpleDraweeSpanTextView
 
-        textView.mDraweeStringBuilder?.apply {
+        val stringBuilder = textView.mDraweeStringBuilder?.apply {
             setSpan(ForegroundColorSpan(member.color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            textView.setDraweeSpanStringBuilder(this)
         }
+
+        textView.setDraweeSpanStringBuilder(stringBuilder)
     }
 }
 

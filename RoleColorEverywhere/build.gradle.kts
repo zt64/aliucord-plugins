@@ -1,8 +1,11 @@
-version = "1.11.1"
+version = "1.11.2"
 description = "Displays the highest role color in more places like mentions and typing text"
 
 aliucord.changelog.set(
     """
+    # 1.11.2
+    * Fixed colored messages
+    
     # 1.11.1
     * Fixed usernames in voice channels sometimes being the wrong color
     

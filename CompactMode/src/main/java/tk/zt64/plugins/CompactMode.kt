@@ -54,13 +54,16 @@ class CompactMode : Plugin() {
         val messageRootId = Utils.getResId("widget_chat_list_adapter_item_text_root", "id")
         val failedMessageRootId = Utils.getResId("chat_list_adapter_item_failed", "id")
         val usernameViewId = Utils.getResId("chat_list_adapter_item_text_name", "id")
+        val errorTextId = Utils.getResId("chat_list_adapter_item_text_error", "id")
+        val loadingTextId = Utils.getResId("chat_list_adapter_item_text_loading", "id")
 
         patcher.after<WidgetChatListItem>("onConfigure", Int::class.java, ChatListEntry::class.java) {
             val contentMargin = settings.contentMargin.dp
 
             when (this) {
                 is WidgetChatListAdapterItemAttachment,
-                is WidgetChatListAdapterItemEphemeralMessage -> itemView.findViewById<Guideline>(guidelineId).setGuidelineBegin(contentMargin)
+                is WidgetChatListAdapterItemEphemeralMessage -> itemView.findViewById<Guideline>(guidelineId)
+                    .setGuidelineBegin(contentMargin)
 
                 is WidgetChatListAdapterItemInvite,
                 is WidgetChatListAdapterItemStageInvite,
@@ -81,12 +84,22 @@ class CompactMode : Plugin() {
                 is WidgetChatListAdapterItemMessage -> when (itemView.id) {
                     // Regular message
                     messageRootId -> {
+                        (itemView.findViewById<ImageView>(loadingTextId).layoutParams as ConstraintLayout.LayoutParams).apply {
+                            marginStart = 0
+                        }
+
+                        (itemView.findViewById<ImageView>(errorTextId).layoutParams as ConstraintLayout.LayoutParams).apply {
+                            startToEnd = ConstraintLayout.LayoutParams.UNSET
+                            startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+
                         val headerView = itemView.findViewById<ConstraintLayout>(headerLayoutId)
 
                         itemView.findViewById<Guideline>(guidelineId).setGuidelineBegin(contentMargin)
                         itemView.setPadding(0, settings.messagePadding.dp, 0, 0)
 
-                        if (settings.hideReplyIcon) itemView.findViewById<FrameLayout>(replyIconViewId).visibility = View.GONE
+                        if (settings.hideReplyIcon) itemView.findViewById<FrameLayout>(replyIconViewId).visibility =
+                            View.GONE
                         if (settings.hideAvatar) {
                             avatarView!!.visibility = View.GONE
 

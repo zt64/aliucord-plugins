@@ -1,8 +1,11 @@
-version = "1.3.1"
+version = "1.3.2"
 description = "Modifies chat to have a more compact appearance, with several options to change"
 
 aliucord.changelog.set(
     """
+    # 1.3.2
+    * Fixed error causing messages to not be fully styled
+    
     # 1.3.1
     * Fixed message loading text
     

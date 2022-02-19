@@ -79,111 +79,115 @@ class CompactMode : Plugin() {
                         contentMargin
                 is WidgetChatListAdapterItemEmbed -> (itemView.findViewById<MaterialCardView>(embedContainerCardId).layoutParams as ConstraintLayout.LayoutParams).marginStart =
                         contentMargin
+            }
+        }
 
-                is WidgetChatListAdapterItemMessage -> when (itemView.id) {
-                    // Regular message
-                    messageRootId -> {
-                        (itemView.findViewById<TextView>(loadingTextId).layoutParams as ConstraintLayout.LayoutParams).apply {
-                            marginStart = 0
-                        }
+        patcher.after<WidgetChatListAdapterItemMessage>("onConfigure", Int::class.java, ChatListEntry::class.java) {
+            val contentMargin = settings.contentMargin.dp
 
-                        val headerView = itemView.findViewById<ConstraintLayout>(headerLayoutId)
+            when (itemView.id) {
+                // Regular message
+                messageRootId -> {
+                    (itemView.findViewById<TextView>(loadingTextId).layoutParams as ConstraintLayout.LayoutParams).apply {
+                        marginStart = 0
+                    }
 
-                        itemView.findViewById<Guideline>(guidelineId).setGuidelineBegin(contentMargin)
-                        itemView.setPadding(0, settings.messagePadding.dp, 0, 0)
+                    val headerView = itemView.findViewById<ConstraintLayout>(headerLayoutId)
 
-                        if (settings.hideReplyIcon) itemView.findViewById<FrameLayout>(replyIconViewId).visibility =
+                    itemView.findViewById<Guideline>(guidelineId).setGuidelineBegin(contentMargin)
+                    itemView.setPadding(0, settings.messagePadding.dp, 0, 0)
+
+                    if (settings.hideReplyIcon) itemView.findViewById<FrameLayout>(replyIconViewId).visibility =
                             View.GONE
-                        if (settings.hideAvatar) {
-                            avatarView!!.visibility = View.GONE
+                    if (settings.hideAvatar) {
+                        avatarView!!.visibility = View.GONE
 
-                            (headerView.layoutParams as ConstraintLayout.LayoutParams).marginStart = contentMargin
+                        (headerView.layoutParams as ConstraintLayout.LayoutParams).marginStart = contentMargin
 
-                            return@after
-                        }
-
-                        2.dp.let { dp -> avatarView!!.setPadding(dp, dp, dp, dp) }
-
-                        val constraintLayout = itemView as ConstraintLayout
-                        val constraintSet = ConstraintSet().apply {
-                            clone(constraintLayout)
-
-                            avatarView!!.id.let { id ->
-                                clear(id, ConstraintSet.END)
-
-                                settings.avatarScale.dp.let { dp ->
-                                    constrainWidth(id, dp)
-                                    constrainHeight(id, dp)
-                                }
-
-                                setMargin(id, ConstraintSet.START, settings.headerMargin.dp)
-
-                                connect(id, ConstraintSet.BOTTOM, itemTextViewId, ConstraintSet.TOP)
-                                connect(itemTextViewId, ConstraintSet.TOP, id, ConstraintSet.BOTTOM)
-
-                                centerVertically(id, headerLayoutId)
-                            }
-
-                            headerView.id.let { id ->
-                                setMargin(id, ConstraintSet.START, 4.dp)
-
-                                connect(id, ConstraintSet.START, avatarView!!.id, ConstraintSet.END)
-                                connect(id, ConstraintSet.BOTTOM, itemTextViewId, ConstraintSet.TOP)
-                            }
-                        }
-
-                        constraintSet.applyTo(constraintLayout)
+                        return@after
                     }
-                    // Failed message
-                    failedMessageRootId -> {
-                        val root = itemView as RelativeLayout
-                        val contentView = root.getChildAt(1) as LinearLayout
-                        val nameView = contentView.findViewById<TextView>(usernameViewId)
-                        val contentViewLayoutParams = contentView.layoutParams as RelativeLayout.LayoutParams
 
-                        itemView.setPadding(0, settings.messagePadding.dp, 0, 0)
-                        (itemView.layoutParams as RecyclerView.LayoutParams).setMargins(0, 0, 0, 0)
-                        contentViewLayoutParams.marginStart = contentMargin
+                    2.dp.let { dp -> avatarView!!.setPadding(dp, dp, dp, dp) }
 
-                        if (settings.hideAvatar) return@after avatarView!!.setVisibility(View.GONE)
+                    val constraintLayout = itemView as ConstraintLayout
+                    val constraintSet = ConstraintSet().apply {
+                        clone(constraintLayout)
 
-                        root.removeView(avatarView)
-                        contentView.removeView(nameView)
+                        avatarView!!.id.let { id ->
+                            clear(id, ConstraintSet.END)
 
-                        val headerLayout = LinearLayout(root.context).apply {
-                            id = View.generateViewId()
-                            orientation = LinearLayout.HORIZONTAL
-                            addView(avatarView)
-                            addView(nameView)
-                        }
-
-                        root.addView(headerLayout, 0)
-
-                        (nameView.layoutParams as LinearLayout.LayoutParams).apply {
-                            gravity = Gravity.CENTER_VERTICAL
-                            setMargins(4.dp, 0, 0, 0)
-                        }
-
-                        contentViewLayoutParams.apply {
-                            setMargins(0, 2.dp, 8.dp, 0)
-                            removeRule(RelativeLayout.END_OF)
-                            addRule(RelativeLayout.BELOW, headerLayout.id)
-                        }
-
-                        avatarView!!.apply {
-                            2.dp.let { dp -> setPadding(dp, dp, dp, dp) }
-
-                            (layoutParams as LinearLayout.LayoutParams).apply {
-                                marginStart = settings.headerMargin.dp
-                                marginEnd = 0
-                                width = settings.avatarScale.dp
-                                height = settings.avatarScale.dp
+                            settings.avatarScale.dp.let { dp ->
+                                constrainWidth(id, dp)
+                                constrainHeight(id, dp)
                             }
+
+                            setMargin(id, ConstraintSet.START, settings.headerMargin.dp)
+
+                            connect(id, ConstraintSet.BOTTOM, itemTextViewId, ConstraintSet.TOP)
+                            connect(itemTextViewId, ConstraintSet.TOP, id, ConstraintSet.BOTTOM)
+
+                            centerVertically(id, headerLayoutId)
+                        }
+
+                        headerView.id.let { id ->
+                            setMargin(id, ConstraintSet.START, 4.dp)
+
+                            connect(id, ConstraintSet.START, avatarView!!.id, ConstraintSet.END)
+                            connect(id, ConstraintSet.BOTTOM, itemTextViewId, ConstraintSet.TOP)
                         }
                     }
-                    // Minimal message
-                    else -> (messageTextView.layoutParams as ConstraintLayout.LayoutParams).marginStart = contentMargin
+
+                    constraintSet.applyTo(constraintLayout)
                 }
+                // Failed message
+                failedMessageRootId -> {
+                    val root = itemView as RelativeLayout
+                    val contentView = root.getChildAt(1) as LinearLayout
+                    val nameView = contentView.findViewById<TextView>(usernameViewId)
+                    val contentViewLayoutParams = contentView.layoutParams as RelativeLayout.LayoutParams
+
+                    itemView.setPadding(0, settings.messagePadding.dp, 0, 0)
+                    (itemView.layoutParams as RecyclerView.LayoutParams).setMargins(0, 0, 0, 0)
+                    contentViewLayoutParams.marginStart = contentMargin
+
+                    if (settings.hideAvatar) return@after avatarView!!.setVisibility(View.GONE)
+
+                    root.removeView(avatarView)
+                    contentView.removeView(nameView)
+
+                    val headerLayout = LinearLayout(root.context).apply {
+                        id = View.generateViewId()
+                        orientation = LinearLayout.HORIZONTAL
+                        addView(avatarView)
+                        addView(nameView)
+                    }
+
+                    root.addView(headerLayout, 0)
+
+                    (nameView.layoutParams as LinearLayout.LayoutParams).apply {
+                        gravity = Gravity.CENTER_VERTICAL
+                        setMargins(4.dp, 0, 0, 0)
+                    }
+
+                    contentViewLayoutParams.apply {
+                        setMargins(0, 2.dp, 8.dp, 0)
+                        removeRule(RelativeLayout.END_OF)
+                        addRule(RelativeLayout.BELOW, headerLayout.id)
+                    }
+
+                    avatarView!!.apply {
+                        2.dp.let { dp -> setPadding(dp, dp, dp, dp) }
+
+                        (layoutParams as LinearLayout.LayoutParams).apply {
+                            marginStart = settings.headerMargin.dp
+                            marginEnd = 0
+                            width = settings.avatarScale.dp
+                            height = settings.avatarScale.dp
+                        }
+                    }
+                }
+                // Minimal message
+                else -> (messageTextView.layoutParams as ConstraintLayout.LayoutParams).marginStart = contentMargin
             }
         }
     }

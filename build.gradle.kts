@@ -1,5 +1,6 @@
 import com.aliucord.gradle.AliucordExtension
 import com.android.build.gradle.BaseExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories {
@@ -9,9 +10,9 @@ buildscript {
         maven("https://jitpack.io")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.4")
+        classpath("com.android.tools.build:gradle:7.2.1")
         classpath("com.github.Aliucord:gradle:main-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
     }
 }
 
@@ -36,16 +37,17 @@ subprojects {
 
     aliucord {
         author("zt", 289556910426816513L)
+
         updateUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json")
         buildUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/%s.zip")
     }
 
     android {
-        compileSdkVersion(30)
+        compileSdkVersion(33)
 
         defaultConfig {
             minSdk = 24
-            targetSdk = 30
+            targetSdk = 33
         }
 
         compileOptions {
@@ -53,10 +55,10 @@ subprojects {
             targetCompatibility = JavaVersion.VERSION_11
         }
 
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        tasks.withType<KotlinCompile> {
             kotlinOptions {
                 jvmTarget = "11"
-                freeCompilerArgs = freeCompilerArgs + ("-Xno-call-assertions" + "-Xno-param-assertions" + "-Xno-receiver-assertions")
+                freeCompilerArgs = freeCompilerArgs + "-Xno-call-assertions" + "-Xno-param-assertions" + "-Xno-receiver-assertions"
             }
         }
     }

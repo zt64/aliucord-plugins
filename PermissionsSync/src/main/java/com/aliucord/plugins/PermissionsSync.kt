@@ -19,9 +19,9 @@ import com.aliucord.utils.RxUtils.subscribe
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
 import com.aliucord.wrappers.ChannelWrapper.Companion.name
 import com.aliucord.wrappers.ChannelWrapper.Companion.parentId
+import com.aliucord.wrappers.ChannelWrapper.Companion.permissionOverwrites
 import com.aliucord.wrappers.PermissionOverwriteWrapper.Companion.id
 import com.aliucord.wrappers.PermissionOverwriteWrapper.Companion.type
-import com.discord.api.channel.Channel
 import com.discord.databinding.WidgetChannelSettingsPermissionsAdvancedBinding
 import com.discord.restapi.RestAPIParams
 import com.discord.stores.StoreStream
@@ -32,9 +32,6 @@ import com.lytefast.flexinput.R
 
 @AliucordPlugin
 class PermissionsSync : Plugin() {
-    private val Channel.permissionOverwrites
-        get() = s()
-
     private val getBindingMethod = WidgetChannelSettingsPermissionsAdvanced::class.java.getDeclaredMethod("getViewBinding")
         .apply { isAccessible = true }
 

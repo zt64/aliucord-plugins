@@ -11,7 +11,7 @@ import com.discord.widgets.chat.input.gifpicker.WidgetGifPickerSearch
 import com.discord.widgets.chat.input.gifpicker.`WidgetGifPickerSearch$setUpGifRecycler$1`
 
 @AliucordPlugin
-class AppendGifToMessage : Plugin() {
+class AppendGifAsUrl : Plugin() {
     override fun start(context: Context) {
         lateinit var appFlexInputViewModel: AppFlexInputViewModel
 

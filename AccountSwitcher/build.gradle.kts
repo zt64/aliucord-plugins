@@ -1,8 +1,11 @@
-version = "1.2.2"
+version = "1.2.3"
 description = "Adds the ability to quickly switch accounts"
 
 aliucord.changelog.set(
     """
+    # 1.2.3
+    * Fix for new discord version
+    
     # 1.2.2
     * Fixed users failing to load bug
     

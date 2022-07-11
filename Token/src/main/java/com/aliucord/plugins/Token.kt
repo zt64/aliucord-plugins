@@ -7,9 +7,9 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.CommandsAPI.CommandResult
 import com.aliucord.entities.Plugin
-import com.aliucord.utils.ReflectUtils
 import com.discord.api.commands.ApplicationCommandType
 import com.discord.stores.StoreStream
+import com.discord.utilities.rest.RestAPI
 
 @AliucordPlugin
 class Token : Plugin() {
@@ -21,8 +21,7 @@ class Token : Plugin() {
                 CommandResult(genFakeToken(), null, true)
             } else
                 try {
-                    val token = ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?
-                    CommandResult("```\n$token```", null, false)
+                    CommandResult("```\n${RestAPI.AppHeadersProvider.INSTANCE.authToken}```", null, false)
                 } catch (e: ReflectiveOperationException) {
                     Logger("Token").error(e)
                     CommandResult("Uh oh, failed to get token", null, false)

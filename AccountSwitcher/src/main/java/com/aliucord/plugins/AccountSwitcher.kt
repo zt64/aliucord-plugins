@@ -11,10 +11,7 @@ import com.aliucord.plugins.accountswitcher.SwitcherPage
 import com.aliucord.plugins.accountswitcher.getAccounts
 import com.aliucord.plugins.accountswitcher.settings.PluginSettings
 import com.discord.utilities.rest.RestAPI
-import com.discord.utilities.rest.RestAPI.api
 import com.discord.widgets.settings.WidgetSettings
-import com.lytefast.flexinput.R.g.settings
-import com.discord.utilities.rest.RestAPI
 
 @AliucordPlugin
 class AccountSwitcher : Plugin() {
@@ -32,7 +29,7 @@ class AccountSwitcher : Plugin() {
 
         patcher.patch(WidgetSettings::class.java.getDeclaredMethod("showLogoutDialog", Context::class.java), InsteadHook {
             Utils.openPageWithProxy(Utils.appActivity, SwitcherPage(getAccounts().apply {
-                removeIf { it.token == RestAPI.AppHeadersProvider.INSTANCE.authToken) }
+                removeIf { it.token == RestAPI.AppHeadersProvider.INSTANCE.authToken }
             }))
         })
 

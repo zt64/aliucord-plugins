@@ -70,7 +70,7 @@ class AccountAdapter(private val fragment: SettingsPage, val accounts: ArrayList
         Utils.threadPool.execute {
             fetchUser(it.token) ?: return@execute Utils.showToast("Invalid token")
 
-            StoreStream.getAuthentication().handleLoginResult(ModelLoginResult(it.token.lowercase().startsWith("mfa"), null, it.token, null))
+            StoreStream.getAuthentication().handleLoginResult(ModelLoginResult(it.token.lowercase().startsWith("mfa"), null, it.token, null, emptyList()))
 
             Utils.mainThread.postDelayed({
                 val intent = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)

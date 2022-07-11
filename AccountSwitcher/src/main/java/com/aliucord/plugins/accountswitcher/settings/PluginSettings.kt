@@ -16,12 +16,12 @@ import com.aliucord.Utils
 import com.aliucord.api.SettingsAPI
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.plugins.accountswitcher.SwitcherPage
-import com.aliucord.plugins.accountswitcher.authToken
 import com.aliucord.plugins.accountswitcher.getAccounts
 import com.aliucord.utils.DimenUtils
 import com.aliucord.views.Button
 import com.aliucord.views.Divider
 import com.discord.stores.StoreStream
+import com.discord.utilities.rest.RestAPI
 import com.lytefast.flexinput.R
 
 class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
@@ -40,7 +40,7 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
             .setIcon(Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.e.ic_my_account_24dp)!!.mutate()))
             .setOnMenuItemClickListener {
                 Utils.openPageWithProxy(ctx, SwitcherPage(getAccounts().apply {
-                    removeIf { it.token == StoreStream.getAuthentication().authToken }
+                    removeIf { it.token == RestAPI.AppHeadersProvider.INSTANCE.authToken }
                 }))
                 false
             }
@@ -72,7 +72,7 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
         })
 
         if (StoreStream.getAuthentication().isAuthed) {
-            val token = StoreStream.getAuthentication().authToken
+            val token = RestAPI.AppHeadersProvider.INSTANCE.authToken
 
             if (getAccounts().none { it.token == token }) {
                 addView(Button(ctx).apply {

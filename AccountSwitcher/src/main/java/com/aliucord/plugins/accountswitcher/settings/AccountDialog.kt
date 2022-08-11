@@ -55,7 +55,7 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
             body.visibility = View.GONE
         }
 
-        okButton.isEnabled = token != null
+        okButton.isEnabled = true;
         okButton.backgroundTintList = ColorStateList(
             buttonStates, intArrayOf(
                 resources.getColor(R.c.uikit_btn_bg_color_selector_brand, context?.theme), // enabled color
@@ -63,7 +63,7 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
             )
         )
 
-        inputLayout.editText?.addTextChangedListener(object : TextWatcher {
+        /*inputLayout.editText?.addTextChangedListener(object : TextWatcher {
             private val pattern = Pattern.compile("(mfa\\.[a-z0-9_-]{20,})|([a-z0-9_-]{23,28}\\.[a-z0-9_-]{6,7}\\.[a-z0-9_-]{27})", Pattern.CASE_INSENSITIVE)
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -71,7 +71,7 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
             override fun afterTextChanged(s: Editable?) {
                 okButton.isEnabled = pattern.matcher(s?.trim().toString()).matches()
             }
-        })
+        })*/
         inputLayout.editText?.inputType = InputType.TYPE_CLASS_TEXT
     }
 }

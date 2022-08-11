@@ -55,7 +55,7 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
             body.visibility = View.GONE
         }
 
-        okButton.isEnabled = true;
+        okButton.isEnabled = true
         okButton.backgroundTintList = ColorStateList(
             buttonStates, intArrayOf(
                 resources.getColor(R.c.uikit_btn_bg_color_selector_brand, context?.theme), // enabled color

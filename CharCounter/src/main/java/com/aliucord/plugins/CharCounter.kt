@@ -62,7 +62,7 @@ class CharCounter : Plugin() {
                 }
                 8.dp.let { dp -> setPadding(dp, 0, dp, 0) }
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, root.resources.getDimension(textSizeDimenId))
-                setBackgroundColor(ColorCompat.getThemedColor(root.context, R.b.primary_630))
+                setBackgroundColor(ColorCompat.getThemedColor(root.context, R.c.primary_dark_600))
                 root.addView(this)
             }
 

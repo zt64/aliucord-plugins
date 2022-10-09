@@ -1,4 +1,4 @@
-version = "1.3.1"
+version = "1.3.2"
 description = "Adds presets to the custom status menu. Long press on the save button to save a preset"
 
 aliucord.changelog.set("""

@@ -1,4 +1,4 @@
-version = "1.11.2"
+version = "1.11.3"
 description = "Displays the highest role color in more places like mentions and typing text"
 
 aliucord.changelog.set(
@@ -17,4 +17,5 @@ aliucord.changelog.set(
      
     # 1.9.0
     * Added color to reaction username list
-""".trimIndent())
+""".trimIndent()
+)

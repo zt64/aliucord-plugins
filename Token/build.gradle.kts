@@ -1,11 +1,11 @@
-version = "1.4.1"
+version = "1.4.2"
 description = "Adds a token slash command to tell you your account token"
 
 aliucord {
     author("Vendicated", 343383572805058560L)
 
     changelog.set(
-            """
+        """
                 
             # 1.3.0
             * Support V96

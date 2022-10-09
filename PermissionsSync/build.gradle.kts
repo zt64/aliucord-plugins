@@ -1,4 +1,4 @@
-version = "1.0.1"
+version = "1.0.2"
 description = "Adds the sync permissions option from the Desktop client"
 
 aliucord.changelog.set(

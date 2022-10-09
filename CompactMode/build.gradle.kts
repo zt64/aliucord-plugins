@@ -1,4 +1,4 @@
-version = "1.3.3"
+version = "1.3.4"
 description = "Modifies chat to have a more compact appearance, with several options to change"
 
 aliucord.changelog.set(
@@ -18,4 +18,5 @@ aliucord.changelog.set(
     # 1.2.0
     * Styled failed messages
     * Updated description
-""".trimIndent())
+""".trimIndent()
+)

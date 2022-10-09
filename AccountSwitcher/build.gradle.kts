@@ -1,4 +1,4 @@
-version = "1.2.3"
+version = "1.2.4"
 description = "Adds the ability to quickly switch accounts"
 
 aliucord.changelog.set(
@@ -20,4 +20,5 @@ aliucord.changelog.set(
     
     # 1.0.1
     * Minor bug fixes
-""".trimIndent())
+""".trimIndent()
+)

@@ -1,7 +1,8 @@
-version = "1.4.1"
+version = "1.4.2"
 description = "Adds a character counter to the message box"
 
-aliucord.changelog.set("""
+aliucord.changelog.set(
+    """
     # 1.4.1
     * Improved the background to fit in with chat
 
@@ -22,4 +23,5 @@ aliucord.changelog.set("""
 
     # 1.1.0
     * Support V96
-""".trimIndent())
+""".trimIndent()
+)

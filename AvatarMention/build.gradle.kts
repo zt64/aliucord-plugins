@@ -1,4 +1,4 @@
-version = "1.4.0"
+version = "1.4.1"
 description = "Makes tapping a message avatar mention that user"
 
 aliucord {

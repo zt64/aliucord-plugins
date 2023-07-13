@@ -25,6 +25,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
+          cache: 'gradle'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
@@ -45,4 +46,3 @@ jobs:
           git add *
           git commit -m "Build $GITHUB_SHA" || exit 0   # do not error if nothing to commit
           git push
-

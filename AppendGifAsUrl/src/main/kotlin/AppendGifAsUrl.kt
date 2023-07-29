@@ -1,12 +1,11 @@
 import android.content.Context
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component2
 import com.aliucord.patcher.instead
 import com.discord.widgets.chat.input.AppFlexInputViewModel
-import com.discord.widgets.chat.input.gifpicker.GifAdapterItem
-import com.discord.widgets.chat.input.gifpicker.WidgetGifCategory
-import com.discord.widgets.chat.input.gifpicker.WidgetGifPickerSearch
-import com.discord.widgets.chat.input.gifpicker.`WidgetGifPickerSearch$setUpGifRecycler$1`
+import com.discord.widgets.chat.input.gifpicker.*
 
 @AliucordPlugin
 class AppendGifAsUrl : Plugin() {
@@ -17,18 +16,20 @@ class AppendGifAsUrl : Plugin() {
             appFlexInputViewModel = it.thisObject as AppFlexInputViewModel
         }
 
-        patcher.instead<`WidgetGifPickerSearch$setUpGifRecycler$1`>("invoke", GifAdapterItem.GifItem::class.java) {
-            val gifItem = it.args[0] as GifAdapterItem.GifItem
-
+        patcher.instead<`WidgetGifPickerSearch$setUpGifRecycler$1`>(
+            "invoke",
+            GifAdapterItem.GifItem::class.java
+        ) { (_, gifItem: GifAdapterItem.GifItem) ->
             appFlexInputViewModel.onInputTextAppended("${gifItem.gif.tenorGifUrl} ")
             WidgetGifPickerSearch.`access$getOnGifSelected$p`(`this$0`).invoke()
 
             return@instead null
         }
 
-        patcher.instead<WidgetGifCategory>("selectGif", GifAdapterItem.GifItem::class.java) {
-            val gifItem = it.args[0] as GifAdapterItem.GifItem
-
+        patcher.instead<WidgetGifCategory>(
+            "selectGif",
+            GifAdapterItem.GifItem::class.java
+        ) { (_, gifItem: GifAdapterItem.GifItem) ->
             appFlexInputViewModel.onInputTextAppended("${gifItem.gif.tenorGifUrl} ")
 
             return@instead null

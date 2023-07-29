@@ -8,11 +8,13 @@ import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.discord.stores.StoreStream
 
+@Suppress("MissingPermission")
 @AliucordPlugin
 class DisablePreviewsOnData : Plugin() {
     private val storeUserSettings = StoreStream.getUserSettings()
-    private val connectivityManager = Utils.appContext.getSystemService(ConnectivityManager::class.java)
-    private val networkCallback: NetworkCallback = object : NetworkCallback() {
+    private val connectivityManager =
+        Utils.appContext.getSystemService(ConnectivityManager::class.java)
+    private val networkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
             val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return
             val onWifi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)

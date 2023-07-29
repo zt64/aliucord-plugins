@@ -9,7 +9,7 @@ import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.SettingsPage
-import com.aliucord.patcher.Hook
+import com.aliucord.patcher.after
 import com.aliucord.views.TextInput
 import com.discord.databinding.WidgetChatListBinding
 import com.discord.widgets.chat.list.WidgetChatList
@@ -33,14 +33,29 @@ class RotatedChat : Plugin() {
 
             setActionBarTitle("Rotated Chat")
 
-            val textInput = TextInput(requireContext()) // .apply { hint = "Rotation of chat in degrees" }
+            val textInput =
+                TextInput(requireContext()) // .apply { hint = "Rotation of chat in degrees" }
             textInput.editText.apply {
                 maxLines = 1
                 inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
                 setText(settings.getFloat("degrees", 0f).toString())
                 addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                    override fun beforeTextChanged(
+                        s: CharSequence,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
+                    }
+
                     override fun afterTextChanged(s: Editable) {
                         try {
                             settings.setFloat("degrees", s.toString().toFloat())
@@ -58,6 +73,7 @@ class RotatedChat : Plugin() {
         patcher.after<WidgetChatList>("configureUI", WidgetChatListModel::class.java) {
             getBinding().root.rotation = settings.getFloat("degrees", 0f)
         }
-
-        override fun stop(context: Context) = patcher.unpatchAll()
     }
+
+    override fun stop(context: Context) = patcher.unpatchAll()
+}

@@ -1,78 +1,106 @@
+@file:Suppress("UnstableApiUsage")
+
 import com.aliucord.gradle.AliucordExtension
-import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.LibraryExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://maven.aliucord.com/snapshots")
-        maven("https://jitpack.io")
-    }
-    dependencies {
-        classpath("com.android.tools.build:gradle:7.4.2")
-        classpath("com.github.aliucord:gradle:main-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
-    }
+@Suppress("DSL_SCOPE_VIOLATION")
+plugins {
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.aliucord) apply false
 }
 
-allprojects {
+subprojects {
+    apply {
+        plugin("com.android.library")
+        plugin("com.aliucord.gradle")
+        plugin("kotlin-android")
+    }
+
     repositories {
         google()
         mavenCentral()
 //        mavenLocal()
         maven("https://maven.aliucord.com/snapshots")
-        maven("https://jitpack.io")
-    }
-}
-
-fun Project.android(configuration: BaseExtension.() -> Unit) =
-    extensions.getByName<BaseExtension>("android").configuration()
-
-fun Project.aliucord(configuration: AliucordExtension.() -> Unit) =
-    extensions.getByName<AliucordExtension>("aliucord").configuration()
-
-subprojects {
-    apply(plugin = "com.android.library")
-    apply(plugin = "com.aliucord.gradle")
-    apply(plugin = "kotlin-android")
-
-    aliucord {
-        author("zt", 289556910426816513L)
-
-        updateUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json")
-        buildUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/%s.zip")
     }
 
-    android {
+    configure<LibraryExtension> {
         namespace = "com.aliucord.plugins"
 
-        compileSdkVersion(33)
+        compileSdk = 34
 
         defaultConfig {
             minSdk = 24
-            targetSdk = 33
+            targetSdk = 34
+        }
+
+        buildFeatures {
+            renderScript = false
+            shaders = false
+            buildConfig = true
+            resValues = false
+            aidl = false
         }
 
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
         }
+    }
 
-        tasks.withType<KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "11"
-                freeCompilerArgs = freeCompilerArgs + "-Xno-call-assertions" + "-Xno-param-assertions" + "-Xno-receiver-assertions"
-            }
-        }
+    configure<AliucordExtension> {
+        author("zt", 289556910426816513L)
+
+        updateUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/updater.json")
+        buildUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/%s.zip")
     }
 
     dependencies {
         val discord by configurations
         val compileOnly by configurations
 
-        discord("com.discord:discord:aliucord-SNAPSHOT")
-        compileOnly("com.aliucord:Aliucord:main-SNAPSHOT")
-//        compileOnly("com.github.Aliucord:Aliucord:unspecified")
+        discord(rootProject.libs.discord)
+        compileOnly(rootProject.libs.aliucord)
+        // compileOnly("com.github.Aliucord:Aliucord:unspecified")
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "11"
+            freeCompilerArgs = freeCompilerArgs + listOf(
+                "-Xno-call-assertions",
+                "-Xno-param-assertions",
+                "-Xno-receiver-assertions",
+                "-Xopt-in=kotlin.RequiresOptIn"
+            )
+        }
+    }
+}
+
+task("generateReadMe") {
+    doLast {
+        val readMe = rootProject.file("README.md")
+
+        val header = """
+            ## Plugins for [Aliucord](https://github.com/Aliucord)
+            
+            Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
+        """.trimIndent()
+
+        val plugins = subprojects.joinToString("\n") { subproject ->
+            with(subproject) {
+                val aliucord: AliucordExtension by extensions
+
+                if (aliucord.excludeFromUpdaterJson.get()) return@with ""
+
+                buildString {
+                    appendLine("- [$name](https://github.com/zt64/aliucord-plugins/raw/builds/$name.zip )")
+                    appendLine(description)
+                }
+            }
+        }
+
+        readMe.writeText("$header\n\n$plugins")
     }
 }

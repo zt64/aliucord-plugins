@@ -17,8 +17,12 @@ import dmcategories.sheets.CategorySheet
 
 class ChannelListItemDMCategory(val category: DMCategory) : ChannelListItem {
     override fun getKey(): String = ""
-    override fun getType(): Int = 400
+    override fun getType(): Int = TYPE
     operator fun component1() = category
+
+    companion object {
+        const val TYPE = 400
+    }
 }
 
 class ItemDMCategory(

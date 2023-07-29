@@ -7,8 +7,10 @@ import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.list.items.ChannelListItem
 
 object ChannelListItemDivider : ChannelListItem {
+    const val TYPE = 401
+
     override fun getKey(): String = ""
-    override fun getType(): Int = 401
+    override fun getType(): Int = TYPE
 }
 
 class ItemDivider(@LayoutRes i: Int, adapter: WidgetChannelsListAdapter) : WidgetChannelsListAdapter.Item(i, adapter) {

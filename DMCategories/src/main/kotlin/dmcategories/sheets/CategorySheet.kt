@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import com.aliucord.Utils
 import com.aliucord.widgets.BottomSheet
@@ -21,38 +22,44 @@ class CategorySheet(private val category: DMCategory) : BottomSheet() {
 
         val ctx = requireContext()
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-            text = category.name
-        })
+        fun textView(text: String, @StyleRes style: Int) = TextView(ctx, null, 0, style).apply {
+            this.text = text
+        }
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Rename Category"
-            setOnClickListener {
-                dismiss()
-                CategoryDialog(category.name).show(parentFragmentManager, "EditCategory")
-            }
-            setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(ctx, R.e.ic_edit_24dp)!!.mutate().apply {
-                setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
-            }, null, null, null)
-        })
+        fun addAction(
+            text: String,
+            drawable: Int,
+            tint: Int,
+            onClick: () -> Unit
+        ) {
+            addView(textView(text, R.i.UiKit_Settings_Item_Icon).apply {
+                setOnClickListener {
+                    dismiss()
+                    onClick()
+                }
+                setCompoundDrawablesWithIntrinsicBounds(
+                    ContextCompat.getDrawable(ctx, drawable)!!
+                        .mutate()
+                        .apply {
+                            setTint(ColorCompat.getThemedColor(ctx, tint))
+                        }, null, null, null
+                )
+            })
+        }
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Delete Category"
-            setOnClickListener {
-                dismiss()
-                Utils.showToast("Removed category: ${category.name}")
+        addView(textView(category.name, R.i.UiKit_Settings_Item_Header))
 
-                DMCategories.removeCategory(category)
 
-                Util.updateChannels()
-            }
-            setCompoundDrawablesWithIntrinsicBounds(
-                ContextCompat.getDrawable(ctx, R.e.ic_delete_24dp)!!
-                    .mutate()
-                    .apply {
-                        setTint(ColorCompat.getThemedColor(ctx, R.b.colorInfoDangerForeground))
-                    }, null, null, null
-            )
-        })
+        addAction("Rename Category", R.e.ic_edit_24dp, R.b.colorInteractiveNormal) {
+            CategoryDialog(category.name).show(parentFragmentManager, "EditCategory")
+        }
+
+        addAction("Delete Category", R.e.ic_delete_24dp, R.b.colorInfoDangerForeground) {
+            Utils.showToast("Removed category: ${category.name}")
+
+            DMCategories.removeCategory(category)
+
+            Util.updateChannels()
+        }
     }
 }

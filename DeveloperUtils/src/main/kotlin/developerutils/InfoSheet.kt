@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.aliucord.PluginManager.logger
 import com.aliucord.Utils
 import com.aliucord.views.Divider
 import com.aliucord.widgets.BottomSheet
 import com.aliucord.widgets.LinearLayout
 import com.lytefast.flexinput.R
-import tk.zt64.plugins.DeveloperUtils
 
 class InfoSheet(private val tappedView: View) : BottomSheet() {
     @SuppressLint("SetTextI18n")
@@ -51,7 +51,7 @@ class InfoSheet(private val tappedView: View) : BottomSheet() {
                     if (it != 0) addField("Image Resource ID", tappedView.resources.getResourceEntryName(it as Int))
                 }
             } catch (e: Throwable) {
-                DeveloperUtils.logger.error(e)
+                logger.error(e)
             }
         }
 

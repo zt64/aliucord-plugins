@@ -9,27 +9,20 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.after
-import com.aliucord.patcher.before
+import com.aliucord.patcher.*
 import com.aliucord.settings.delegate
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
 import com.discord.databinding.WidgetChannelsListItemActionsBinding
 import com.discord.utilities.color.ColorCompat
-import com.discord.widgets.channels.list.WidgetChannelListModel
-import com.discord.widgets.channels.list.WidgetChannelsList
-import com.discord.widgets.channels.list.WidgetChannelsListAdapter
-import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions
+import com.discord.widgets.channels.list.*
 import com.discord.widgets.channels.list.items.ChannelListItemPrivate
 import com.google.gson.reflect.TypeToken
 import com.lytefast.flexinput.R
 import dmcategories.DMCategory
 import dmcategories.PluginSettings
 import dmcategories.Util
-import dmcategories.items.ChannelListItemDMCategory
-import dmcategories.items.ChannelListItemDivider
-import dmcategories.items.ItemDMCategory
-import dmcategories.items.ItemDivider
+import dmcategories.items.*
 import dmcategories.sheets.CategoriesSheet
 
 private val categoryType = TypeToken.getParameterized(ArrayList::class.java, DMCategory::class.javaObjectType).getType()
@@ -66,33 +59,45 @@ class DMCategories : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         val categoryLayoutId = Utils.getResId("widget_channels_list_item_category", "layout")
-        val stageEventsSeparatorId = Utils.getResId("widget_channels_list_item_stage_events_separator", "layout")
+        val stageEventsSeparatorId =
+            Utils.getResId("widget_channels_list_item_stage_events_separator", "layout")
 
         mSettings = settings
 
-        patcher.after<WidgetChannelsListItemChannelActions>("configureUI", WidgetChannelsListItemChannelActions.Model::class.java) {
-            val model = it.args[0] as WidgetChannelsListItemChannelActions.Model
-
+        patcher.after<WidgetChannelsListItemChannelActions>(
+            "configureUI",
+            WidgetChannelsListItemChannelActions.Model::class.java
+        ) { (_, model: WidgetChannelsListItemChannelActions.Model) ->
             if (!model.channel.isDM()) return@after
 
             val root = getBinding().root as NestedScrollView
             val ctx = root.context
 
-            (root.getChildAt(0) as LinearLayout).addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-                categories.find { category -> category.channelIds.contains(model.channel.id) }?.let { category ->
-                    text = "Remove from category"
-                    setOnClickListener {
-                        dismiss()
+            (root.getChildAt(0) as LinearLayout).addView(
+                TextView(
+                    ctx,
+                    null,
+                    0,
+                    R.i.UiKit_Settings_Item_Icon
+                ).apply {
+                    categories.find { category -> category.channelIds.contains(model.channel.id) }
+                        ?.let { category ->
+                            text = "Remove from category"
+                            setOnClickListener {
+                                dismiss()
 
-                        category.channelIds.remove(model.channel.id)
+                                category.channelIds.remove(model.channel.id)
 
-                        Util.updateChannels()
+                                Util.updateChannels()
 
-                        saveCategories()
-                    }
-                    setCompoundDrawablesWithIntrinsicBounds(
-                        ContextCompat.getDrawable(ctx, R.e.ic_remove_circle_outline_red_24dp)!!
-                            .mutate()
+                                saveCategories()
+                            }
+                            setCompoundDrawablesWithIntrinsicBounds(
+                                ContextCompat.getDrawable(
+                                    ctx,
+                                    R.e.ic_remove_circle_outline_red_24dp
+                                )!!
+                                    .mutate()
                             .apply {
                                 setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
                             }, null, null, null
@@ -103,24 +108,31 @@ class DMCategories : Plugin() {
                         dismiss()
                         CategoriesSheet(model.channel.id).show(parentFragmentManager, "Categories")
                     }
-                    setCompoundDrawablesWithIntrinsicBounds(
-                        ContextCompat.getDrawable(ctx, R.e.ic_group_add_white_24dp)!!
-                            .mutate()
-                            .apply {
-                                setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
-                            }, null, null, null
-                    )
-                }
-            })
+                        setCompoundDrawablesWithIntrinsicBounds(
+                            ContextCompat.getDrawable(ctx, R.e.ic_group_add_white_24dp)!!
+                                .mutate()
+                                .apply {
+                                    setTint(
+                                        ColorCompat.getThemedColor(
+                                            ctx,
+                                            R.b.colorInteractiveNormal
+                                        )
+                                    )
+                                }, null, null, null
+                        )
+                    }
+                })
         }
 
-        patcher.before<WidgetChannelsList>("configureUI", WidgetChannelListModel::class.java) {
-            val model = it.args[0] as WidgetChannelListModel
-
+        @OptIn(ExperimentalStdlibApi::class)
+        patcher.before<WidgetChannelsList>(
+            "configureUI",
+            WidgetChannelListModel::class.java
+        ) { (_, model: WidgetChannelListModel) ->
             if (model.selectedGuild != null) return@before
 
             // I hate this but it works
-            if (categories.none { category -> category.userId == Util.getCurrentId() }) return@before
+            if (categories.none { (userId) -> userId == Util.getCurrentId() }) return@before
 
             val privateChannels = model.items.filterIsInstance<ChannelListItemPrivate>()
             val items = buildList(1000) {
@@ -148,11 +160,15 @@ class DMCategories : Plugin() {
             model.items.addAll(0, items)
         }
 
-        patcher.after<WidgetChannelsListAdapter>("onCreateViewHolder", ViewGroup::class.java, Int::class.java) {
-            it.result = when (it.args[1]) {
-                400 -> ItemDMCategory(categoryLayoutId, this)
-                401 -> ItemDivider(stageEventsSeparatorId, this)
-                else -> it.result
+        patcher.after<WidgetChannelsListAdapter>(
+            "onCreateViewHolder",
+            ViewGroup::class.java,
+            Int::class.java
+        ) { (param, type: Int) ->
+            param.result = when (type) {
+                ChannelListItemDMCategory.TYPE -> ItemDMCategory(categoryLayoutId, this)
+                ChannelListItemDivider.TYPE -> ItemDivider(stageEventsSeparatorId, this)
+                else -> param.result
             }
         }
     }

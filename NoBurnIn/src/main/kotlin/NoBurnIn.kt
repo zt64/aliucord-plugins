@@ -6,8 +6,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.after
-import com.aliucord.patcher.before
+import com.aliucord.patcher.*
 import com.discord.databinding.WidgetHomeBinding
 import com.discord.views.channelsidebar.GuildChannelSideBarActionsView
 import com.discord.widgets.home.WidgetHome
@@ -30,7 +29,10 @@ class NoBurnIn : Plugin() {
         val videoButtonId = Utils.getResId("menu_chat_start_video_call", "id")
 
         if (settings.getBool("immersiveMode", false)) {
-            WindowInsetsControllerCompat(Utils.appActivity.window, Utils.appActivity.findViewById<ViewGroup>(android.R.id.content)).hide(
+            WindowInsetsControllerCompat(
+                Utils.appActivity.window,
+                Utils.appActivity.findViewById<ViewGroup>(android.R.id.content)
+            ).hide(
                 when (settings.getInt("immersiveModeType", 0)) {
                     0 -> WindowInsetsCompat.Type.statusBars()
                     1 -> WindowInsetsCompat.Type.navigationBars()
@@ -40,13 +42,22 @@ class NoBurnIn : Plugin() {
             )
         }
 
-        patcher.after<WidgetHomeHeaderManager>("configure", WidgetHome::class.java, WidgetHomeModel::class.java, WidgetHomeBinding::class.java) {
-            with(it.args[0] as WidgetHome) {
+        patcher.after<WidgetHomeHeaderManager>(
+            "configure",
+            WidgetHome::class.java,
+            WidgetHomeModel::class.java,
+            WidgetHomeBinding::class.java
+        ) { (_, home: WidgetHome) ->
+            with(home) {
                 if (settings.getBool("hideToolbar", false)) {
                     toolbar.visibility = View.GONE
                     unreadCountView.visibility = View.GONE
                 } else {
-                    if (settings.getBool("hideChannelIcon", false)) actionBarTitleLayout.findViewById<View>(toolbarIconId)?.visibility = View.GONE
+                    if (settings.getBool(
+                            "hideChannelIcon",
+                            false
+                        )
+                    ) actionBarTitleLayout.findViewById<View>(toolbarIconId)?.visibility = View.GONE
 
                     if (settings.getBool("hideText", false)) {
                         setActionBarTitle("")
@@ -54,7 +65,11 @@ class NoBurnIn : Plugin() {
                     }
 
                     if (settings.getBool("hideUnread", true)) unreadCountView.visibility = View.GONE
-                    if (settings.getBool("hideDrawerButton", true)) setActionBarDisplayHomeAsUpEnabled(false)
+                    if (settings.getBool(
+                            "hideDrawerButton",
+                            true
+                        )
+                    ) setActionBarDisplayHomeAsUpEnabled(false)
 
                     toolbar.menu.run {
                         if (settings.getBool("hideSearchButton", true)) findItem(searchButtonId)?.isVisible = false

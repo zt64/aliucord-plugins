@@ -12,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.ColorUtils
 import com.aliucord.Utils
 import com.aliucord.api.PatcherAPI
+import com.aliucord.patcher.after
 
 class NotificationReceiver(
     private val patcher: PatcherAPI,
@@ -21,14 +22,15 @@ class NotificationReceiver(
     private var selectedView: View? = null
     private var originalDrawable: Drawable? = null
 
+    @Suppress("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
         context.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
 
-        if (devMode)
+        if (devMode) {
             patcher.unpatchAll()
-        else
+        } else {
             patcher.after<View>("performClick") {
-                {
+                run {
                     val view = it.thisObject as View
 
                     if (selectedView == view) {
@@ -44,7 +46,10 @@ class NotificationReceiver(
                             cornerRadius = 4f
                             setStroke(6, Color.RED)
                         }
-                        InfoSheet(view).show(Utils.appActivity.supportFragmentManager, "DevUtilsSheet")
+                        InfoSheet(view).show(
+                            Utils.appActivity.supportFragmentManager,
+                            "DevUtilsSheet"
+                        )
                     }
 
                     false
@@ -57,5 +62,6 @@ class NotificationReceiver(
 
                 Utils.showToast("${if (devMode) "Enabled" else "Disabled"} inspector")
             }
+        }
     }
 }

@@ -14,22 +14,24 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
 
         val ctx = requireContext()
 
-        fun createCheckedSetting(title: String, setting: String, checked: Boolean = true): CheckedSetting {
-            return Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, null).apply {
-                isChecked = settings.getBool(setting, checked)
+        fun createCheckedSetting(title: String, setting: String, checked: Boolean = true) {
+            return addView(
+                Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, null).apply {
+                    isChecked = settings.getBool(setting, checked)
 
-                setOnCheckedListener {
-                    settings.setBool(setting, it)
-                    PluginManager.stopPlugin("AlwaysAnimate")
-                    PluginManager.startPlugin("AlwaysAnimate")
+                    setOnCheckedListener {
+                        settings.setBool(setting, it)
+                        PluginManager.stopPlugin("AlwaysAnimate")
+                        PluginManager.startPlugin("AlwaysAnimate")
+                    }
                 }
-            }
+            )
         }
 
-        addView(createCheckedSetting("Server icons", "guildIcons"))
-        addView(createCheckedSetting("User avatars", "avatars"))
-        addView(createCheckedSetting("Statuses", "status"))
-        addView(createCheckedSetting("Round Animated Avatars", "roundedAvatars"))
-        addView(createCheckedSetting("Disable animations when battery saver is on", "batterySaver", false))
+        createCheckedSetting("Server icons", "guildIcons")
+        createCheckedSetting("User avatars", "avatars")
+        createCheckedSetting("Statuses", "status")
+        createCheckedSetting("Round Animated Avatars", "roundedAvatars")
+        createCheckedSetting("Disable animations when battery saver is on", "batterySaver", false)
     }
 }

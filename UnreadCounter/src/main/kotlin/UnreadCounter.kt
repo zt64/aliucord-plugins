@@ -9,10 +9,12 @@ import androidx.core.content.ContextCompat
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
+import com.aliucord.patcher.after
 import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.utils.RxUtils.subscribe
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
 import com.aliucord.wrappers.ChannelWrapper.Companion.name
+import com.discord.api.utcdatetime.UtcDateTime
 import com.discord.databinding.WidgetChannelsListItemChannelBinding
 import com.discord.stores.StoreStream
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
@@ -34,23 +36,37 @@ class UnreadCounter : Plugin() {
         val unreadCounterId = View.generateViewId()
         val mentionsCounterId = Utils.getResId("channels_item_channel_mentions", "id")
 
-        patcher.after<WidgetChannelsListAdapter.ItemChannelText>("onConfigure", Int::class.javaPrimitiveType, ChannelListItem::class.java) {
+        patcher.after<WidgetChannelsListAdapter.ItemChannelText>(
+            "onConfigure",
+            Int::class.javaPrimitiveType!!,
+            ChannelListItem::class.java
+        ) {
             val textChannel = it.args[1] as ChannelListItemTextChannel
             val itemChannelText = it.thisObject as WidgetChannelsListAdapter.ItemChannelText
             val root = itemChannelText.binding.root as RelativeLayout
 
-            val counter = root.findViewById(unreadCounterId) ?: TextView(root.context, null, 0, R.i.Icon_Mentions_Large).apply {
+            val counter = root.findViewById(unreadCounterId) ?: TextView(
+                root.context,
+                null,
+                0,
+                R.i.Icon_Mentions_Large
+            ).apply {
                 id = unreadCounterId
                 visibility = View.GONE
-                background = ContextCompat.getDrawable(root.context, R.e.drawable_overlay_mentions)!!.mutate().apply {
-                    setTint(Color.GRAY)
-                }
+                background =
+                    ContextCompat.getDrawable(root.context, R.e.drawable_overlay_mentions)!!
+                        .mutate().apply {
+                            setTint(Color.GRAY)
+                        }
                 layoutParams = RelativeLayout.LayoutParams(20.dp, 20.dp).apply {
                     alignWithParent = true
                     minWidth = 16.dp
                     marginStart = 8.dp
                     marginEnd = 16.dp
-                    addRule(RelativeLayout.START_OF, root.findViewById<TextView>(mentionsCounterId).id)
+                    addRule(
+                        RelativeLayout.START_OF,
+                        root.findViewById<TextView>(mentionsCounterId).id
+                    )
                     addRule(RelativeLayout.CENTER_VERTICAL)
                 }
                 root.addView(this)
@@ -59,7 +75,10 @@ class UnreadCounter : Plugin() {
 //            counter.visibility = if (this > 0) View.VISIBLE else View.GONE
 //            counter.text = this.toString()
             StoreStream.getReadStates()
-                .observeUnreadCountForChannel(textChannel.channel.id)
+                .observeUnreadCountForChannel(
+                    textChannel.channel.id,
+                    UtcDateTime(System.currentTimeMillis())
+                )
                 .subscribe(object : Subscriber<Int>() {
                     override fun onCompleted() {}
 

@@ -2,10 +2,7 @@ package bettermediaviewer
 
 import android.animation.ValueAnimator
 import android.app.DownloadManager
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
@@ -18,16 +15,11 @@ import com.aliucord.PluginManager
 import com.aliucord.Utils
 import com.aliucord.api.PatcherAPI
 import com.aliucord.api.SettingsAPI
-import com.aliucord.patcher.InsteadHook
-import com.aliucord.patcher.after
-import com.aliucord.patcher.instead
+import com.aliucord.patcher.*
 import com.aliucord.utils.RxUtils
 import com.discord.player.MediaType
 import com.discord.utilities.rx.ObservableExtensionsKt
-import com.discord.widgets.media.WidgetMedia
-import com.discord.widgets.media.`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`
-import com.discord.widgets.media.`WidgetMedia$showControls$1`
-import com.discord.widgets.media.`WidgetMedia$showControls$2`
+import com.discord.widgets.media.*
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.material.appbar.AppBarLayout
 import com.lytefast.flexinput.R
@@ -125,15 +117,20 @@ object Patches {
         val mediaPlayerViewId = Utils.getResId("media_player_control_view", "id")
 
         after<WidgetMedia>("getToolbarTranslationY") {
-            if (mediaSource == null) it.result = -binding.root.findViewById<AppBarLayout>(actionBarId).translationY
+            if (mediaSource == null) it.result =
+                -binding.root.findViewById<AppBarLayout>(actionBarId).translationY
         }
 
-        instead<`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`>("onAnimationUpdate", ValueAnimator::class.java) {
+        instead<`WidgetMedia$configureAndStartControlsAnimation$$inlined$apply$lambda$1`>(
+            "onAnimationUpdate",
+            ValueAnimator::class.java
+        ) { (_, animator: ValueAnimator) ->
             val widgetMedia = `this$0`
-            val floatValue = ((it.args[0] as ValueAnimator).animatedValue) as Float
+            val floatValue = animator.animatedValue as Float
             val root = widgetMedia.binding.root
 
-            root.findViewById<AppBarLayout>(actionBarId).translationY = if (widgetMedia.mediaSource != null) floatValue else -floatValue
+            root.findViewById<AppBarLayout>(actionBarId).translationY =
+                if (widgetMedia.mediaSource != null) floatValue else -floatValue
 
             if (widgetMedia.isVideo() && widgetMedia.playerControlsHeight > 0) {
                 root.findViewById<PlayerControlView>(mediaPlayerViewId).translationY =
@@ -146,17 +143,17 @@ object Patches {
         patch(WidgetMedia::class.java.getDeclaredMethod("getFormattedUrl", Context::class.java, Uri::class.java)) {
             val res = it.result as String
 
-            if (res.contains(".discordapp.net/")) {
-                val arr = res.split("\\?").toTypedArray()
+            if (".discordapp.net/" !in res) return@patch
 
-                it.result = "$arr[0]${
-                    if ("format=" in arr[1]) {
-                        "?format=${arr[1].split("format=")[1]}"
-                    } else {
-                        ""
-                    }
-                }"
-            }
+            val arr = res.split("\\?").toTypedArray()
+
+            it.result = "$arr[0]${
+                if ("format=" in arr[1]) {
+                    "?format=${arr[1].split("format=")[1]}"
+                } else {
+                    ""
+                }
+            }"
         }
 
 

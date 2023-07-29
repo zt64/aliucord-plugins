@@ -2,15 +2,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.view.ViewGroup.MarginLayoutParams
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Guideline
-import androidx.recyclerview.widget.RecyclerView
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
@@ -18,30 +14,14 @@ import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
 import com.aliucord.settings.delegate
 import com.aliucord.utils.DimenUtils.dp
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemAttachment
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemBotComponentRow
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemEmbed
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemEphemeralMessage
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemGameInvite
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemGift
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemInvite
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemReactions
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemSpotifyListenTogether
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemStageInvite
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemSticker
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemUploadProgress
-import com.discord.widgets.chat.list.adapter.WidgetChatListItem
+import com.aliucord.utils.lazyField
+import com.discord.widgets.chat.list.adapter.*
 import com.discord.widgets.chat.list.entries.ChatListEntry
-import com.google.android.flexbox.FlexboxLayout
-import com.google.android.material.card.MaterialCardView
 import compactmode.PluginSettings
 
 @AliucordPlugin
 class CompactMode : Plugin() {
-    private val itemAvatarField = WidgetChatListAdapterItemMessage::class.java
-        .getDeclaredField("itemAvatar")
-        .apply { isAccessible = true }
+    private val itemAvatarField by lazyField<WidgetChatListAdapterItemMessage>("itemAvatar")
 
     private val WidgetChatListAdapterItemMessage.avatarView
         get() = itemAvatarField[this] as ImageView?
@@ -56,7 +36,10 @@ class CompactMode : Plugin() {
     private val SettingsAPI.hideAvatar by settings.delegate(false)
 
     init {
-        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+        settingsTab = SettingsTab(
+            PluginSettings::class.java,
+            SettingsTab.Type.BOTTOM_SHEET
+        ).withArgs(settings)
     }
 
     @SuppressLint("SetTextI18n")
@@ -65,7 +48,8 @@ class CompactMode : Plugin() {
         val headerLayoutId = Utils.getResId("chat_list_adapter_item_text_header", "id")
         val guidelineId = Utils.getResId("uikit_chat_guideline", "id")
         val embedContainerCardId = Utils.getResId("chat_list_item_embed_container_card", "id")
-        val replyIconViewId = Utils.getResId("chat_list_adapter_item_text_decorator_reply_link_icon", "id")
+        val replyIconViewId =
+            Utils.getResId("chat_list_adapter_item_text_decorator_reply_link_icon", "id")
         val itemTextViewId = Utils.getResId("chat_list_adapter_item_text", "id")
         val componentRowId = Utils.getResId("chat_list_adapter_item_component_root", "id")
         val messageRootId = Utils.getResId("widget_chat_list_adapter_item_text_root", "id")
@@ -73,42 +57,52 @@ class CompactMode : Plugin() {
         val usernameViewId = Utils.getResId("chat_list_adapter_item_text_name", "id")
         val loadingTextId = Utils.getResId("chat_list_adapter_item_text_loading", "id")
 
-        patcher.after<WidgetChatListItem>("onConfigure", Int::class.java, ChatListEntry::class.java) {
+        patcher.after<WidgetChatListItem>(
+            "onConfigure",
+            Int::class.java,
+            ChatListEntry::class.java
+        ) {
             val contentMargin = settings.contentMargin.dp
 
             when (this) {
                 is WidgetChatListAdapterItemAttachment,
-                is WidgetChatListAdapterItemEphemeralMessage -> itemView
-                    .findViewById<Guideline>(guidelineId)
-                    .setGuidelineBegin(contentMargin)
+                is WidgetChatListAdapterItemEphemeralMessage -> {
+                    itemView
+                        .findViewById<Guideline>(guidelineId)
+                        .setGuidelineBegin(contentMargin)
+                    return@after
+                }
+            }
 
+            val layoutParams = when (this) {
                 is WidgetChatListAdapterItemInvite,
                 is WidgetChatListAdapterItemStageInvite,
                 is WidgetChatListAdapterItemSticker,
                 is WidgetChatListAdapterItemUploadProgress,
                 is WidgetChatListAdapterItemGift,
                 is WidgetChatListAdapterItemGameInvite,
-                is WidgetChatListAdapterItemSpotifyListenTogether -> (itemView.layoutParams as RecyclerView.LayoutParams).marginStart =
-                    contentMargin
+                is WidgetChatListAdapterItemSpotifyListenTogether -> itemView
 
-                is WidgetChatListAdapterItemBotComponentRow -> (itemView.findViewById<LinearLayout>(componentRowId).layoutParams as ConstraintLayout.LayoutParams).marginStart =
-                    contentMargin
+                is WidgetChatListAdapterItemBotComponentRow -> itemView.findViewById(componentRowId)
+                is WidgetChatListAdapterItemReactions -> itemView.findViewById(reactionsFlexBoxId)
+                is WidgetChatListAdapterItemEmbed -> itemView.findViewById(embedContainerCardId)
+                else -> null
+            }?.layoutParams as MarginLayoutParams?
 
-                is WidgetChatListAdapterItemReactions -> (itemView.findViewById<FlexboxLayout>(reactionsFlexBoxId).layoutParams as ConstraintLayout.LayoutParams).marginStart =
-                    contentMargin
-
-                is WidgetChatListAdapterItemEmbed -> (itemView.findViewById<MaterialCardView>(embedContainerCardId).layoutParams as ConstraintLayout.LayoutParams).marginStart =
-                    contentMargin
-            }
+            layoutParams?.marginStart = contentMargin
         }
 
-        patcher.after<WidgetChatListAdapterItemMessage>("onConfigure", Int::class.java, ChatListEntry::class.java) {
+        patcher.after<WidgetChatListAdapterItemMessage>(
+            "onConfigure",
+            Int::class.java,
+            ChatListEntry::class.java
+        ) {
             val contentMargin = settings.contentMargin.dp
 
             when (itemView.id) {
                 // Regular message
                 messageRootId -> {
-                    (itemView.findViewById<TextView>(loadingTextId).layoutParams as ConstraintLayout.LayoutParams).apply {
+                    (itemView.findViewById<View>(loadingTextId).layoutParams as MarginLayoutParams).apply {
                         marginStart = 0
                     }
 
@@ -118,12 +112,13 @@ class CompactMode : Plugin() {
                     itemView.setPadding(0, settings.messagePadding.dp, 0, 0)
 
                     if (settings.hideReplyIcon) {
-                        itemView.findViewById<FrameLayout>(replyIconViewId).visibility = View.GONE
+                        itemView.findViewById<View>(replyIconViewId).visibility = View.GONE
                     }
                     if (settings.hideAvatar) {
                         avatarView!!.visibility = View.GONE
 
-                        (headerView.layoutParams as ConstraintLayout.LayoutParams).marginStart = contentMargin
+                        (headerView.layoutParams as ConstraintLayout.LayoutParams).marginStart =
+                            contentMargin
 
                         return@after
                     }
@@ -165,10 +160,11 @@ class CompactMode : Plugin() {
                     val root = itemView as RelativeLayout
                     val contentView = root.getChildAt(1) as LinearLayout
                     val nameView = contentView.findViewById<TextView>(usernameViewId)
-                    val contentViewLayoutParams = contentView.layoutParams as RelativeLayout.LayoutParams
+                    val contentViewLayoutParams =
+                        contentView.layoutParams as RelativeLayout.LayoutParams
 
                     itemView.setPadding(0, settings.messagePadding.dp, 0, 0)
-                    (itemView.layoutParams as RecyclerView.LayoutParams).setMargins(0, 0, 0, 0)
+                    (itemView.layoutParams as MarginLayoutParams).setMargins(0, 0, 0, 0)
                     contentViewLayoutParams.marginStart = contentMargin
 
                     if (settings.hideAvatar) return@after avatarView!!.setVisibility(View.GONE)
@@ -199,7 +195,7 @@ class CompactMode : Plugin() {
                     avatarView!!.apply {
                         2.dp.let { dp -> setPadding(dp, dp, dp, dp) }
 
-                        (layoutParams as LinearLayout.LayoutParams).apply {
+                        (layoutParams as MarginLayoutParams).apply {
                             marginStart = settings.headerMargin.dp
                             marginEnd = 0
                             width = settings.avatarScale.dp
@@ -209,7 +205,8 @@ class CompactMode : Plugin() {
                 }
                 // Minimal message
                 else -> {
-                    (messageTextView.layoutParams as ConstraintLayout.LayoutParams).marginStart = contentMargin
+                    (messageTextView.layoutParams as MarginLayoutParams).marginStart =
+                        contentMargin
                 }
             }
         }

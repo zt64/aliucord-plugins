@@ -8,9 +8,7 @@ import android.os.PowerManager
 import android.widget.ImageView
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.PreHook
-import com.aliucord.patcher.after
-import com.aliucord.patcher.before
+import com.aliucord.patcher.*
 import com.aliucord.utils.DimenUtils
 import com.discord.models.presence.Presence
 import com.discord.utilities.icon.IconUtils
@@ -36,14 +34,28 @@ class AlwaysAnimate : Plugin() {
         }
 
         if (settings.getBool("avatars", true)) {
-            patcher.before<IconUtils>("getForUser", Long::class.javaObjectType, String::class.javaObjectType, Int::class.javaObjectType, Boolean::class.java, Int::class.javaObjectType) {
+            patcher.before<IconUtils>(
+                "getForUser",
+                Long::class.javaObjectType,
+                String::class.javaObjectType,
+                Int::class.javaObjectType,
+                Boolean::class.java,
+                Int::class.javaObjectType
+            ) {
                 it.args[3] = true
             }
 
-            patcher.after<IconUtils>("setIcon", ImageView::class.java, String::class.java, Int::class.java, Int::class.java, Boolean::class.java, Function1::class.java, MGImages.ChangeDetector::class.java) {
-                val simpleDraweeView = it.args[0] as SimpleDraweeView
-
-                simpleDraweeView.apply {
+            patcher.after<IconUtils>(
+                "setIcon",
+                ImageView::class.java,
+                String::class.java,
+                Int::class.java,
+                Int::class.java,
+                Boolean::class.java,
+                Function1::class.java,
+                MGImages.ChangeDetector::class.java
+            ) { (_, view: SimpleDraweeView) ->
+                view.apply {
                     clipToOutline = true
 
                     background = if (settings.getBool("roundedAvatars", true)) {

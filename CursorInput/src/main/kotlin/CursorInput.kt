@@ -1,8 +1,7 @@
 import android.content.Context
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.after
-import com.aliucord.patcher.instead
+import com.aliucord.patcher.*
 import com.discord.widgets.chat.input.AppFlexInputViewModel
 import com.lytefast.flexinput.R
 import com.lytefast.flexinput.fragment.`FlexInputFragment$c`
@@ -10,32 +9,35 @@ import com.lytefast.flexinput.widget.FlexEditText
 
 @AliucordPlugin
 class CursorInput : Plugin() {
-    private var flexEditText: FlexEditText? = null
+    private lateinit var flexEditText: FlexEditText
 
     override fun start(context: Context) {
         patcher.after<`FlexInputFragment$c`>("invoke", Object::class.java) {
             flexEditText = (it.result as b.b.a.e.a).root.findViewById(R.f.text_input)
         }
 
-        patcher.instead<AppFlexInputViewModel>("onInputTextAppended", String::class.java) {
+        patcher.instead<AppFlexInputViewModel>(
+            "onInputTextAppended",
+            String::class.java
+        ) { (_, str: String) ->
             val baseString = requireViewState().a
-            var str = it.args[0] as String
 
-            if (flexEditText == null) {
+            if (!::flexEditText.isInitialized) {
                 onInputTextChanged(baseString + str, null)
             } else {
-                val selectionEnd = flexEditText!!.selectionEnd
+                val selectionEnd = flexEditText.selectionEnd
 
-                if (selectionEnd != baseString.length) str = str.trim()
+                val trimmed = if (selectionEnd != baseString.length) str.trim() else str
 
-                onInputTextChanged(StringBuilder(baseString).insert(selectionEnd, str).toString(), null)
-                flexEditText!!.setSelection(selectionEnd + str.length)
+                onInputTextChanged(
+                    StringBuilder(baseString).insert(selectionEnd, trimmed).toString(), null
+                )
+                flexEditText.setSelection(selectionEnd + trimmed.length)
             }
         }
     }
 
     override fun stop(context: Context) {
         patcher.unpatchAll()
-        flexEditText = null
     }
 }

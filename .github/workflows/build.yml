@@ -1,9 +1,14 @@
-name: Build
+name: "Build"
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'gradle.properties'
+      - 'gradle/**'
+      - 'plugin/**'
+      - '**.gradle.kts'
 
 jobs:
   build:

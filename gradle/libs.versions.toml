@@ -1,7 +1,7 @@
 [versions]
 discord = "aliucord-SNAPSHOT"
 aliucord = "bbcd8a8"
-kotlin = "1.5.21"
+kotlin = "1.9.0"
 android = "7.4.2"
 
 [libraries]

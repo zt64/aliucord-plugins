@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
         google()
@@ -7,10 +9,16 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://maven.aliucord.com/snapshots")
+    }
+}
+
 rootProject.name = "plugins"
 
-rootDir.listFiles { file ->
+rootDir.resolve("plugin").listFiles { file ->
     file.isDirectory && file.resolve("build.gradle.kts").exists()
-}!!.forEach {
-    include(it.name)
-}
+}!!.map { ":plugin:${it.name}" }.let(::include)

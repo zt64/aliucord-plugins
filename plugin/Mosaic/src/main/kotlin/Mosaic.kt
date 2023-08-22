@@ -1,21 +1,10 @@
 import android.content.Context
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.LinearLayout.LayoutParams
-import androidx.constraintlayout.helper.widget.Flow
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.recyclerview.widget.RecyclerView
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.*
-import com.aliucord.utils.DimenUtils.dp
-import com.aliucord.widgets.LinearLayout
 import com.aliucord.wrappers.ChannelWrapper.Companion.guildId
 import com.aliucord.wrappers.embeds.MessageEmbedWrapper.Companion.url
-import com.aliucord.wrappers.messages.AttachmentWrapper.Companion.height
 import com.aliucord.wrappers.messages.AttachmentWrapper.Companion.type
-import com.aliucord.wrappers.messages.AttachmentWrapper.Companion.width
 import com.discord.api.channel.Channel
 import com.discord.api.message.attachment.MessageAttachment
 import com.discord.api.message.attachment.MessageAttachmentType
@@ -25,36 +14,29 @@ import com.discord.api.role.GuildRole
 import com.discord.models.member.GuildMember
 import com.discord.models.message.Message
 import com.discord.stores.StoreMessageState
-import com.discord.stores.StoreStream
-import com.discord.utilities.embed.EmbedResourceUtils
-import com.discord.widgets.chat.list.InlineMediaView
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapter
-import com.discord.widgets.chat.list.adapter.`WidgetChatListAdapterItemAttachment$configureUI$6`
-import com.discord.widgets.chat.list.adapter.WidgetChatListItem
 import com.discord.widgets.chat.list.entries.*
-import de.robv.android.xposed.XposedBridge
 
 @AliucordPlugin
 class Mosaic : Plugin() {
     override fun start(context: Context) {
-        /**
-         * This patch adds our custom entry type to the list of entries that the adapter can handle
-         */
-        patcher.instead<WidgetChatListAdapter>(
-            "onCreateViewHolder",
-            ViewGroup::class.java,
-            Int::class.java
-        ) { (param, _: Any, i: Int) ->
-            if (i == MosaicEntry.TYPE) {
-                WidgetChatListItems(this)
-            } else {
-                XposedBridge.invokeOriginalMethod(
-                    param.method,
-                    param.thisObject,
-                    param.args
-                )
-            }
-        }
+        // /**
+        //  * This patch adds our custom entry type to the list of entries that the adapter can handle
+        //  */
+        // patcher.instead<WidgetChatListAdapter>(
+        //     "onCreateViewHolder",
+        //     ViewGroup::class.java,
+        //     Int::class.java
+        // ) { (param, _: Any, i: Int) ->
+        //     if (i == MosaicEntry.TYPE) {
+        //         WidgetChatListItems(this)
+        //     } else {
+        //         XposedBridge.invokeOriginalMethod(
+        //             param.method,
+        //             param.thisObject,
+        //             param.args
+        //         )
+        //     }
+        // }
 
         /**
          * This patch modifies the default behavior of splitting a messages attachment into separate
@@ -182,90 +164,90 @@ class Mosaic : Plugin() {
     override fun stop(context: Context) = patcher.unpatchAll()
 }
 
-private class WidgetChatListItems(adapter: WidgetChatListAdapter) :
-    WidgetChatListItem(2131559042, adapter) {
-    private lateinit var recycler: RecyclerView
-    private lateinit var flow: Flow
-    private val embedResourceUtils = EmbedResourceUtils.INSTANCE
-    private val maxImageWidth = embedResourceUtils.computeMaximumImageWidthPx(adapter.context)
-    private val maxImageHeight = embedResourceUtils.maX_IMAGE_VIEW_HEIGHT_PX
-    private val resources = adapter.context.resources
+// private class WidgetChatListItems(adapter: WidgetChatListAdapter) :
+//     WidgetChatListItem(2131559042, adapter) {
+//     private lateinit var recycler: RecyclerView
+//     private lateinit var flow: Flow
+//     private val embedResourceUtils = EmbedResourceUtils.INSTANCE
+//     private val maxImageWidth = embedResourceUtils.computeMaximumImageWidthPx(adapter.context)
+//     private val maxImageHeight = embedResourceUtils.maX_IMAGE_VIEW_HEIGHT_PX
+//     private val resources = adapter.context.resources
+//
+//     override fun onConfigure(i: Int, chatListEntry: ChatListEntry?) {
+//         super.onConfigure(i, chatListEntry)
+//
+//         val entry = chatListEntry as? MosaicEntry ?: return
+//         val attachments = entry.attachments
+//         val context = adapter.context
+//
+//         if (!::recycler.isInitialized) {
+//             recycler = RecyclerView(context).apply {
+//                 layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+//
+//                 layoutManager = SpannedGridLayoutManager(
+//                     orientation = SpannedGridLayoutManager.Orientation.VERTICAL,
+//                     spans = 3
+//                 ).apply {
+//                     spanSizeLookup = SpannedGridLayoutManager.SpanSizeLookup { position ->
+//                         attachments[position].let {
+//                             SpanSize(it.width!!, it.height!!)
+//                         }
+//                     }
+//                 }
+//             }
+//
+//             (itemView as ViewGroup).addView(recycler)
+//         }
+//
+//         recycler.removeAllViews()
+//
+//         recycler.adapter = MosaicAdapter(attachments)
+//     }
+// }
 
-    override fun onConfigure(i: Int, chatListEntry: ChatListEntry?) {
-        super.onConfigure(i, chatListEntry)
-
-        val entry = chatListEntry as? MosaicEntry ?: return
-        val attachments = entry.attachments
-        val context = adapter.context
-
-        if (!::recycler.isInitialized) {
-            recycler = RecyclerView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-
-                layoutManager = SpannedGridLayoutManager(
-                    orientation = SpannedGridLayoutManager.Orientation.VERTICAL,
-                    spans = 3
-                ).apply {
-                    spanSizeLookup = SpannedGridLayoutManager.SpanSizeLookup { position ->
-                        attachments[position].let {
-                            SpanSize(it.width!!, it.height!!)
-                        }
-                    }
-                }
-            }
-
-            (itemView as ViewGroup).addView(recycler)
-        }
-
-        recycler.removeAllViews()
-
-        recycler.adapter = MosaicAdapter(attachments)
-    }
-}
-
-class MosaicAdapter(
-    private var attachments: List<MessageAttachment>
-) : RecyclerView.Adapter<MosaicAdapter.ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LinearLayout(parent.context).apply {
-            layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-        })
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val attachment = attachments[position]
-
-        holder.mediaView.updateUIWithAttachment(
-            /* p0 = */ attachment,
-            /* p1 = */ attachment.width,
-            /* p2 = */ attachment.height,
-            /* p3 = */ StoreStream.getUserSettings().isAutoPlayGifsEnabled
-        )
-
-        holder.mediaView.setOnClickListener(
-            `WidgetChatListAdapterItemAttachment$configureUI$6`(
-                attachment
-            )
-        )
-    }
-
-    override fun getItemCount(): Int = attachments.size
-
-    // Initializing the Views
-    class ViewHolder(layout: LinearLayout) : RecyclerView.ViewHolder(layout) {
-        var mediaView: InlineMediaView
-
-        init {
-            mediaView = InlineMediaView(layout.context).apply {
-                layoutParams = ConstraintLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
-                    radius = 8.dp.toFloat()
-                }
-            }
-
-            layout.addView(mediaView)
-        }
-    }
-}
+// class MosaicAdapter(
+//     private var attachments: List<MessageAttachment>
+// ) : RecyclerView.Adapter<MosaicAdapter.ViewHolder>() {
+//     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+//         return ViewHolder(LinearLayout(parent.context).apply {
+//             layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+//         })
+//     }
+//
+//     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+//         val attachment = attachments[position]
+//
+//         holder.mediaView.updateUIWithAttachment(
+//             /* p0 = */ attachment,
+//             /* p1 = */ attachment.width,
+//             /* p2 = */ attachment.height,
+//             /* p3 = */ StoreStream.getUserSettings().isAutoPlayGifsEnabled
+//         )
+//
+//         holder.mediaView.setOnClickListener(
+//             `WidgetChatListAdapterItemAttachment$configureUI$6`(
+//                 attachment
+//             )
+//         )
+//     }
+//
+//     override fun getItemCount(): Int = attachments.size
+//
+//     // Initializing the Views
+//     class ViewHolder(layout: LinearLayout) : RecyclerView.ViewHolder(layout) {
+//         var mediaView: InlineMediaView
+//
+//         init {
+//             mediaView = InlineMediaView(layout.context).apply {
+//                 layoutParams = ConstraintLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+//                     radius = 8.dp.toFloat()
+//                 }
+//             }
+//
+//             layout.addView(mediaView)
+//         }
+//     }
+// }
 
 private class MosaicEntry(val attachments: List<MessageAttachment>) : ChatListEntry() {
     override fun getKey(): String = ""

@@ -26,12 +26,12 @@ jobs:
           java-version: 11
           distribution: temurin
 
-      - name: Build Plugins
+      - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
-        with:
-          arguments: make generateUpdaterJson
 
-      - run: |
+      - name: Build plugins
+        run: |
+          ./gradlew make generateUpdaterJson
           cp **/build/*.zip $GITHUB_WORKSPACE/builds
           cp build/updater.json $GITHUB_WORKSPACE/builds
 

@@ -1,6 +1,26 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "gradle"
+      ],
+      "allowedVersions": "<=7.6.2"
+    },
+    {
+      "matchPackageNames": [
+        "com.android.library"
+      ],
+      "allowedVersions": "<=7.4.2"
+    },
+    {
+      "matchPackageNames": [
+        "org.jetbrains.kotlin.android"
+      ],
+      "allowedVersions": "<=1.5.21"
+    }
   ]
 }

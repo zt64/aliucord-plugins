@@ -1,12 +1,12 @@
 [versions]
 discord = "aliucord-SNAPSHOT"
-aliucord = "bbcd8a8"
+aliucord = "main-SNAPSHOT"
 kotlin = "1.5.21"
 android = "7.4.2"
 
 [libraries]
 discord = { module = "com.discord:discord", version.ref = "discord" }
-aliucord = { module = "com.aliucord:Aliucord", version = "main-SNAPSHOT" }
+aliucord = { module = "com.aliucord:Aliucord", version.ref = "aliucord" }
 
 [plugins]
 android-library = { id = "com.android.library", version.ref = "android" }

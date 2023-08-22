@@ -33,7 +33,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/src
           ./gradlew make generateUpdaterJson
-          cp **/build/*.zip $GITHUB_WORKSPACE/builds
+          cp plugin/**/build/*.zip $GITHUB_WORKSPACE/builds
           cp build/updater.json $GITHUB_WORKSPACE/builds
 
       - name: Push builds

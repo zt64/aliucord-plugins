@@ -62,30 +62,25 @@ subprojects {
     }
 }
 
-task("generateReadMe") {
-    outputs.file("README.md")
-    doLast {
-        val readMe = rootProject.file("README.md")
+project.gradle.taskGraph.whenReady {
+    val readMe = rootProject.file("README.md")
+    val content = buildString {
+        appendLine("## Plugins for [Aliucord](https://github.com/Aliucord)")
+        appendLine()
+        appendLine("Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder")
+        appendLine()
 
-        val header = """
-            ## Plugins for [Aliucord](https://github.com/Aliucord)
-            
-            Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
-        """.trimIndent()
-
-        val plugins = subprojects.joinToString("\n") { subproject ->
-            with(subproject) {
-                val aliucord: AliucordExtension by extensions
-
-                if (aliucord.excludeFromUpdaterJson.get()) return@with ""
-
-                buildString {
+        subprojects.filterNot {
+            it.extensions.getByType<AliucordExtension>().excludeFromUpdaterJson.get()
+        }.joinToString("\n") { subproject ->
+            buildString {
+                with(subproject) {
                     appendLine("- [$name](https://github.com/zt64/aliucord-plugins/raw/builds/$name.zip )")
                     appendLine(description)
                 }
             }
-        }
-
-        readMe.writeText("$header\n\n$plugins")
+        }.let(::append)
     }
+
+    readMe.writeText(content)
 }

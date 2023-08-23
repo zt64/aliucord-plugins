@@ -1,0 +1,102 @@
+## Plugins for [Aliucord](https://github.com/Aliucord)
+
+Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
+
+- [AccountSwitcher](https://github.com/zt64/aliucord-plugins/raw/builds/AccountSwitcher.zip )
+Adds the ability to quickly switch accounts
+
+- [AlwaysAnimate](https://github.com/zt64/aliucord-plugins/raw/builds/AlwaysAnimate.zip )
+Allows making server icons and user avatars always animate
+
+- [AppendGifAsUrl](https://github.com/zt64/aliucord-plugins/raw/builds/AppendGifAsUrl.zip )
+Makes selecting a GIF add as a URL to the message, instead of sending and clearing your message.
+
+- [AppsAction](https://github.com/zt64/aliucord-plugins/raw/builds/AppsAction.zip )
+Displays images and videos in a mosaic layout
+
+- [AttachmentCounter](https://github.com/zt64/aliucord-plugins/raw/builds/AttachmentCounter.zip )
+Shows the total number of attachments selected in the media picker
+
+- [AvatarMention](https://github.com/zt64/aliucord-plugins/raw/builds/AvatarMention.zip )
+Makes tapping a message avatar mention that user
+
+- [BanCount](https://github.com/zt64/aliucord-plugins/raw/builds/BanCount.zip )
+Shows the total number of banned users on the bans page in the server settings
+
+- [ChannelInvites](https://github.com/zt64/aliucord-plugins/raw/builds/ChannelInvites.zip )
+Shows the total number of banned users on the bans page in the server settings
+
+- [CharCounter](https://github.com/zt64/aliucord-plugins/raw/builds/CharCounter.zip )
+Adds a character counter to the message box
+
+- [CompactMode](https://github.com/zt64/aliucord-plugins/raw/builds/CompactMode.zip )
+Modifies chat to have a more compact appearance, with several options to change
+
+- [CursorInput](https://github.com/zt64/aliucord-plugins/raw/builds/CursorInput.zip )
+Makes it so that emojis, mentions and others are added at the cursor position instead of the end of the message
+
+- [CustomNoticeDuration](https://github.com/zt64/aliucord-plugins/raw/builds/CustomNoticeDuration.zip )
+Allows setting the dismiss time of notices (in-app notifications)
+
+- [CustomStatusPresets](https://github.com/zt64/aliucord-plugins/raw/builds/CustomStatusPresets.zip )
+Adds presets to the custom status menu. Long press on the save button to save a preset
+
+- [DeveloperUtils](https://github.com/zt64/aliucord-plugins/raw/builds/DeveloperUtils.zip )
+Adds several utilities to make development easier
+
+- [DisablePreviewsOnData](https://github.com/zt64/aliucord-plugins/raw/builds/DisablePreviewsOnData.zip )
+Disables inline images and videos in chat in the Text & Images settings when on mobile data to limit data usage
+
+- [DMCategories](https://github.com/zt64/aliucord-plugins/raw/builds/DMCategories.zip )
+Adds the ability to create categories for DMs, which will come first in the list
+
+- [Favorites](https://github.com/zt64/aliucord-plugins/raw/builds/Favorites.zip )
+Allows you to favorite GIFs and view them later
+
+- [FolderOpacity](https://github.com/zt64/aliucord-plugins/raw/builds/FolderOpacity.zip )
+Adds an option to the guild folder settings to set the opacity
+
+- [InviteDetails](https://github.com/zt64/aliucord-plugins/raw/builds/InviteDetails.zip )
+Adds useful information to the invite embed
+
+- [MessageWidthFix](https://github.com/zt64/aliucord-plugins/raw/builds/MessageWidthFix.zip )
+Fixes the width on embeds and stickers to make long press work
+
+- [Mosaic](https://github.com/zt64/aliucord-plugins/raw/builds/Mosaic.zip )
+Displays images and videos in a mosaic layout
+
+- [NoBurnIn](https://github.com/zt64/aliucord-plugins/raw/builds/NoBurnIn.zip )
+Adds many options to hide items from the top bar in an attempt to prevent screen burn-in
+
+- [NoLinkify](https://github.com/zt64/aliucord-plugins/raw/builds/NoLinkify.zip )
+Disables highlighting for phone numbers and addresses in messages
+
+- [PermissionsSync](https://github.com/zt64/aliucord-plugins/raw/builds/PermissionsSync.zip )
+Adds the sync permissions option from the Desktop client
+
+- [QuickStar](https://github.com/zt64/aliucord-plugins/raw/builds/QuickStar.zip )
+Adds a star button to the message context menu that reacts to the message with the star emoji
+
+- [RestartButton](https://github.com/zt64/aliucord-plugins/raw/builds/RestartButton.zip )
+Adds a button to restart Aliucord to the settings page
+
+- [RoleColorEverywhere](https://github.com/zt64/aliucord-plugins/raw/builds/RoleColorEverywhere.zip )
+Displays the highest role color in more places like mentions and typing text
+
+- [RotatedChat](https://github.com/zt64/aliucord-plugins/raw/builds/RotatedChat.zip )
+Rotate your chat!
+
+- [ServerProfiles](https://github.com/zt64/aliucord-plugins/raw/builds/ServerProfiles.zip )
+Displays images and videos in a mosaic layout
+
+- [SystemInfo](https://github.com/zt64/aliucord-plugins/raw/builds/SystemInfo.zip )
+Adds a systeminfo slash command that provides basic system information
+
+- [Token](https://github.com/zt64/aliucord-plugins/raw/builds/Token.zip )
+Adds a token slash command to tell you your account token
+
+- [Weather](https://github.com/zt64/aliucord-plugins/raw/builds/Weather.zip )
+Adds a weather slash command to get information for the current location or one that's provided
+
+- [WiderScrollbar](https://github.com/zt64/aliucord-plugins/raw/builds/WiderScrollbar.zip )
+Allows changing the scrollbar width to make it easier to drag

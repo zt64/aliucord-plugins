@@ -1,2 +1,3 @@
 version = "1.0.0"
-description = "Displays images and videos in a mosaic layout"
+description = "Adds server profiles"
+aliucord.excludeFromUpdaterJson.set(true)

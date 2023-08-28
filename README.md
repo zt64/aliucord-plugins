@@ -11,9 +11,6 @@ Allows making server icons and user avatars always animate
 - [AppendGifAsUrl](https://github.com/zt64/aliucord-plugins/raw/builds/AppendGifAsUrl.zip )
 Makes selecting a GIF add as a URL to the message, instead of sending and clearing your message.
 
-- [AppsAction](https://github.com/zt64/aliucord-plugins/raw/builds/AppsAction.zip )
-Displays images and videos in a mosaic layout
-
 - [AttachmentCounter](https://github.com/zt64/aliucord-plugins/raw/builds/AttachmentCounter.zip )
 Shows the total number of attachments selected in the media picker
 
@@ -50,9 +47,6 @@ Disables inline images and videos in chat in the Text & Images settings when on 
 - [DMCategories](https://github.com/zt64/aliucord-plugins/raw/builds/DMCategories.zip )
 Adds the ability to create categories for DMs, which will come first in the list
 
-- [Favorites](https://github.com/zt64/aliucord-plugins/raw/builds/Favorites.zip )
-Allows you to favorite GIFs and view them later
-
 - [FolderOpacity](https://github.com/zt64/aliucord-plugins/raw/builds/FolderOpacity.zip )
 Adds an option to the guild folder settings to set the opacity
 
@@ -61,9 +55,6 @@ Adds useful information to the invite embed
 
 - [MessageWidthFix](https://github.com/zt64/aliucord-plugins/raw/builds/MessageWidthFix.zip )
 Fixes the width on embeds and stickers to make long press work
-
-- [Mosaic](https://github.com/zt64/aliucord-plugins/raw/builds/Mosaic.zip )
-Displays images and videos in a mosaic layout
 
 - [NoBurnIn](https://github.com/zt64/aliucord-plugins/raw/builds/NoBurnIn.zip )
 Adds many options to hide items from the top bar in an attempt to prevent screen burn-in
@@ -82,12 +73,6 @@ Adds a button to restart Aliucord to the settings page
 
 - [RoleColorEverywhere](https://github.com/zt64/aliucord-plugins/raw/builds/RoleColorEverywhere.zip )
 Displays the highest role color in more places like mentions and typing text
-
-- [RotatedChat](https://github.com/zt64/aliucord-plugins/raw/builds/RotatedChat.zip )
-Rotate your chat!
-
-- [ServerProfiles](https://github.com/zt64/aliucord-plugins/raw/builds/ServerProfiles.zip )
-Displays images and videos in a mosaic layout
 
 - [SystemInfo](https://github.com/zt64/aliucord-plugins/raw/builds/SystemInfo.zip )
 Adds a systeminfo slash command that provides basic system information

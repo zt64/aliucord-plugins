@@ -1,12 +1,14 @@
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
+
 import FrecencyUserSettingsOuterClass.FrecencyUserSettings
 import FrecencyUserSettingsOuterClass.FrecencyUserSettings.FavoriteGIFs
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Base64
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.FrameLayout
+import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import com.aliucord.Http
 import com.aliucord.Utils
@@ -40,7 +42,6 @@ import com.lytefast.flexinput.R
 import favorites.*
 import favorites.gif.GifCategoryItemFavorites
 import favorites.sticker.FavoritesItem
-import kotlin.reflect.*
 import j0.l.e.k as ScalarSynchronousObservable
 
 private data class Response(val settings: String)
@@ -65,7 +66,7 @@ class Favorites : Plugin() {
         .execute()
         .json(Response::class.java)
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(ctx: Context) {
         fun ModelGif.setFavorite(favorite: Boolean): Boolean {
             val favoriteGif = FrecencyUserSettings.FavoriteGIF.newBuilder().apply {
@@ -113,11 +114,11 @@ class Favorites : Plugin() {
             Int::class.java,
             Function1::class.java
         ) { (_, item: GifAdapterItem.GifItem) ->
-            itemView.setOnLongClickListener {
-                // toggleFavorite(item.model)
-
-                true
-            }
+            // itemView.setOnLongClickListener {
+            //     // toggleFavorite(item.model)
+            //
+            //     true
+            // }
         }
 
         patcher.after<GifCategoryViewHolder>(
@@ -127,9 +128,9 @@ class Favorites : Plugin() {
         ) { (_, gifCategoryItem: GifCategoryItem?) ->
             if (gifCategoryItem == null || gifCategoryItem !is GifCategoryItemFavorites) return@after
 
-            itemView.findViewById<ImageView>(Id.gif_category_item_icon)
-                .setImageDrawable(starDrawable)
-            itemView.findViewById<TextView>(Id.gif_category_item_title).text = "Favorites"
+            // itemView.findViewById<ImageView>(Id.gif_category_item_icon)
+            //     .setImageDrawable(starDrawable)
+            // itemView.findViewById<TextView>(Id.gif_category_item_title).text = "Favorites"
 
             gifCategoryItem.previewUrl?.let(::setPreviewImage)
         }

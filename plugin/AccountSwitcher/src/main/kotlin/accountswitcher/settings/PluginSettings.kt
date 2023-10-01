@@ -2,7 +2,6 @@ package accountswitcher.settings
 
 import accountswitcher.SwitcherPage
 import accountswitcher.getAccounts
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
@@ -24,8 +23,9 @@ import com.discord.stores.StoreStream
 import com.discord.utilities.rest.RestAPI
 import com.lytefast.flexinput.R
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 

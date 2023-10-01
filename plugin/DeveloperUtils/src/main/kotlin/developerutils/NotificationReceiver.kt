@@ -1,5 +1,8 @@
-package tk.zt64.plugins.developerutils
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 
+package developerutils
+
+import InfoSheet
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent

@@ -1,4 +1,4 @@
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -27,6 +27,7 @@ import dmcategories.sheets.CategoriesSheet
 
 private val categoryType = TypeToken.getParameterized(ArrayList::class.java, DMCategory::class.javaObjectType).getType()
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class DMCategories : Plugin() {
     private val getBindingMethod = WidgetChannelsListItemChannelActions::class.java
@@ -56,7 +57,7 @@ class DMCategories : Plugin() {
         fun getCategory(name: String) = categories.find { dmCategory -> dmCategory.name == name }
     }
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val categoryLayoutId = Utils.getResId("widget_channels_list_item_category", "layout")
         val stageEventsSeparatorId =

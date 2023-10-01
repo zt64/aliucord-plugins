@@ -1,11 +1,5 @@
-package tk.zt64.plugins
-
-import android.annotation.SuppressLint
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.aliucord.Utils
@@ -13,14 +7,14 @@ import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.discord.utilities.fcm.NotificationClient
 import com.lytefast.flexinput.R
-import tk.zt64.plugins.developerutils.NotificationReceiver
+import developerutils.NotificationReceiver
 
 @AliucordPlugin
 class DeveloperUtils : Plugin() {
     private var receiver: BroadcastReceiver? = null
 
     // Shut
-    @SuppressLint("LaunchActivityFromNotification")
+    @Suppress("LaunchActivityFromNotification")
     override fun start(context: Context) {
         val pendingIntent = PendingIntent.getBroadcast(context, 0, Intent("tk.zt64.plugins.INSPECT"), PendingIntent.FLAG_IMMUTABLE)
         val notificationBuilder =

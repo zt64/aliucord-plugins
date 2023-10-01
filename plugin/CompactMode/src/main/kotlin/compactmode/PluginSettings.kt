@@ -1,6 +1,5 @@
 package compactmode
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -14,24 +13,32 @@ import com.aliucord.widgets.BottomSheet
 import com.discord.views.CheckedSetting
 import com.lytefast.flexinput.R
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(val settings: SettingsAPI) : BottomSheet() {
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 
         val ctx = requireContext()
 
         fun addCheckedSetting(
-            title: String, subtext: String, setting: String, default: Boolean = false
-        ): CheckedSetting {
-            return Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, subtext).apply {
-                isChecked = settings.getBool(setting, default)
-                setOnCheckedListener { settings.setBool(setting, it) }
-                linearLayout.addView(this)
-            }
+            title: String,
+            subtext: String,
+            setting: String,
+            default: Boolean = false
+        ) = Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, title, subtext).apply {
+            isChecked = settings.getBool(setting, default)
+            setOnCheckedListener { settings.setBool(setting, it) }
+            linearLayout.addView(this)
         }
 
-        fun createSeekbar(label: String, setting: String, default: Int, min: Int, max: Int): LinearLayout =
+        fun createSeekbar(
+            label: String,
+            setting: String,
+            default: Int,
+            min: Int,
+            max: Int
+        ): LinearLayout =
             LinearLayout(ctx, null, 0, R.i.UiKit_Settings_Item).apply {
                 val settingValue = settings.getInt(setting, default)
                 val display = TextView(ctx, null, 0, R.i.UiKit_TextView).apply {
@@ -41,12 +48,19 @@ class PluginSettings(val settings: SettingsAPI) : BottomSheet() {
                 }
 
                 addView(SeekBar(ctx, null, 0, R.i.UiKit_SeekBar).apply {
-                    layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    layoutParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
                     progress = settingValue - min
                     12.dp.let { setPadding(it, 0, it, 0) }
                     setMax(max - min)
                     setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                        override fun onProgressChanged(
+                            seekBar: SeekBar,
+                            progress: Int,
+                            fromUser: Boolean
+                        ) {
                             display.text = "${min + progress} dp"
                         }
 
@@ -64,7 +78,12 @@ class PluginSettings(val settings: SettingsAPI) : BottomSheet() {
         })
 
         addCheckedSetting("Hide Avatar", "Whether the avatar should be hidden", "hideAvatar", false)
-        addCheckedSetting("Hide Reply Icon", "Whether the reply icon should be hidden", "hideReplyIcon", true)
+        addCheckedSetting(
+            "Hide Reply Icon",
+            "Whether the reply icon should be hidden",
+            "hideReplyIcon",
+            true
+        )
 
         addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
             text = "Avatar Scale"

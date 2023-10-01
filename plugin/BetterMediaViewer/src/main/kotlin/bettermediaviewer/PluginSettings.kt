@@ -1,14 +1,10 @@
 package bettermediaviewer
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Environment
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.RadioGroup
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -24,10 +20,11 @@ import com.discord.views.RadioManager
 import com.lytefast.flexinput.R
 import java.io.File
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
     private var launcher: ActivityResultLauncher<Intent>? = null
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 

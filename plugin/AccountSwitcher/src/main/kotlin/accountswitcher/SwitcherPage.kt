@@ -1,7 +1,6 @@
 package accountswitcher
 
 import accountswitcher.settings.AccountAdapter
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
@@ -18,8 +17,9 @@ import com.aliucord.views.Button
 import com.discord.stores.StoreStream
 import com.lytefast.flexinput.R
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class SwitcherPage(private val accounts: ArrayList<Account>) : SettingsPage() {
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 

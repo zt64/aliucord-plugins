@@ -1,4 +1,4 @@
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.view.View
 import android.widget.LinearLayout
@@ -14,9 +14,10 @@ import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.channels.settings.WidgetTextChannelSettings
 import com.lytefast.flexinput.R
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class ChannelInvites : Plugin() {
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(c: Context) {
         val invitesLayoutId = View.generateViewId()
         val scrollViewId = Utils.getResId("scroll_view", "id")

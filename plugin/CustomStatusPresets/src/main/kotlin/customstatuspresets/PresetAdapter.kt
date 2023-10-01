@@ -1,7 +1,6 @@
 package customstatuspresets
 
 import CustomStatusPresets
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -22,6 +21,7 @@ import com.discord.widgets.user.profile.UserStatusPresenceCustomView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.lytefast.flexinput.R
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PresetAdapter(
     private val widgetUserSetCustomStatus: WidgetUserSetCustomStatus,
     private val presets: ArrayList<UserStatusPresenceCustomView.ViewState.WithStatus>
@@ -55,7 +55,7 @@ class PresetAdapter(
                 .inflate(statusViewId, parent, false) as LinearLayout
         )
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onBindViewHolder(holder: PresetViewHolder, position: Int) = presets[position].let {
         if (it.statusText.isEmpty()) {
             holder.customText.apply {

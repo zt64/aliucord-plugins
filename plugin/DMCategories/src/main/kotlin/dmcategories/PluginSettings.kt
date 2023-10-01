@@ -1,6 +1,5 @@
 package dmcategories
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -9,11 +8,12 @@ import com.aliucord.settings.delegate
 import com.aliucord.widgets.BottomSheet
 import com.lytefast.flexinput.R
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
     private var SettingsAPI.showSelected: Boolean by settings.delegate(true)
     private var SettingsAPI.showUnread: Boolean by settings.delegate(false)
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 

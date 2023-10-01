@@ -25,6 +25,7 @@ class ChannelListItemDMCategory(val category: DMCategory) : ChannelListItem {
     }
 }
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class ItemDMCategory(
     @LayoutRes i: Int,
     adapter: WidgetChannelsListAdapter

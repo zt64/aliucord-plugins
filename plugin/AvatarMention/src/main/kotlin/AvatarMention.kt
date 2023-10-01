@@ -6,6 +6,7 @@ import com.aliucord.patcher.instead
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
 import com.discord.widgets.chat.list.adapter.`WidgetChatListAdapterItemMessage$onConfigure$5`
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class AvatarMention : Plugin() {
     override fun start(context: Context) {

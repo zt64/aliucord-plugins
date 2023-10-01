@@ -7,6 +7,7 @@ import com.aliucord.patcher.instead
 import com.discord.widgets.chat.input.AppFlexInputViewModel
 import com.discord.widgets.chat.input.gifpicker.*
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class AppendGifAsUrl : Plugin() {
     override fun start(context: Context) {

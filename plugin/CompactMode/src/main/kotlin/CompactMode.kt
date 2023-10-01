@@ -1,13 +1,14 @@
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Guideline
-import com.aliucord.Utils
+import com.aliucord.Utils.getResId
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
@@ -42,20 +43,20 @@ class CompactMode : Plugin() {
         ).withArgs(settings)
     }
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(context: Context) {
-        val reactionsFlexBoxId = Utils.getResId("chat_list_item_reactions", "id")
-        val headerLayoutId = Utils.getResId("chat_list_adapter_item_text_header", "id")
-        val guidelineId = Utils.getResId("uikit_chat_guideline", "id")
-        val embedContainerCardId = Utils.getResId("chat_list_item_embed_container_card", "id")
+        val reactionsFlexBoxId = getResId("chat_list_item_reactions", "id")
+        val headerLayoutId = getResId("chat_list_adapter_item_text_header", "id")
+        val guidelineId = getResId("uikit_chat_guideline", "id")
+        val embedContainerCardId = getResId("chat_list_item_embed_container_card", "id")
         val replyIconViewId =
-            Utils.getResId("chat_list_adapter_item_text_decorator_reply_link_icon", "id")
-        val itemTextViewId = Utils.getResId("chat_list_adapter_item_text", "id")
-        val componentRowId = Utils.getResId("chat_list_adapter_item_component_root", "id")
-        val messageRootId = Utils.getResId("widget_chat_list_adapter_item_text_root", "id")
-        val failedMessageRootId = Utils.getResId("chat_list_adapter_item_failed", "id")
-        val usernameViewId = Utils.getResId("chat_list_adapter_item_text_name", "id")
-        val loadingTextId = Utils.getResId("chat_list_adapter_item_text_loading", "id")
+            getResId("chat_list_adapter_item_text_decorator_reply_link_icon", "id")
+        val itemTextViewId = getResId("chat_list_adapter_item_text", "id")
+        val componentRowId = getResId("chat_list_adapter_item_component_root", "id")
+        val messageRootId = getResId("widget_chat_list_adapter_item_text_root", "id")
+        val failedMessageRootId = getResId("chat_list_adapter_item_failed", "id")
+        val usernameViewId = getResId("chat_list_adapter_item_text_name", "id")
+        val loadingTextId = getResId("chat_list_adapter_item_text_loading", "id")
 
         patcher.after<WidgetChatListItem>(
             "onConfigure",
@@ -87,7 +88,7 @@ class CompactMode : Plugin() {
                 is WidgetChatListAdapterItemReactions -> itemView.findViewById(reactionsFlexBoxId)
                 is WidgetChatListAdapterItemEmbed -> itemView.findViewById(embedContainerCardId)
                 else -> null
-            }?.layoutParams as MarginLayoutParams?
+            }?.layoutParams<MarginLayoutParams>()
 
             layoutParams?.marginStart = contentMargin
         }
@@ -102,9 +103,8 @@ class CompactMode : Plugin() {
             when (itemView.id) {
                 // Regular message
                 messageRootId -> {
-                    (itemView.findViewById<View>(loadingTextId).layoutParams as MarginLayoutParams).apply {
-                        marginStart = 0
-                    }
+                    itemView.findViewById<View>(loadingTextId).layoutParams<MarginLayoutParams>()
+                        .marginStart = 0
 
                     val headerView = itemView.findViewById<ConstraintLayout>(headerLayoutId)
 
@@ -117,7 +117,7 @@ class CompactMode : Plugin() {
                     if (settings.hideAvatar) {
                         avatarView!!.visibility = View.GONE
 
-                        (headerView.layoutParams as ConstraintLayout.LayoutParams).marginStart =
+                        headerView.layoutParams<ConstraintLayout.LayoutParams>().marginStart =
                             contentMargin
 
                         return@after
@@ -161,10 +161,10 @@ class CompactMode : Plugin() {
                     val contentView = root.getChildAt(1) as LinearLayout
                     val nameView = contentView.findViewById<TextView>(usernameViewId)
                     val contentViewLayoutParams =
-                        contentView.layoutParams as RelativeLayout.LayoutParams
+                        contentView.layoutParams<RelativeLayout.LayoutParams>()
 
                     itemView.setPadding(0, settings.messagePadding.dp, 0, 0)
-                    (itemView.layoutParams as MarginLayoutParams).setMargins(0, 0, 0, 0)
+                    itemView.layoutParams<MarginLayoutParams>().setMargins(0, 0, 0, 0)
                     contentViewLayoutParams.marginStart = contentMargin
 
                     if (settings.hideAvatar) return@after avatarView!!.setVisibility(View.GONE)
@@ -181,7 +181,7 @@ class CompactMode : Plugin() {
 
                     root.addView(headerLayout, 0)
 
-                    (nameView.layoutParams as LinearLayout.LayoutParams).apply {
+                    nameView.layoutParams<LinearLayout.LayoutParams>().apply {
                         gravity = Gravity.CENTER_VERTICAL
                         setMargins(4.dp, 0, 0, 0)
                     }
@@ -195,7 +195,7 @@ class CompactMode : Plugin() {
                     avatarView!!.apply {
                         2.dp.let { dp -> setPadding(dp, dp, dp, dp) }
 
-                        (layoutParams as MarginLayoutParams).apply {
+                        layoutParams<MarginLayoutParams>().apply {
                             marginStart = settings.headerMargin.dp
                             marginEnd = 0
                             width = settings.avatarScale.dp
@@ -205,7 +205,7 @@ class CompactMode : Plugin() {
                 }
                 // Minimal message
                 else -> {
-                    (messageTextView.layoutParams as MarginLayoutParams).marginStart =
+                    messageTextView.layoutParams<MarginLayoutParams>().marginStart =
                         contentMargin
                 }
             }
@@ -214,3 +214,6 @@ class CompactMode : Plugin() {
 
     override fun stop(context: Context) = patcher.unpatchAll()
 }
+
+@Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+inline fun <T : LayoutParams> View.layoutParams() = layoutParams as T

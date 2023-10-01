@@ -1,4 +1,6 @@
-package tk.zt64.plugins.developerutils
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
+
+package developerutils
 
 import android.view.View
 import android.view.ViewGroup

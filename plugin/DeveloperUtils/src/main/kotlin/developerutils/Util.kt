@@ -1,5 +1,3 @@
-package tk.zt64.plugins.developerutils
-
 import android.view.View
 import android.view.ViewGroup
 

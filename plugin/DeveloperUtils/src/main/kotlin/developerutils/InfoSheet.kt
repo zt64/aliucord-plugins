@@ -1,6 +1,5 @@
-package tk.zt64.plugins.developerutils
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -13,7 +12,7 @@ import com.aliucord.widgets.LinearLayout
 import com.lytefast.flexinput.R
 
 class InfoSheet(private val tappedView: View) : BottomSheet() {
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 

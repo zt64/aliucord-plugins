@@ -20,6 +20,7 @@ import com.discord.widgets.servers.WidgetServerSettingsInstantInvitesActions
 import com.discord.widgets.servers.settings.invites.WidgetServerSettingsInstantInvites
 import com.google.gson.stream.JsonReader
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class InvitesPage(private val channel: Channel) :
     AppFragment(Utils.getResId("widget_server_settings_instant_invites", "layout")) {
     private val viewFlipperId = Utils.getResId("server_settings_instant_invites_view_flipper", "id")

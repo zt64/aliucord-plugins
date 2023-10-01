@@ -13,6 +13,7 @@ import com.discord.stores.StoreStream
 import com.lytefast.flexinput.R
 import java.util.regex.Pattern
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class AccountDialog(private val adapter: AccountAdapter, private val account: Account? = null) : InputDialog() {
     private val token = account?.token
 

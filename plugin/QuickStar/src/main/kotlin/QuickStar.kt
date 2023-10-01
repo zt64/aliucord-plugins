@@ -1,4 +1,3 @@
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -17,6 +16,7 @@ import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.chat.list.actions.WidgetChatListActions
 import com.lytefast.flexinput.R
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class QuickStar : Plugin() {
     private val getBindingMethod = WidgetChatListActions::class.java
@@ -27,7 +27,7 @@ class QuickStar : Plugin() {
     private fun WidgetChatListActions.addReaction(emoji: Emoji) =
         WidgetChatListActions.`access$addReaction`(this, emoji)
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val actionsContainerId = Utils.getResId("dialog_chat_actions_container", "id")
         val quickStarId = View.generateViewId()

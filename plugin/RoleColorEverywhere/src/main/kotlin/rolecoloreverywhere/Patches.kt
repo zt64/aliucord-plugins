@@ -1,3 +1,5 @@
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
+
 package rolecoloreverywhere
 
 import android.graphics.Color

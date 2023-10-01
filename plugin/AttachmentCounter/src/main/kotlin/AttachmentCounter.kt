@@ -1,4 +1,4 @@
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.os.Bundle
 import android.view.*
@@ -12,7 +12,7 @@ import com.aliucord.utils.DimenUtils.dp
 import com.lytefast.flexinput.R
 import b.b.a.a.a as AddContentDialogFragment
 
-@SuppressLint("SetTextI18n")
+@Suppress("SetTextI18n")
 @AliucordPlugin
 class AttachmentCounter : Plugin() {
     override fun start(context: Context) {

@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.aliucord.Utils
+import com.aliucord.Utils.getResId
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.*
@@ -14,6 +15,7 @@ import com.discord.widgets.home.WidgetHomeHeaderManager
 import com.discord.widgets.home.WidgetHomeModel
 import noburnin.PluginSettings
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class NoBurnIn : Plugin() {
     init {
@@ -21,12 +23,12 @@ class NoBurnIn : Plugin() {
     }
 
     override fun start(context: Context) {
-        val toolbarIconId = Utils.getResId("toolbar_icon", "id")
-        val searchButtonId = Utils.getResId("menu_chat_search", "id")
-        val threadButtonId = Utils.getResId("menu_chat_thread_browser", "id")
-        val membersButtonId = Utils.getResId("menu_chat_side_panel", "id")
-        val callButtonId = Utils.getResId("menu_chat_start_call", "id")
-        val videoButtonId = Utils.getResId("menu_chat_start_video_call", "id")
+        val toolbarIconId = getResId("toolbar_icon", "id")
+        val searchButtonId = getResId("menu_chat_search", "id")
+        val threadButtonId = getResId("menu_chat_thread_browser", "id")
+        val membersButtonId = getResId("menu_chat_side_panel", "id")
+        val callButtonId = getResId("menu_chat_start_call", "id")
+        val videoButtonId = getResId("menu_chat_start_video_call", "id")
 
         if (settings.getBool("immersiveMode", false)) {
             WindowInsetsControllerCompat(

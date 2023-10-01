@@ -4,7 +4,6 @@ import AccountSwitcher
 import accountswitcher.Account
 import accountswitcher.fetchUser
 import accountswitcher.getAccounts
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.ViewGroup
@@ -24,6 +23,7 @@ import com.discord.utilities.rest.RestAPI
 import com.discord.utilities.user.UserUtils
 import com.aliucord.widgets.LinearLayout as ACLinearLayout
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class AccountAdapter(
     private val fragment: SettingsPage,
     val accounts: ArrayList<Account>,
@@ -43,7 +43,7 @@ class AccountAdapter(
         isSettings = isSettings
     )
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onBindViewHolder(holder: AccountViewHolder, position: Int): Unit = accounts[position].let { account ->
         Utils.threadPool.execute {
             val user = StoreStream.getUsers().users[account.id] ?: RestAPI.api.userGet(account.id)

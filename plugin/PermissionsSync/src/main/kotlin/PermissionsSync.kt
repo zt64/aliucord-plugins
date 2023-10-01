@@ -1,4 +1,4 @@
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -28,6 +28,7 @@ import com.discord.utilities.rest.RestAPI
 import com.discord.widgets.channels.permissions.WidgetChannelSettingsPermissionsAdvanced
 import com.lytefast.flexinput.R
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class PermissionsSync : Plugin() {
     private val getBindingMethod = WidgetChannelSettingsPermissionsAdvanced::class.java
@@ -37,7 +38,7 @@ class PermissionsSync : Plugin() {
     private fun WidgetChannelSettingsPermissionsAdvanced.getBinding() =
         getBindingMethod(this) as WidgetChannelSettingsPermissionsAdvancedBinding
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val textViewId = View.generateViewId()
 

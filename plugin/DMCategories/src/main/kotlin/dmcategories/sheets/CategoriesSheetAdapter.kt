@@ -9,6 +9,7 @@ import dmcategories.DMCategory
 import dmcategories.DMCategoryViewHolder
 import dmcategories.Util
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class CategoriesSheetAdapter(
     private val sheet: BottomSheet,
     private val channelId: Long,

@@ -1,7 +1,6 @@
 package dmcategories.sheets
 
 import DMCategories
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
@@ -20,8 +19,9 @@ import com.lytefast.flexinput.R
 import dmcategories.CategoryDialog
 import dmcategories.Util
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class CategoriesSheet(private val channelId: Long) : BottomSheet() {
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 

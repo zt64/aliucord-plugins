@@ -1,4 +1,4 @@
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.util.TypedValue
 import android.view.Gravity
@@ -25,6 +25,7 @@ import com.discord.widgets.chat.overlay.`WidgetChatOverlay$binding$2`
 import com.lytefast.flexinput.R
 import kotlin.properties.Delegates
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class CharCounter : Plugin() {
     private var SettingsAPI.reverse: Boolean by settings.delegate(false)
@@ -34,7 +35,7 @@ class CharCounter : Plugin() {
         settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
     }
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val textSizeDimenId = Utils.getResId("uikit_textsize_small", "dimen")
         val typingOverlayId = Utils.getResId("chat_overlay_typing", "id")

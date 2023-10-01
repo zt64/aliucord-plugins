@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken
 
 private val accountsType = TypeToken.getParameterized(ArrayList::class.java, Account::class.javaObjectType).getType()
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 fun fetchUser(token: String): MeUser? = try {
     Http.Request("https://discord.com/api/v9/users/@me")
         .setHeader("Authorization", token)

@@ -1,18 +1,15 @@
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.SeekBar
+import android.widget.*
+import android.widget.LinearLayout.LayoutParams
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import com.aliucord.Utils
+import com.aliucord.Utils.getResId
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
@@ -29,6 +26,7 @@ import com.discord.widgets.guilds.list.GuildListViewHolder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.lytefast.flexinput.R
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class FolderOpacity : Plugin() {
     private val folderViewHolderMap = HashMap<Long, GuildListViewHolder.FolderViewHolder>()
@@ -44,7 +42,7 @@ class FolderOpacity : Plugin() {
 
     private fun WidgetGuildFolderSettings.getBinding() = getBindingMethod(this) as WidgetGuildFolderSettingsBinding
 
-    private val folderContainerId = Utils.getResId("guilds_item_folder_container", "id")
+    private val folderContainerId = getResId("guilds_item_folder_container", "id")
 
     private fun GuildListViewHolder.FolderViewHolder.setAlpha(alpha: Int) {
         val root = binding.root
@@ -55,10 +53,10 @@ class FolderOpacity : Plugin() {
         root.findViewById<FrameLayout>(folderContainerId).background = background
     }
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(context: Context) {
-        val folderColorPickerId = Utils.getResId("guild_folder_settings_color", "id")
-        val saveButtonId = Utils.getResId("guild_folder_settings_save", "id")
+        val folderColorPickerId = getResId("guild_folder_settings_color", "id")
+        val saveButtonId = getResId("guild_folder_settings_save", "id")
         val seekBarId = View.generateViewId()
 
         // Disable decoration drawing
@@ -70,7 +68,7 @@ class FolderOpacity : Plugin() {
 
             folderViewHolderMap[folderItem.folderId] = this
 
-            setAlpha(settings.getInt(folderItem.folderId.toString() + "opacity", 30))
+            setAlpha(settings.getInt("${folderItem.folderId}opacity", 30))
         }
 
         // Patch folder settings
@@ -94,7 +92,8 @@ class FolderOpacity : Plugin() {
                     addView(currentOpacity)
                     addView(SeekBar(ctx, null, 0, R.i.UiKit_SeekBar).apply {
                         id = seekBarId
-                        layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                        layoutParams =
+                            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                         max = 255
                         progress = opacity
                         12.dp.let { dp -> setPadding(dp, 0, dp, 0) }

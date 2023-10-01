@@ -1,7 +1,6 @@
 import accountswitcher.SwitcherPage
 import accountswitcher.getAccounts
 import accountswitcher.settings.PluginSettings
-import android.annotation.SuppressLint
 import android.content.Context
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
@@ -15,6 +14,7 @@ import com.discord.widgets.settings.WidgetSettings
 import de.robv.android.xposed.XC_MethodHook
 import kotlin.properties.ReadOnlyProperty
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class AccountSwitcher : Plugin() {
     init {
@@ -25,7 +25,7 @@ class AccountSwitcher : Plugin() {
         lateinit var mSettings: SettingsAPI
     }
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         mSettings = settings
 

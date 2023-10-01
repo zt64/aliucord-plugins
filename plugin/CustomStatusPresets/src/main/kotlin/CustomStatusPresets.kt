@@ -1,4 +1,4 @@
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.view.View
 import android.widget.LinearLayout
@@ -11,7 +11,9 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.*
+import com.aliucord.patcher.after
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component2
 import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.views.Divider
 import com.discord.models.domain.emoji.ModelEmojiCustom
@@ -25,6 +27,7 @@ import com.google.gson.reflect.TypeToken
 import com.lytefast.flexinput.R
 import customstatuspresets.PresetAdapter
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class CustomStatusPresets : Plugin() {
     private val presetType = TypeToken.getParameterized(
@@ -36,7 +39,7 @@ class CustomStatusPresets : Plugin() {
         lateinit var mSettings: SettingsAPI
     }
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         mSettings = settings
 

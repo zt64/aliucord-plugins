@@ -7,6 +7,7 @@ import com.aliucord.patcher.component1
 import com.aliucord.patcher.component2
 import com.discord.widgets.servers.WidgetServerSettingsBans
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class BanCount : Plugin() {
     override fun start(context: Context) {

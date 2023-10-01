@@ -1,7 +1,6 @@
 package dmcategories.sheets
 
 import DMCategories
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -15,8 +14,9 @@ import dmcategories.CategoryDialog
 import dmcategories.DMCategory
 import dmcategories.Util
 
+@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class CategorySheet(private val category: DMCategory) : BottomSheet() {
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 

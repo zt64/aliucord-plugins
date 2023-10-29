@@ -165,7 +165,7 @@ class DMCategories : Plugin() {
             "onCreateViewHolder",
             ViewGroup::class.java,
             Int::class.java
-        ) { (param, type: Int) ->
+        ) { (param, _: Any, type: Int) ->
             param.result = when (type) {
                 ChannelListItemDMCategory.TYPE -> ItemDMCategory(categoryLayoutId, this)
                 ChannelListItemDivider.TYPE -> ItemDivider(stageEventsSeparatorId, this)

@@ -1,8 +1,11 @@
-version = "1.2.4"
+version = "1.2.5"
 description = "Adds the ability to quickly switch accounts"
 
 aliucord.changelog.set(
     """
+    # 1.2.5
+    * Fix out of date token regex
+    
     # 1.2.3
     * Fix for new discord version
     

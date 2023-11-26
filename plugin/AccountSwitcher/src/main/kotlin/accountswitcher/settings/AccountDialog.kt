@@ -13,8 +13,12 @@ import com.discord.stores.StoreStream
 import com.lytefast.flexinput.R
 import java.util.regex.Pattern
 
+private const val TOKEN_REGEX =
+    """(mfa\.[a-z0-9_-]{20,})|([a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.([a-z0-9_-]{27,38}))"""
+
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
-class AccountDialog(private val adapter: AccountAdapter, private val account: Account? = null) : InputDialog() {
+class AccountDialog(private val adapter: AccountAdapter, private val account: Account? = null) :
+    InputDialog() {
     private val token = account?.token
 
     private val buttonStates = arrayOf(
@@ -33,12 +37,15 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
         setOnOkListener {
             val inputToken = input.trim()
 
-            if (adapter.accounts.any { it != account && it.token == inputToken }) return@setOnOkListener Utils.showToast("An account with this token already exists")
+            if (adapter.accounts.any { it != account && it.token == inputToken }) return@setOnOkListener Utils.showToast(
+                "An account with this token already exists"
+            )
 
             if (account?.token == inputToken) return@setOnOkListener dismiss()
 
             Utils.threadPool.execute {
-                val userId = fetchUser(inputToken)?.id ?: return@execute Utils.showToast("Invalid token")
+                val userId =
+                    fetchUser(inputToken)?.id ?: return@execute Utils.showToast("Invalid token")
 
                 if (account?.token != null) adapter.removeAccount(account.token)
 
@@ -61,13 +68,19 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
         okButton.isEnabled = token != null
         okButton.backgroundTintList = ColorStateList(
             buttonStates, intArrayOf(
-                resources.getColor(R.c.uikit_btn_bg_color_selector_brand, context?.theme), // enabled color
-                resources.getColor(R.c.uikit_btn_bg_color_selector_secondary, context?.theme) // disabled color
+                resources.getColor(
+                    R.c.uikit_btn_bg_color_selector_brand,
+                    context?.theme
+                ), // enabled color
+                resources.getColor(
+                    R.c.uikit_btn_bg_color_selector_secondary,
+                    context?.theme
+                ) // disabled color
             )
         )
 
         inputLayout.editText?.addTextChangedListener(object : TextWatcher {
-            private val pattern = Pattern.compile("(mfa\\.[a-z0-9_-]{20,})|([a-z0-9_-]{23,28}\\.[a-z0-9_-]{6,7}\\.[a-z0-9_-]{27})", Pattern.CASE_INSENSITIVE)
+            private val pattern = Pattern.compile(TOKEN_REGEX, Pattern.CASE_INSENSITIVE)
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}

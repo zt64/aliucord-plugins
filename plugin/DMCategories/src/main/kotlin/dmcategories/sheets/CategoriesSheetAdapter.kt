@@ -16,9 +16,15 @@ class CategoriesSheetAdapter(
     private val categories: List<DMCategory>
 ) : RecyclerView.Adapter<DMCategoryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DMCategoryViewHolder {
-        return DMCategoryViewHolder(this, LinearLayout(parent.context).apply {
-            layoutParams = android.widget.LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        })
+        return DMCategoryViewHolder(
+            this,
+            LinearLayout(parent.context).apply {
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+        )
     }
 
     override fun onBindViewHolder(holder: DMCategoryViewHolder, position: Int) {

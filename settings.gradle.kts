@@ -15,10 +15,15 @@ dependencyResolutionManagement {
         mavenCentral()
         maven("https://maven.aliucord.com/snapshots")
     }
+
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
 }
 
-rootProject.name = "plugins"
+rootProject.name = "aliucord-plugins"
 
-rootDir.resolve("plugin").listFiles { file ->
-    file.isDirectory && file.resolve("build.gradle.kts").exists()
-}!!.map { ":plugin:${it.name}" }.let(::include)
+rootDir
+    .resolve("plugin")
+    .listFiles { file ->
+        file.isDirectory && file.resolve("build.gradle.kts").exists()
+    }!!
+    .forEach { include(":plugin:${it.name}") }

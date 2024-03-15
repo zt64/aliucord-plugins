@@ -1,5 +1,8 @@
 import android.app.PendingIntent
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.aliucord.Utils
@@ -16,9 +19,15 @@ class DeveloperUtils : Plugin() {
     // Shut
     @Suppress("LaunchActivityFromNotification")
     override fun start(context: Context) {
-        val pendingIntent = PendingIntent.getBroadcast(context, 0, Intent("tk.zt64.plugins.INSPECT"), PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            0,
+            Intent("tk.zt64.plugins.INSPECT"),
+            PendingIntent.FLAG_IMMUTABLE
+        )
         val notificationBuilder =
-            NotificationCompat.Builder(context, NotificationClient.NOTIF_GENERAL)
+            NotificationCompat
+                .Builder(context, NotificationClient.NOTIF_GENERAL)
                 .setSmallIcon(R.e.ic_security_24dp)
                 .setContentTitle("DeveloperUtils")
                 .setContentText("Tap to enable inspector")

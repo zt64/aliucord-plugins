@@ -1,4 +1,3 @@
-
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -9,23 +8,37 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.*
+import com.aliucord.patcher.after
+import com.aliucord.patcher.before
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component2
+import com.aliucord.patcher.component3
 import com.aliucord.settings.delegate
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
 import com.discord.databinding.WidgetChannelsListItemActionsBinding
 import com.discord.utilities.color.ColorCompat
-import com.discord.widgets.channels.list.*
+import com.discord.widgets.channels.list.WidgetChannelListModel
+import com.discord.widgets.channels.list.WidgetChannelsList
+import com.discord.widgets.channels.list.WidgetChannelsListAdapter
+import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions
 import com.discord.widgets.channels.list.items.ChannelListItemPrivate
 import com.google.gson.reflect.TypeToken
 import com.lytefast.flexinput.R
 import dmcategories.DMCategory
 import dmcategories.PluginSettings
 import dmcategories.Util
-import dmcategories.items.*
+import dmcategories.items.ChannelListItemDMCategory
+import dmcategories.items.ChannelListItemDivider
+import dmcategories.items.ItemDMCategory
+import dmcategories.items.ItemDivider
 import dmcategories.sheets.CategoriesSheet
 
-private val categoryType = TypeToken.getParameterized(ArrayList::class.java, DMCategory::class.javaObjectType).getType()
+private val categoryType = TypeToken
+    .getParameterized(
+        ArrayList::class.java,
+        DMCategory::class.javaObjectType
+    ).getType()
 
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
@@ -41,19 +54,31 @@ class DMCategories : Plugin() {
     private val SettingsAPI.showUnread: Boolean by settings.delegate(false)
 
     init {
-        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+        settingsTab =
+            SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(
+                settings
+            )
     }
 
     companion object {
         private lateinit var mSettings: SettingsAPI
-        val categories: MutableList<DMCategory> by lazy { mSettings.getObject("categories", mutableListOf(), categoryType) }
-
-        fun saveCategories() = mSettings.setObject("categories", categories)
-        fun addCategory(name: String, channelIds: ArrayList<Long> = ArrayList()) {
-            categories.add(DMCategory(Util.getCurrentId(), name, channelIds)).also { if (it) saveCategories() }
+        val categories: MutableList<DMCategory> by lazy {
+            mSettings.getObject("categories", mutableListOf(), categoryType)
         }
 
-        fun removeCategory(category: DMCategory) = categories.remove(category).also { if (it) saveCategories() }
+        fun saveCategories() = mSettings.setObject("categories", categories)
+
+        fun addCategory(name: String, channelIds: ArrayList<Long> = ArrayList()) {
+            categories
+                .add(
+                    DMCategory(Util.getCurrentId(), name, channelIds)
+                ).also { if (it) saveCategories() }
+        }
+
+        fun removeCategory(category: DMCategory) = categories.remove(category).also {
+            if (it) saveCategories()
+        }
+
         fun getCategory(name: String) = categories.find { dmCategory -> dmCategory.name == name }
     }
 
@@ -81,7 +106,8 @@ class DMCategories : Plugin() {
                     0,
                     R.i.UiKit_Settings_Item_Icon
                 ).apply {
-                    categories.find { category -> category.channelIds.contains(model.channel.id) }
+                    categories
+                        .find { category -> category.channelIds.contains(model.channel.id) }
                         ?.let { category ->
                             text = "Remove from category"
                             setOnClickListener {
@@ -94,23 +120,36 @@ class DMCategories : Plugin() {
                                 saveCategories()
                             }
                             setCompoundDrawablesWithIntrinsicBounds(
-                                ContextCompat.getDrawable(
-                                    ctx,
-                                    R.e.ic_remove_circle_outline_red_24dp
-                                )!!
+                                ContextCompat
+                                    .getDrawable(
+                                        ctx,
+                                        R.e.ic_remove_circle_outline_red_24dp
+                                    )!!
                                     .mutate()
-                            .apply {
-                                setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
-                            }, null, null, null
-                    )
-                } ?: run {
-                    text = "Set Category"
-                    setOnClickListener {
-                        dismiss()
-                        CategoriesSheet(model.channel.id).show(parentFragmentManager, "Categories")
-                    }
+                                    .apply {
+                                        setTint(
+                                            ColorCompat.getThemedColor(
+                                                ctx,
+                                                R.b.colorInteractiveNormal
+                                            )
+                                        )
+                                    },
+                                null,
+                                null,
+                                null
+                            )
+                        } ?: run {
+                        text = "Set Category"
+                        setOnClickListener {
+                            dismiss()
+                            CategoriesSheet(model.channel.id).show(
+                                parentFragmentManager,
+                                "Categories"
+                            )
+                        }
                         setCompoundDrawablesWithIntrinsicBounds(
-                            ContextCompat.getDrawable(ctx, R.e.ic_group_add_white_24dp)!!
+                            ContextCompat
+                                .getDrawable(ctx, R.e.ic_group_add_white_24dp)!!
                                 .mutate()
                                 .apply {
                                     setTint(
@@ -119,10 +158,14 @@ class DMCategories : Plugin() {
                                             R.b.colorInteractiveNormal
                                         )
                                     )
-                                }, null, null, null
+                                },
+                            null,
+                            null,
+                            null
                         )
                     }
-                })
+                }
+            )
         }
 
         @OptIn(ExperimentalStdlibApi::class)
@@ -151,9 +194,15 @@ class DMCategories : Plugin() {
                             if (!settings.showSelected && !settings.showUnread) return@forEach
 
                             channels.filter { channel ->
-                                settings.showSelected && channel.selected || settings.showUnread && !channel.muted && channel.mentionCount > 0
+                                settings.showSelected &&
+                                    channel.selected ||
+                                    settings.showUnread &&
+                                    !channel.muted &&
+                                    channel.mentionCount > 0
                             }
-                        } else channels
+                        } else {
+                            channels
+                        }
                     )
                 }
             } + ChannelListItemDivider

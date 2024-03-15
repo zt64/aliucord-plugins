@@ -7,7 +7,10 @@ import com.aliucord.Utils
 import com.aliucord.Utils.getResId
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.*
+import com.aliucord.patcher.after
+import com.aliucord.patcher.before
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component2
 import com.discord.databinding.WidgetHomeBinding
 import com.discord.views.channelsidebar.GuildChannelSideBarActionsView
 import com.discord.widgets.home.WidgetHome
@@ -19,7 +22,8 @@ import noburnin.PluginSettings
 @AliucordPlugin
 class NoBurnIn : Plugin() {
     init {
-        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET)
+            .withArgs(settings)
     }
 
     override fun start(context: Context) {
@@ -37,8 +41,12 @@ class NoBurnIn : Plugin() {
             ).hide(
                 when (settings.getInt("immersiveModeType", 0)) {
                     0 -> WindowInsetsCompat.Type.statusBars()
+
                     1 -> WindowInsetsCompat.Type.navigationBars()
-                    2 -> WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.statusBars()
+
+                    2 -> WindowInsetsCompat.Type.statusBars() or
+                        WindowInsetsCompat.Type.statusBars()
+
                     else -> return
                 }
             )
@@ -55,11 +63,10 @@ class NoBurnIn : Plugin() {
                     toolbar.visibility = View.GONE
                     unreadCountView.visibility = View.GONE
                 } else {
-                    if (settings.getBool(
-                            "hideChannelIcon",
-                            false
-                        )
-                    ) actionBarTitleLayout.findViewById<View>(toolbarIconId)?.visibility = View.GONE
+                    if (settings.getBool("hideChannelIcon", false)) {
+                        actionBarTitleLayout.findViewById<View>(toolbarIconId)?.visibility =
+                            View.GONE
+                    }
 
                     if (settings.getBool("hideText", false)) {
                         setActionBarTitle("")
@@ -67,25 +74,39 @@ class NoBurnIn : Plugin() {
                     }
 
                     if (settings.getBool("hideUnread", true)) unreadCountView.visibility = View.GONE
-                    if (settings.getBool(
-                            "hideDrawerButton",
-                            true
-                        )
-                    ) setActionBarDisplayHomeAsUpEnabled(false)
+                    if (settings.getBool("hideDrawerButton", true)) {
+                        setActionBarDisplayHomeAsUpEnabled(false)
+                    }
 
                     toolbar.menu.run {
-                        if (settings.getBool("hideSearchButton", true)) findItem(searchButtonId)?.isVisible = false
-                        if (settings.getBool("hideThreadsButton", true)) findItem(threadButtonId)?.isVisible = false
-                        if (settings.getBool("hideMembersButton", true)) findItem(membersButtonId)?.isVisible = false
-                        if (settings.getBool("hideCallButton", true)) findItem(callButtonId)?.isVisible = false
-                        if (settings.getBool("hideVideoButton", true)) findItem(videoButtonId)?.isVisible = false
+                        if (settings.getBool("hideSearchButton", true)) {
+                            findItem(searchButtonId)?.isVisible = false
+                        }
+                        if (settings.getBool("hideThreadsButton", true)) {
+                            findItem(threadButtonId)?.isVisible = false
+                        }
+                        if (settings.getBool("hideMembersButton", true)) {
+                            findItem(membersButtonId)?.isVisible = false
+                        }
+                        if (settings.getBool("hideCallButton", true)) {
+                            findItem(callButtonId)?.isVisible = false
+                        }
+                        if (settings.getBool("hideVideoButton", true)) {
+                            findItem(videoButtonId)?.isVisible = false
+                        }
                     }
                 }
             }
         }
 
         // Show the search button in members list instead of the threads button
-        patcher.before<GuildChannelSideBarActionsView>("a", *Array(5) { Function1::class.java }, *Array(4) { Boolean::class.java }) {
+        patcher.before<GuildChannelSideBarActionsView>(
+            "a",
+            *Array(5) {
+                Function1::class.java
+            },
+            *Array(4) { Boolean::class.java }
+        ) {
             it.args[8] = true
         }
     }

@@ -27,30 +27,54 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
         val ctx = requireContext()
 
         addView(
-            Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, "Reverse", "Whether the counter goes in reverse, counting down how many chars remain")
-                .apply {
+            Utils
+                .createCheckedSetting(
+                    context = ctx,
+                    type = CheckedSetting.ViewType.SWITCH,
+                    text = "Reverse",
+                    subtext = "Whether the counter goes in reverse, counting down how many chars remain"
+                ).apply {
                     isChecked = settings.reverse
                     setOnCheckedListener { settings.reverse = it }
                 }
         )
 
-        addView(TextInput(ctx).apply {
-            editText.apply {
-                inputType = InputType.TYPE_CLASS_NUMBER
-                setText(settings.threshold.toString())
-                addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-                    override fun afterTextChanged(s: Editable) {
-                        s.toString().toIntOrNull()?.let { settings.threshold = it }
-                    }
-                })
+        addView(
+            TextInput(ctx).apply {
+                editText.apply {
+                    inputType = InputType.TYPE_CLASS_NUMBER
+                    setText(settings.threshold.toString())
+                    addTextChangedListener(object : TextWatcher {
+                        override fun beforeTextChanged(
+                            s: CharSequence,
+                            start: Int,
+                            count: Int,
+                            after: Int
+                        ) {
+                        }
+
+                        override fun onTextChanged(
+                            s: CharSequence,
+                            start: Int,
+                            before: Int,
+                            count: Int
+                        ) {
+                        }
+
+                        override fun afterTextChanged(s: Editable) {
+                            s.toString().toIntOrNull()?.let { settings.threshold = it }
+                        }
+                    })
+                }
+                setHint("Threshold")
+                8.dp.let { setPadding(it, it, it, it) }
             }
-            setHint("Threshold")
-            8.dp.let { setPadding(it, it, it, it) }
-        })
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Addition).apply {
-            text = "Minimum number of characters for the counter to appear. Set to zero for it to always be visible"
-        })
+        )
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Addition).apply {
+                text =
+                    "Minimum number of characters for the counter to appear. Set to zero for it to always be visible"
+            }
+        )
     }
 }

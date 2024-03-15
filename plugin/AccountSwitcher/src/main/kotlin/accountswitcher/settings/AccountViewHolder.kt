@@ -89,6 +89,8 @@ class AccountViewHolder(
                 setOnClickListener { adapter.onRemove(adapterPosition) }
                 layout.addView(this)
             }
-        } else layout.setOnClickListener { adapter.onClick(ctx, adapterPosition) }
+        } else {
+            layout.setOnClickListener { adapter.onClick(ctx, adapterPosition) }
+        }
     }
 }

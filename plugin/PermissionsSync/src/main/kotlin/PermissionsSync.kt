@@ -42,72 +42,124 @@ class PermissionsSync : Plugin() {
     override fun start(context: Context) {
         val textViewId = View.generateViewId()
 
-        patcher.after<WidgetChannelSettingsPermissionsAdvanced>("configureUI", WidgetChannelSettingsPermissionsAdvanced.Model::class.java) {
+        patcher.after<WidgetChannelSettingsPermissionsAdvanced>(
+            "configureUI",
+            WidgetChannelSettingsPermissionsAdvanced.Model::class.java
+        ) {
             val model = it.args[0] as WidgetChannelSettingsPermissionsAdvanced.Model?
             if (model == null || !model.canManage || model.channel.parentId == 0L) return@after
 
             val binding = getBinding()
-            val parent = ((binding.root as ViewGroup).getChildAt(0) as ViewGroup).getChildAt(0) as LinearLayout
+            val parent = (
+                (binding.root as ViewGroup).getChildAt(
+                    0
+                ) as ViewGroup
+            ).getChildAt(0) as LinearLayout
             val ctx = parent.context
 
-            val textView = parent.findViewById(textViewId) ?: TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
+            val textView = parent.findViewById(textViewId) ?: TextView(
+                ctx,
+                null,
+                0,
+                R.i.UiKit_Settings_Item_Icon
+            ).apply {
                 id = textViewId
                 parent.addView(this, 0)
             }
 
             val categoryName = StoreStream.getChannels().getChannel(model.channel.parentId).name
 
-            (WidgetChannelSettingsPermissionsAdvanced.Model.Companion).get(model.channel.parentId).subscribe {
-                val parentModel = this
-                val synced = model.memberItems == parentModel.memberItems && model.roleItems == parentModel.roleItems
+            (WidgetChannelSettingsPermissionsAdvanced.Model.Companion)
+                .get(
+                    model.channel.parentId
+                ).subscribe {
+                    val parentModel = this
+                    val synced =
+                        model.memberItems == parentModel.memberItems &&
+                            model.roleItems == parentModel.roleItems
 
-                parentModel.channel.s()
-                textView.apply {
-                    val icon: Drawable?
+                    parentModel.channel.s()
+                    textView.apply {
+                        val icon: Drawable?
 
-                    if (synced) {
-                        text = "Permissions synced with: $categoryName"
-                        icon = ContextCompat.getDrawable(ctx, R.e.ic_info_24dp)?.mutate()?.apply {
-                            setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
-                        }
-                    } else {
-                        text = "Permissions not synced with: $categoryName\nTap to sync"
-                        icon = ContextCompat.getDrawable(ctx, R.e.ic_warning_circle_24dp)?.mutate()?.apply {
-                            setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
-                        }
-
-                        setOnClickListener {
-                            isClickable = false
-
-                            Utils.showToast("Syncing permissions")
-                            Utils.threadPool.execute {
-                                model.channel.permissionOverwrites.forEach { permissionOverwrite ->
-                                    val th = RestAPI.api.deletePermissionOverwrites(model.channel.id, permissionOverwrite.id)
-                                        .await().second
-
-                                    if (th != null) Utils.showToast("Failed to delete permission ${permissionOverwrite.type}: ${permissionOverwrite.id}")
+                        if (synced) {
+                            text = "Permissions synced with: $categoryName"
+                            icon =
+                                ContextCompat.getDrawable(ctx, R.e.ic_info_24dp)?.mutate()?.apply {
+                                    setTint(
+                                        ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal)
+                                    )
                                 }
+                        } else {
+                            text = "Permissions not synced with: $categoryName\nTap to sync"
+                            icon =
+                                ContextCompat
+                                    .getDrawable(ctx, R.e.ic_warning_circle_24dp)
+                                    ?.mutate()
+                                    ?.apply {
+                                        setTint(
+                                            ColorCompat.getThemedColor(
+                                                ctx,
+                                                R.b.colorInteractiveNormal
+                                            )
+                                        )
+                                    }
 
-                                parentModel.channel.permissionOverwrites.forEach { permissionOverwrite ->
-                                    val th = RestAPI.api.updatePermissionOverwrites(
-                                        model.channel.id,
-                                        permissionOverwrite.id,
-                                        (RestAPIParams.ChannelPermissionOverwrites.Companion).fromPermissionOverwrite(permissionOverwrite)
-                                    ).await().second
+                            setOnClickListener {
+                                isClickable = false
 
-                                    if (th != null) Utils.showToast("Failed to add permission ${permissionOverwrite.type}: ${permissionOverwrite.id}")
+                                Utils.showToast("Syncing permissions")
+                                Utils.threadPool.execute {
+                                    model.channel.permissionOverwrites.forEach { permissionOverwrite ->
+                                        val th = RestAPI.api
+                                            .deletePermissionOverwrites(
+                                                model.channel.id,
+                                                permissionOverwrite.id
+                                            ).await()
+                                            .second
+
+                                        if (th != null) {
+                                            Utils.showToast(
+                                                "Failed to delete permission ${permissionOverwrite.type}: ${permissionOverwrite.id}"
+                                            )
+                                        }
+                                    }
+
+                                    parentModel.channel.permissionOverwrites.forEach { permissionOverwrite ->
+                                        val th = RestAPI.api
+                                            .updatePermissionOverwrites(
+                                                model.channel.id,
+                                                permissionOverwrite.id,
+                                                (RestAPIParams.ChannelPermissionOverwrites.Companion)
+                                                    .fromPermissionOverwrite(
+                                                        permissionOverwrite
+                                                    )
+                                            ).await()
+                                            .second
+
+                                        if (th != null) {
+                                            Utils.showToast(
+                                                "Failed to add permission ${permissionOverwrite.type}: ${permissionOverwrite.id}"
+                                            )
+                                        }
+                                    }
+
+                                    Utils.mainThread.post {
+                                        WidgetChannelSettingsPermissionsAdvanced
+                                            .`access$configureUI`(
+                                                this@after,
+                                                parentModel
+                                            )
+                                    }
                                 }
-
-                                Utils.mainThread.post { WidgetChannelSettingsPermissionsAdvanced.`access$configureUI`(this@after, parentModel) }
                             }
                         }
+
+                        typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
+
+                        setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                     }
-
-                    typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
-
-                    setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }
-            }
         }
     }
 

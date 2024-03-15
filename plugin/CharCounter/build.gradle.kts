@@ -23,5 +23,5 @@ aliucord.changelog.set(
 
     # 1.1.0
     * Support V96
-""".trimIndent()
+    """.trimIndent()
 )

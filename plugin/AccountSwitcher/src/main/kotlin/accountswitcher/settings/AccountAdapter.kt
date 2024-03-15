@@ -30,8 +30,15 @@ class AccountAdapter(
     private val isSettings: Boolean = true
 ) : RecyclerView.Adapter<AccountViewHolder>() {
     private fun saveAccounts() = AccountSwitcher.mSettings.setObject("accounts", accounts)
-    fun addAccount(token: String, id: Long) = accounts.add(Account(token, id)).also { if (it) saveAccounts() }
-    fun removeAccount(token: String) = accounts.removeIf { it.token == token }.also { if (it) saveAccounts() }
+
+    fun addAccount(token: String, id: Long) = accounts.add(Account(token, id)).also {
+        if (it) saveAccounts()
+    }
+
+    fun removeAccount(token: String) = accounts
+        .removeIf {
+            it.token == token
+        }.also { if (it) saveAccounts() }
 
     override fun getItemCount() = accounts.size
 
@@ -44,23 +51,38 @@ class AccountAdapter(
     )
 
     @Suppress("SetTextI18n")
-    override fun onBindViewHolder(holder: AccountViewHolder, position: Int): Unit = accounts[position].let { account ->
-        Utils.threadPool.execute {
-            val user = StoreStream.getUsers().users[account.id] ?: RestAPI.api.userGet(account.id)
-                .await().first?.let { user -> CoreUser(user) }
+    override fun onBindViewHolder(holder: AccountViewHolder, position: Int): Unit =
+        accounts[position].let { account ->
+            Utils.threadPool.execute {
+                val user = StoreStream.getUsers().users[account.id] ?: RestAPI.api
+                    .userGet(account.id)
+                    .await()
+                    .first
+                    ?.let { user -> CoreUser(user) }
 
-            holder.name.text = if (user == null) "Failed to load user" else UserUtils.INSTANCE.getUserNameWithDiscriminator(user, null, null)
-            holder.userId.text = "ID: ${user?.id ?: "Unknown"}"
+                holder.name.text = if (user == null) {
+                    "Failed to load user"
+                } else {
+                    UserUtils.INSTANCE.getUserNameWithDiscriminator(
+                        user,
+                        null,
+                        null
+                    )
+                }
+                holder.userId.text = "ID: ${user?.id ?: "Unknown"}"
 
-            IconUtils.setIcon(holder.avatar, user)
+                IconUtils.setIcon(holder.avatar, user)
+            }
         }
+
+    fun onEdit(position: Int) {
+        AccountDialog(this, getAccounts()[position])
+            .show(fragment.parentFragmentManager, "Edit Account")
     }
 
-    fun onEdit(position: Int) =
-        AccountDialog(this, getAccounts()[position]).show(fragment.parentFragmentManager, "Edit Account")
-
     fun onRemove(position: Int) = accounts[position].let { account ->
-        val dialog = ConfirmDialog().setIsDangerous(true)
+        val dialog = ConfirmDialog()
+            .setIsDangerous(true)
             .setTitle("Delete ${StoreStream.getUsers().users[account.id]?.username ?: "Unknown"}")
             .setDescription("Are you sure you want to delete this account?")
 
@@ -79,7 +101,13 @@ class AccountAdapter(
             if (fetchUser(it.token) == null) return@execute Utils.showToast("Invalid token")
 
             StoreStream.getAuthentication().handleLoginResult(
-                ModelLoginResult(it.token.lowercase().startsWith("mfa"), null, it.token, null, emptyList())
+                ModelLoginResult(
+                    it.token.lowercase().startsWith("mfa"),
+                    null,
+                    it.token,
+                    null,
+                    emptyList()
+                )
             )
 
             Utils.mainThread.postDelayed({

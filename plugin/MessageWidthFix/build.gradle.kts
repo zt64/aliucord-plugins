@@ -8,5 +8,5 @@ aliucord.changelog.set(
     
     # 1.0.1
     * Fixed embeds being wrong width
-""".trimIndent()
+    """.trimIndent()
 )

@@ -19,23 +19,32 @@ import com.discord.widgets.voice.fullscreen.stage.SpeakerViewHolder
 import com.discord.widgets.voice.sheet.CallParticipantsAdapter
 import com.facebook.drawee.span.DraweeSpanStringBuilder
 
-private val typingIndicatorBinding = WidgetChatOverlay.TypingIndicatorViewHolder::class.java.getDeclaredField("binding")
+private val typingIndicatorBinding = WidgetChatOverlay.TypingIndicatorViewHolder::class.java
+    .getDeclaredField("binding")
     .apply { isAccessible = true }
-private val itemVoiceBinding = WidgetChannelsListAdapter.ItemVoiceUser::class.java.getDeclaredField("binding")
+private val itemVoiceBinding = WidgetChannelsListAdapter.ItemVoiceUser::class.java
+    .getDeclaredField("binding")
     .apply { isAccessible = true }
-private val autoCompleteBinding = AutocompleteItemViewHolder::class.java.getDeclaredField("binding")
+private val autoCompleteBinding = AutocompleteItemViewHolder::class.java
+    .getDeclaredField("binding")
     .apply { isAccessible = true }
-private val memberListBinding = ChannelMembersListViewHolderMember::class.java.getDeclaredField("binding")
+private val memberListBinding = ChannelMembersListViewHolderMember::class.java
+    .getDeclaredField("binding")
     .apply { isAccessible = true }
-private val voiceListBinding = CallParticipantsAdapter.ViewHolderUser::class.java.getDeclaredField("binding")
+private val voiceListBinding = CallParticipantsAdapter.ViewHolderUser::class.java
+    .getDeclaredField("binding")
     .apply { isAccessible = true }
-private val audienceListBinding = AudienceViewHolder::class.java.getDeclaredField("binding")
+private val audienceListBinding = AudienceViewHolder::class.java
+    .getDeclaredField("binding")
     .apply { isAccessible = true }
-private val speakerListBinding = SpeakerViewHolder::class.java.getDeclaredField("binding")
+private val speakerListBinding = SpeakerViewHolder::class.java
+    .getDeclaredField("binding")
     .apply { isAccessible = true }
-private val reactionListBinding = ManageReactionsResultsAdapter.ReactionUserViewHolder::class.java.getDeclaredField("binding")
+private val reactionListBinding = ManageReactionsResultsAdapter.ReactionUserViewHolder::class.java
+    .getDeclaredField("binding")
     .apply { isAccessible = true }
-private val mDraweeStringBuilderField = SimpleDraweeSpanTextView::class.java.getDeclaredField("mDraweeStringBuilder")
+private val mDraweeStringBuilderField = SimpleDraweeSpanTextView::class.java
+    .getDeclaredField("binding")
     .apply { isAccessible = true }
 
 val WidgetChatOverlay.TypingIndicatorViewHolder.binding

@@ -27,33 +27,54 @@ class CategoriesSheet(private val channelId: Long) : BottomSheet() {
 
         val ctx = requireContext()
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-            text = "Categories"
-        })
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
+                text = "Categories"
+            }
+        )
 
-        addView(RecyclerView(ctx).apply {
-            adapter = CategoriesSheetAdapter(this@CategoriesSheet, channelId, DMCategories.categories.filter { Util.getCurrentId() == it.userId })
-            layoutManager = LinearLayoutManager(ctx)
+        addView(
+            RecyclerView(ctx).apply {
+                adapter = CategoriesSheetAdapter(
+                    this@CategoriesSheet,
+                    channelId,
+                    DMCategories.categories.filter {
+                        Util.getCurrentId() == it.userId
+                    }
+                )
+                layoutManager = LinearLayoutManager(ctx)
 
-            addItemDecoration(DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {
-                setDrawable(ShapeDrawable(RectShape()).apply {
-                    intrinsicHeight = DimenUtils.defaultPadding
-                    setTint(Color.TRANSPARENT)
-                })
-            })
-        })
+                addItemDecoration(
+                    DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {
+                        setDrawable(
+                            ShapeDrawable(RectShape()).apply {
+                                intrinsicHeight = DimenUtils.defaultPadding
+                                setTint(Color.TRANSPARENT)
+                            }
+                        )
+                    }
+                )
+            }
+        )
 
         addView(Divider(ctx))
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Create Category"
-            setOnClickListener {
-                dismiss()
-                CategoryDialog(channelId).show(parentFragmentManager, "CreateCategory")
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
+                text = "Create Category"
+                setOnClickListener {
+                    dismiss()
+                    CategoryDialog(channelId).show(parentFragmentManager, "CreateCategory")
+                }
+                setCompoundDrawablesWithIntrinsicBounds(
+                    ContextCompat.getDrawable(ctx, R.e.ic_add_24dp)!!.mutate().apply {
+                        setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
+                    },
+                    null,
+                    null,
+                    null
+                )
             }
-            setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(ctx, R.e.ic_add_24dp)!!.mutate().apply {
-                setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
-            }, null, null, null)
-        })
+        )
     }
 }

@@ -30,7 +30,9 @@ class PresetAdapter(
     private val emojiPreviewSize = Utils.getResId("custom_status_emoji_preview_size", "dimen")
 
     private fun savePresets() = CustomStatusPresets.mSettings.setObject("presets", presets)
-    fun addPreset(preset: UserStatusPresenceCustomView.ViewState.WithStatus) = presets.add(preset)
+
+    fun addPreset(preset: UserStatusPresenceCustomView.ViewState.WithStatus) = presets
+        .add(preset)
         .also { if (it) savePresets() }
 
     private fun removePreset(preset: UserStatusPresenceCustomView.ViewState.WithStatus) =
@@ -40,20 +42,27 @@ class PresetAdapter(
         val (id, name, isAnimated) = emoji
         val ctx = customEmoji.context
 
-        val str = if (id != null)
-            ModelEmojiCustom.getImageUri(id.toLong(), isAnimated, IconUtils.getMediaProxySize(ctx.resources.getDimensionPixelSize(emojiPreviewSize)))
-        else StoreStream.getEmojis().unicodeEmojiSurrogateMap[name]?.let { modelEmojiUnicode ->
-            ModelEmojiUnicode.getImageUri(modelEmojiUnicode.codePoints, ctx)
+        val str = if (id != null) {
+            ModelEmojiCustom.getImageUri(
+                id.toLong(),
+                isAnimated,
+                IconUtils.getMediaProxySize(ctx.resources.getDimensionPixelSize(emojiPreviewSize))
+            )
+        } else {
+            StoreStream.getEmojis().unicodeEmojiSurrogateMap[name]?.let { modelEmojiUnicode ->
+                ModelEmojiUnicode.getImageUri(modelEmojiUnicode.codePoints, ctx)
+            }
         }
 
         MGImages.setImage(customEmoji, str)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        PresetViewHolder(
-            this, LayoutInflater.from(parent.context)
-                .inflate(statusViewId, parent, false) as LinearLayout
-        )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = PresetViewHolder(
+        this,
+        LayoutInflater
+            .from(parent.context)
+            .inflate(statusViewId, parent, false) as LinearLayout
+    )
 
     @Suppress("SetTextI18n")
     override fun onBindViewHolder(holder: PresetViewHolder, position: Int) = presets[position].let {
@@ -62,7 +71,9 @@ class PresetAdapter(
                 text = "No Status Text"
                 setTextColor(ColorCompat.getThemedColor(this, R.b.colorTextMuted))
             }
-        } else holder.customText.text = it.statusText
+        } else {
+            holder.customText.text = it.statusText
+        }
 
         if (it.emoji != null) setEmoji(holder.customEmoji, it.emoji)
     }
@@ -81,8 +92,11 @@ class PresetAdapter(
             val (id, name) = it.emoji ?: return@with
 
             setStatusEmoji(
-                if (id == null) StoreStream.getEmojis().unicodeEmojiSurrogateMap[name]
-                else StoreStream.getEmojis().getCustomEmojiInternal(id.toLong())
+                if (id == null) {
+                    StoreStream.getEmojis().unicodeEmojiSurrogateMap[name]
+                } else {
+                    StoreStream.getEmojis().getCustomEmojiInternal(id.toLong())
+                }
             )
         }
     }
@@ -90,8 +104,18 @@ class PresetAdapter(
     fun editEmoji(customEmoji: SimpleDraweeView, position: Int) = presets[position].let {
         val emojiPickerListener = EmojiPickerListener { modelEmoji: Emoji ->
             val emoji = when (modelEmoji) {
-                is ModelEmojiUnicode -> UserStatusPresenceCustomView.Emoji(null, modelEmoji.surrogates, false)
-                is ModelEmojiCustom -> UserStatusPresenceCustomView.Emoji(modelEmoji.uniqueId, modelEmoji.name, modelEmoji.isAnimated)
+                is ModelEmojiUnicode -> UserStatusPresenceCustomView.Emoji(
+                    null,
+                    modelEmoji.surrogates,
+                    false
+                )
+
+                is ModelEmojiCustom -> UserStatusPresenceCustomView.Emoji(
+                    modelEmoji.uniqueId,
+                    modelEmoji.name,
+                    modelEmoji.isAnimated
+                )
+
                 else -> return@EmojiPickerListener
             }
 
@@ -100,6 +124,11 @@ class PresetAdapter(
             setEmoji(customEmoji, emoji)
         }
 
-        EmojiPickerNavigator.launchBottomSheet(Utils.appActivity.supportFragmentManager, emojiPickerListener, EmojiPickerContextType.Global.INSTANCE, null)
+        EmojiPickerNavigator.launchBottomSheet(
+            Utils.appActivity.supportFragmentManager,
+            emojiPickerListener,
+            EmojiPickerContextType.Global.INSTANCE,
+            null
+        )
     }
 }

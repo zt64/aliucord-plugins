@@ -1,8 +1,12 @@
 [versions]
 discord = "aliucord-SNAPSHOT"
 aliucord = "main-SNAPSHOT"
+#noinspection GradleDependency
 kotlin = "1.5.21"
 android = "7.4.2"
+ktlintPlugin = "12.1.0"
+#noinspection GradleDependency Newer versions incompatible with other plugins
+ktlint = "0.50.0"
 
 [libraries]
 discord = { module = "com.discord:discord", version.ref = "discord" }
@@ -12,3 +16,4 @@ aliucord = { module = "com.aliucord:Aliucord", version.ref = "aliucord" }
 android-library = { id = "com.android.library", version.ref = "android" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 aliucord = { id = "com.aliucord.gradle", version.ref = "aliucord" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintPlugin" }

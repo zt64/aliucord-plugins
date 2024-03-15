@@ -6,6 +6,6 @@ aliucord {
         """
                 # 1.5.0
                 Support V105.12
-            """.trimIndent()
+        """.trimIndent()
     )
 }

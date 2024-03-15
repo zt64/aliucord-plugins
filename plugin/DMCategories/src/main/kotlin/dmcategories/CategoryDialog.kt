@@ -5,14 +5,17 @@ import android.view.View
 import com.aliucord.Utils
 import com.aliucord.fragments.InputDialog
 
-class CategoryDialog(private val channelId: Long?, private val name: String? = null) : InputDialog() {
+class CategoryDialog(private val channelId: Long?, private val name: String? = null) :
+    InputDialog() {
     constructor(name: String) : this(null, name)
 
     override fun onViewBound(view: View) {
         if (name == null) {
             setTitle("Create Category")
             setDescription("Enter a name for the category")
-        } else setTitle("Edit Category")
+        } else {
+            setTitle("Edit Category")
+        }
 
         setPlaceholderText("Name")
 
@@ -24,7 +27,11 @@ class CategoryDialog(private val channelId: Long?, private val name: String? = n
             if (name != null) {
                 val category = DMCategories.getCategory(name)!!
 
-                DMCategories.categories[DMCategories.categories.indexOf(category)] = DMCategory(Util.getCurrentId(), input, category.channelIds)
+                DMCategories.categories[DMCategories.categories.indexOf(category)] = DMCategory(
+                    Util.getCurrentId(),
+                    input,
+                    category.channelIds
+                )
                 DMCategories.saveCategories()
 
                 Utils.showToast("Renamed category")

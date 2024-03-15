@@ -19,8 +19,12 @@ class InfoSheet(private val tappedView: View) : BottomSheet() {
         val ctx = requireContext()
 
         fun addField(title: String, value: String): LinearLayout = LinearLayout(ctx).apply {
-            this.addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply { text = "$title: " })
-            this.addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Addition).apply { text = value })
+            this.addView(
+                TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply { text = "$title: " }
+            )
+            this.addView(
+                TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Addition).apply { text = value }
+            )
 
             setOnLongClickListener {
                 copyToClipboard(value)
@@ -31,23 +35,37 @@ class InfoSheet(private val tappedView: View) : BottomSheet() {
             linearLayout.addView(this)
         }
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-            text = "DeveloperUtils"
-        })
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
+                text = "DeveloperUtils"
+            }
+        )
 
         addField("Class", tappedView::class.java.name)
 
-        if (tappedView.id != View.NO_ID) addField("Resource Name", tappedView.resources.getResourceEntryName(tappedView.id))
+        if (tappedView.id != View.NO_ID) {
+            addField(
+                "Resource Name",
+                tappedView.resources.getResourceEntryName(tappedView.id)
+            )
+        }
 
         // View specific stuff
         if (tappedView is TextView) {
-
         } else if (tappedView is ImageView) {
             try {
-                val field = ImageView::class.java.getDeclaredField("mResource").apply { isAccessible = true }
+                val field = ImageView::class.java
+                    .getDeclaredField(
+                        "mResource"
+                    ).apply { isAccessible = true }
 
                 field[tappedView].let {
-                    if (it != 0) addField("Image Resource ID", tappedView.resources.getResourceEntryName(it as Int))
+                    if (it != 0) {
+                        addField(
+                            "Image Resource ID",
+                            tappedView.resources.getResourceEntryName(it as Int)
+                        )
+                    }
                 }
             } catch (e: Throwable) {
                 logger.error(e)

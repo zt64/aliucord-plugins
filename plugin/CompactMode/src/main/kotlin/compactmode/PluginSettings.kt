@@ -2,7 +2,7 @@ package compactmode
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
@@ -38,19 +38,19 @@ class PluginSettings(val settings: SettingsAPI) : BottomSheet() {
             default: Int,
             min: Int,
             max: Int
-        ): LinearLayout =
-            LinearLayout(ctx, null, 0, R.i.UiKit_Settings_Item).apply {
-                val settingValue = settings.getInt(setting, default)
-                val display = TextView(ctx, null, 0, R.i.UiKit_TextView).apply {
-                    text = "$settingValue $label"
-                    width = 48.dp
-                    addView(this)
-                }
+        ): LinearLayout = LinearLayout(ctx, null, 0, R.i.UiKit_Settings_Item).apply {
+            val settingValue = settings.getInt(setting, default)
+            val display = TextView(ctx, null, 0, R.i.UiKit_TextView).apply {
+                text = "$settingValue $label"
+                width = 48.dp
+                addView(this)
+            }
 
-                addView(SeekBar(ctx, null, 0, R.i.UiKit_SeekBar).apply {
+            addView(
+                SeekBar(ctx, null, 0, R.i.UiKit_SeekBar).apply {
                     layoutParams = LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.WRAP_CONTENT
                     )
                     progress = settingValue - min
                     12.dp.let { setPadding(it, 0, it, 0) }
@@ -70,12 +70,15 @@ class PluginSettings(val settings: SettingsAPI) : BottomSheet() {
                             settings.setInt(setting, (seekBar.progress + min))
                         }
                     })
-                })
-            }
+                }
+            )
+        }
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-            text = "CompactMode"
-        })
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
+                text = "CompactMode"
+            }
+        )
 
         addCheckedSetting("Hide Avatar", "Whether the avatar should be hidden", "hideAvatar", false)
         addCheckedSetting(
@@ -85,24 +88,32 @@ class PluginSettings(val settings: SettingsAPI) : BottomSheet() {
             true
         )
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
-            text = "Avatar Scale"
-        })
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
+                text = "Avatar Scale"
+            }
+        )
         addView(createSeekbar("dp", "avatarScale", 28, 32, 40))
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
-            text = "Header Left Margin"
-        })
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
+                text = "Header Left Margin"
+            }
+        )
         addView(createSeekbar("dp", "headerMargin", 12, 0, 32))
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
-            text = "Content Left Margin"
-        })
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
+                text = "Content Left Margin"
+            }
+        )
         addView(createSeekbar("dp", "contentMargin", 18, 0, 32))
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
-            text = "Message Top Padding"
-        })
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
+                text = "Message Top Padding"
+            }
+        )
         addView(createSeekbar("dp", "messagePadding", 10, 0, 14))
     }
 }

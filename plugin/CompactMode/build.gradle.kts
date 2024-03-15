@@ -18,5 +18,5 @@ aliucord.changelog.set(
     # 1.2.0
     * Styled failed messages
     * Updated description
-""".trimIndent()
+    """.trimIndent()
 )

@@ -35,13 +35,20 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
 
         setActionBarTitle("Account Switcher")
 
-        headerBar.menu.add("Switcher")
+        headerBar.menu
+            .add("Switcher")
             .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
-            .setIcon(Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.e.ic_my_account_24dp)!!.mutate()))
-            .setOnMenuItemClickListener {
-                Utils.openPageWithProxy(ctx, SwitcherPage(getAccounts().apply {
-                    removeIf { it.token == RestAPI.AppHeadersProvider.INSTANCE.authToken }
-                }))
+            .setIcon(
+                Utils.tintToTheme(ContextCompat.getDrawable(ctx, R.e.ic_my_account_24dp)!!.mutate())
+            ).setOnMenuItemClickListener {
+                Utils.openPageWithProxy(
+                    ctx,
+                    SwitcherPage(
+                        getAccounts().apply {
+                            removeIf { it.token == RestAPI.AppHeadersProvider.INSTANCE.authToken }
+                        }
+                    )
+                )
                 false
             }
 
@@ -52,45 +59,56 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
                 weight = 1f
             }
 
-            addItemDecoration(DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {
-                setDrawable(ShapeDrawable(RectShape()).apply {
-                    intrinsicHeight = DimenUtils.defaultPadding
-                    setTint(Color.TRANSPARENT)
-                })
-            })
+            addItemDecoration(
+                DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {
+                    setDrawable(
+                        ShapeDrawable(RectShape()).apply {
+                            intrinsicHeight = DimenUtils.defaultPadding
+                            setTint(Color.TRANSPARENT)
+                        }
+                    )
+                }
+            )
 
             linearLayout.addView(this)
         }
 
         addView(Divider(ctx))
 
-        addView(Button(ctx).apply {
-            text = "Add Account"
-            setOnClickListener {
-                AccountDialog(accountAdapter).show(parentFragmentManager, "Add Account")
+        addView(
+            Button(ctx).apply {
+                text = "Add Account"
+                setOnClickListener {
+                    AccountDialog(accountAdapter).show(parentFragmentManager, "Add Account")
+                }
             }
-        })
+        )
 
         if (StoreStream.getAuthentication().isAuthed) {
             val token = RestAPI.AppHeadersProvider.INSTANCE.authToken
 
             if (getAccounts().none { it.token == token }) {
-                addView(Button(ctx).apply {
-                    text = "Add Current Account"
-                    setOnClickListener {
-                        when {
-                            getAccounts().any { it.token == token } -> Utils.showToast("Account already added")
-                            token != null -> {
-                                accountAdapter.addAccount(token, StoreStream.getUsers().me.id)
-                                Utils.showToast("Added current account")
+                addView(
+                    Button(ctx).apply {
+                        text = "Add Current Account"
+                        setOnClickListener {
+                            when {
+                                getAccounts().any { it.token == token } -> Utils.showToast(
+                                    "Account already added"
+                                )
+
+                                token != null -> {
+                                    accountAdapter.addAccount(token, StoreStream.getUsers().me.id)
+                                    Utils.showToast("Added current account")
+                                }
+
+                                else -> Utils.showToast("Failed to fetch token")
                             }
 
-                            else -> Utils.showToast("Failed to fetch token")
+                            linearLayout.removeView(this)
                         }
-
-                        linearLayout.removeView(this)
                     }
-                })
+                )
             }
         }
     }

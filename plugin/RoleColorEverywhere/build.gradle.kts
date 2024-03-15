@@ -17,5 +17,5 @@ aliucord.changelog.set(
      
     # 1.9.0
     * Added color to reaction username list
-""".trimIndent()
+    """.trimIndent()
 )

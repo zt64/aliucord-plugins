@@ -9,11 +9,18 @@ import customnoticeduration.PluginSettings
 @AliucordPlugin
 class CustomNoticeDuration : Plugin() {
     init {
-        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+        settingsTab =
+            SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(
+                settings
+            )
     }
 
     override fun start(context: Context) {
-        patcher.after<NoticePopup>("getAutoDismissAnimator", Integer::class.javaObjectType, Function0::class.java) {
+        patcher.after<NoticePopup>(
+            "getAutoDismissAnimator",
+            Integer::class.javaObjectType,
+            Function0::class.java
+        ) {
             val result = it.result as ValueAnimator
 
             if (settings.getBool("autoDismissNotice", true)) {

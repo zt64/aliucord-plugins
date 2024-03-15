@@ -1,7 +1,10 @@
 import android.content.Context
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.*
+import com.aliucord.patcher.after
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component2
+import com.aliucord.patcher.instead
 import com.discord.widgets.chat.input.AppFlexInputViewModel
 import com.lytefast.flexinput.R
 import com.lytefast.flexinput.fragment.`FlexInputFragment$c`
@@ -30,14 +33,13 @@ class CursorInput : Plugin() {
                 val trimmed = if (selectionEnd != baseString.length) str.trim() else str
 
                 onInputTextChanged(
-                    StringBuilder(baseString).insert(selectionEnd, trimmed).toString(), null
+                    StringBuilder(baseString).insert(selectionEnd, trimmed).toString(),
+                    null
                 )
                 flexEditText.setSelection(selectionEnd + trimmed.length)
             }
         }
     }
 
-    override fun stop(context: Context) {
-        patcher.unpatchAll()
-    }
+    override fun stop(context: Context) = patcher.unpatchAll()
 }

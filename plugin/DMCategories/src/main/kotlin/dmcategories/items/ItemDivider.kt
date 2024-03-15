@@ -10,10 +10,14 @@ object ChannelListItemDivider : ChannelListItem {
     const val TYPE = 401
 
     override fun getKey(): String = ""
+
     override fun getType(): Int = TYPE
 }
 
-class ItemDivider(@LayoutRes i: Int, adapter: WidgetChannelsListAdapter) : WidgetChannelsListAdapter.Item(i, adapter) {
+class ItemDivider(
+    @LayoutRes i: Int,
+    adapter: WidgetChannelsListAdapter
+) : WidgetChannelsListAdapter.Item(i, adapter) {
     init {
         (itemView.layoutParams as RecyclerView.LayoutParams).height = 4.dp
     }

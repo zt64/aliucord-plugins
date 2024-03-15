@@ -8,7 +8,11 @@ import android.os.PowerManager
 import android.widget.ImageView
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.*
+import com.aliucord.patcher.PreHook
+import com.aliucord.patcher.after
+import com.aliucord.patcher.before
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component2
 import com.aliucord.utils.DimenUtils
 import com.discord.models.presence.Presence
 import com.discord.utilities.icon.IconUtils
@@ -19,7 +23,8 @@ import com.facebook.drawee.view.SimpleDraweeView
 @AliucordPlugin
 class AlwaysAnimate : Plugin() {
     init {
-        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET)
+            .withArgs(settings)
     }
 
     override fun start(context: Context) {
@@ -28,9 +33,19 @@ class AlwaysAnimate : Plugin() {
         if (settings.getBool("batterySaver", false) && powerManager.isPowerSaveMode) return
 
         if (settings.getBool("guildIcons", true)) {
-            patcher.patch(IconUtils::class.java.getDeclaredMethod("getForGuild", Long::class.javaObjectType, String::class.javaObjectType, String::class.javaObjectType, Boolean::class.java, Int::class.javaObjectType), PreHook {
-                it.args[3] = true
-            })
+            patcher.patch(
+                IconUtils::class.java.getDeclaredMethod(
+                    "getForGuild",
+                    Long::class.javaObjectType,
+                    String::class.javaObjectType,
+                    String::class.javaObjectType,
+                    Boolean::class.java,
+                    Int::class.javaObjectType
+                ),
+                PreHook {
+                    it.args[3] = true
+                }
+            )
         }
 
         if (settings.getBool("avatars", true)) {
@@ -71,7 +86,15 @@ class AlwaysAnimate : Plugin() {
         }
 
         if (settings.getBool("status", true)) {
-            patcher.before<PresenceUtils>("getStatusDraweeSpanStringBuilder", Context::class.java, Presence::class.java, Boolean::class.java, Boolean::class.java, Boolean::class.java, Boolean::class.java) {
+            patcher.before<PresenceUtils>(
+                "getStatusDraweeSpanStringBuilder",
+                Context::class.java,
+                Presence::class.java,
+                Boolean::class.java,
+                Boolean::class.java,
+                Boolean::class.java,
+                Boolean::class.java
+            ) {
                 it.args[5] = true
             }
         }

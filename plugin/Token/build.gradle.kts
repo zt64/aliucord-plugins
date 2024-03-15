@@ -13,6 +13,6 @@ aliucord {
             # 1.2.0
             * Add 'send' option - Ven
             
-            """.trimIndent()
+        """.trimIndent()
     )
 }

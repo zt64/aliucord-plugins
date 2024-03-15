@@ -3,6 +3,7 @@
 import com.aliucord.gradle.AliucordExtension
 import com.android.build.gradle.LibraryExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 subprojects {
     val libs = rootProject.libs
@@ -11,6 +12,7 @@ subprojects {
         plugin(libs.plugins.android.library.get().pluginId)
         plugin(libs.plugins.aliucord.get().pluginId)
         plugin(libs.plugins.kotlin.android.get().pluginId)
+        plugin(libs.plugins.ktlint.get().pluginId)
     }
 
     configure<LibraryExtension> {
@@ -43,9 +45,18 @@ subprojects {
         buildUrl.set("https://raw.githubusercontent.com/zt64/aliucord-plugins/builds/%s.zip")
     }
 
+    configure<KtlintExtension> {
+        version.set(libs.versions.ktlint)
+
+        coloredOutput.set(true)
+        outputColorName.set("RED")
+        ignoreFailures.set(true)
+    }
+
     dependencies {
         val discord by configurations
         val compileOnly by configurations
+        val implementation by configurations
 
         discord(libs.discord)
         compileOnly(libs.aliucord)
@@ -55,9 +66,7 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "11"
-            freeCompilerArgs += listOf(
-                "-Xopt-in=kotlin.RequiresOptIn",
-            )
+            freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
         }
     }
 }
@@ -67,19 +76,24 @@ project.gradle.taskGraph.whenReady {
     val content = buildString {
         appendLine("## Plugins for [Aliucord](https://github.com/Aliucord)")
         appendLine()
-        appendLine("Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder")
+        appendLine(
+            "Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder"
+        )
         appendLine()
 
-        subprojects.filterNot {
-            it.extensions.getByType<AliucordExtension>().excludeFromUpdaterJson.get()
-        }.joinToString("\n") { subproject ->
-            buildString {
-                with(subproject) {
-                    appendLine("- [$name](https://github.com/zt64/aliucord-plugins/raw/builds/$name.zip )")
-                    appendLine(description)
+        subprojects
+            .filterNot {
+                it.extensions.getByType<AliucordExtension>().excludeFromUpdaterJson.get()
+            }.joinToString("\n") { subproject ->
+                buildString {
+                    with(subproject) {
+                        appendLine(
+                            "- [$name](https://github.com/zt64/aliucord-plugins/raw/builds/$name.zip )"
+                        )
+                        appendLine(description)
+                    }
                 }
-            }
-        }.let(::append)
+            }.let(::append)
     }
 
     readMe.writeText(content)

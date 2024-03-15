@@ -33,7 +33,10 @@ class RoleColorEverywhere : Plugin() {
     private val typingUsers = HashMap<String, Int>()
 
     init {
-        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+        settingsTab =
+            SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(
+                settings
+            )
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -41,7 +44,11 @@ class RoleColorEverywhere : Plugin() {
         if (settings.getBool("typingText", true)) {
             val typingUsersTextViewId = Utils.getResId("chat_typing_users_typing", "id")
 
-            patcher.after<`ChatTypingModel$Companion$getTypingUsers$1$1`<Any, Any, Any>>("call", Map::class.java, Map::class.java) {
+            patcher.after<`ChatTypingModel$Companion$getTypingUsers$1$1`<Any, Any, Any>>(
+                "call",
+                Map::class.java,
+                Map::class.java
+            ) {
                 typingUsers.clear()
 
                 if (StoreStream.getChannelsSelected().selectedChannel.isDM()) return@after
@@ -51,18 +58,34 @@ class RoleColorEverywhere : Plugin() {
 
                 members.forEach { (id, member) ->
                     val color = member.color
-                    if (color != Color.BLACK) typingUsers[GuildMember.getNickOrUsername(member, users[id])] = color
+                    if (color != Color.BLACK) {
+                        typingUsers[
+                            GuildMember.getNickOrUsername(
+                                member,
+                                users[id]
+                            )
+                        ] = color
+                    }
                 }
             }
 
-            patcher.after<WidgetChatOverlay.TypingIndicatorViewHolder>("configureTyping", ChatTypingModel.Typing::class.java) {
+            patcher.after<WidgetChatOverlay.TypingIndicatorViewHolder>(
+                "configureTyping",
+                ChatTypingModel.Typing::class.java
+            ) {
                 val textView = binding.root.findViewById<TextView>(typingUsersTextViewId)
 
                 textView.run {
                     text = SpannableString(text).apply {
                         typingUsers.forEach { (username, color) ->
-                            val start = text.indexOf(username).takeUnless { it == -1 } ?: return@forEach
-                            setSpan(ForegroundColorSpan(color), start, start + username.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            val start =
+                                text.indexOf(username).takeUnless { it == -1 } ?: return@forEach
+                            setSpan(
+                                ForegroundColorSpan(color),
+                                start,
+                                start + username.length,
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
                         }
                     }
                 }
@@ -73,7 +96,11 @@ class RoleColorEverywhere : Plugin() {
             if (settings.getBool("userMentions", true)) patchMentions()
             if (settings.getBool("voiceChannel", true)) patchVoiceChannels()
             if (settings.getBool("userMentionList", true)) patchMentionsList()
-            if (settings.getBool("profileName", true)) patchProfileName(settings.getBool("profileTag", true))
+            if (settings.getBool("profileName", true)) {
+                patchProfileName(
+                    settings.getBool("profileTag", true)
+                )
+            }
             if (settings.getBool("messages", false)) patchMessages()
             if (settings.getBool("status", true)) patchMemberStatuses()
             if (settings.getBool("reactionList", true)) patchReactionsList()

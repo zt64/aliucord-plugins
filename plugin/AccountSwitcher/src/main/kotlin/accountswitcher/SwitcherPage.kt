@@ -35,22 +35,33 @@ class SwitcherPage(private val accounts: ArrayList<Account>) : SettingsPage() {
                 weight = 1f
             }
 
-            addItemDecoration(DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {
-                setDrawable(ShapeDrawable(RectShape()).apply {
-                    intrinsicHeight = DimenUtils.defaultPadding
-                    setTint(Color.TRANSPARENT)
-                })
-            })
+            addItemDecoration(
+                DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL).apply {
+                    setDrawable(
+                        ShapeDrawable(RectShape()).apply {
+                            intrinsicHeight = DimenUtils.defaultPadding
+                            setTint(Color.TRANSPARENT)
+                        }
+                    )
+                }
+            )
 
             linearLayout.addView(this)
         }
 
         if (StoreStream.getAuthentication().isAuthed) {
-            addView(Button(ctx).apply {
-                text = "Log Out"
-                setBackgroundColor(view.resources.getColor(R.c.uikit_btn_bg_color_selector_red, view.context.theme))
-                setOnClickListener { StoreStream.getAuthentication().setAuthed(null) }
-            })
+            addView(
+                Button(ctx).apply {
+                    text = "Log Out"
+                    setBackgroundColor(
+                        view.resources.getColor(
+                            R.c.uikit_btn_bg_color_selector_red,
+                            view.context.theme
+                        )
+                    )
+                    setOnClickListener { StoreStream.getAuthentication().setAuthed(null) }
+                }
+            )
         }
     }
 }

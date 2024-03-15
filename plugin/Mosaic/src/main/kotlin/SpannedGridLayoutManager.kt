@@ -2,16 +2,6 @@
  * Copyright © 2017 Jorge Martín Espinosa
  */
 
-import android.graphics.PointF
-import android.graphics.Rect
-import android.os.Parcel
-import android.os.Parcelable
-import android.util.Log
-import android.util.SparseArray
-import android.view.View
-import androidx.recyclerview.widget.LinearSmoothScroller
-import androidx.recyclerview.widget.RecyclerView
-
 // open class SpannedGridLayoutManager(
 //     private val orientation: Orientation,
 //     val spans: Int

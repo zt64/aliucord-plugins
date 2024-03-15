@@ -20,7 +20,11 @@ class MessageWidthFix : Plugin() {
     override fun start(context: Context) {
         val containerCardViewId = Utils.getResId("chat_list_item_embed_container_card", "id")
 
-        patcher.after<WidgetChatListItem>("onConfigure", Int::class.java, ChatListEntry::class.java) {
+        patcher.after<WidgetChatListItem>(
+            "onConfigure",
+            Int::class.java,
+            ChatListEntry::class.java
+        ) {
             val chatListEntry = it.args[1] as ChatListEntry
 
             itemView.resources.getDimension(R.d.chat_cell_horizontal_spacing_padding)
@@ -31,7 +35,11 @@ class MessageWidthFix : Plugin() {
                         width = RecyclerView.LayoutParams.MATCH_PARENT
                     }
 
-                    (findViewById<MaterialCardView>(containerCardViewId).layoutParams as ConstraintLayout.LayoutParams).apply {
+                    (
+                        findViewById<MaterialCardView>(
+                            containerCardViewId
+                        ).layoutParams as ConstraintLayout.LayoutParams
+                    ).apply {
                         width = ConstraintLayout.LayoutParams.WRAP_CONTENT
                         horizontalBias = 0.0f
                         constrainedWidth = true
@@ -44,7 +52,11 @@ class MessageWidthFix : Plugin() {
                     // Discord devs too lazy to do it themselves
                     setOnLongClickListener {
                         val stickerEntry = chatListEntry as StickerEntry
-                        adapter.eventHandler.onMessageLongClicked(stickerEntry.message, "", stickerEntry.message.hasThread())
+                        adapter.eventHandler.onMessageLongClicked(
+                            stickerEntry.message,
+                            "",
+                            stickerEntry.message.hasThread()
+                        )
                         true
                     }
                 }

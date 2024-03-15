@@ -32,7 +32,10 @@ class CharCounter : Plugin() {
     private var SettingsAPI.threshold: Int by settings.delegate(0)
 
     init {
-        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+        settingsTab =
+            SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(
+                settings
+            )
     }
 
     @Suppress("SetTextI18n")
@@ -60,21 +63,39 @@ class CharCounter : Plugin() {
                     bottomToBottom = PARENT_ID
                 }
                 8.dp.let { dp -> setPadding(dp, 0, dp, 0) }
-                setTextSize(TypedValue.COMPLEX_UNIT_PX, root.resources.getDimension(textSizeDimenId))
+                setTextSize(
+                    TypedValue.COMPLEX_UNIT_PX,
+                    root.resources.getDimension(textSizeDimenId)
+                )
                 setBackgroundColor(ColorCompat.getThemedColor(root.context, R.c.primary_dark_600))
                 root.addView(this)
             }
 
-            (root.findViewById<RelativeLayout>(typingOverlayId).layoutParams as ConstraintLayout.LayoutParams).apply {
+            (
+                root
+                    .findViewById<RelativeLayout>(
+                        typingOverlayId
+                    ).layoutParams as ConstraintLayout.LayoutParams
+            ).apply {
                 startToStart = PARENT_ID
                 endToStart = counter!!.id
                 width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
             }
         }
 
-        patcher.after<AppFlexInputViewModel>("onInputTextChanged", String::class.java, Boolean::class.javaObjectType) {
+        patcher.after<AppFlexInputViewModel>(
+            "onInputTextChanged",
+            String::class.java,
+            Boolean::class.javaObjectType
+        ) {
             val chars = (it.args[0] as String).length
-            val maxChars = if (StoreStream.getUsers().me.premiumTier == PremiumTier.TIER_2) 4000 else 2000
+            val maxChars = if (StoreStream.getUsers().me.premiumTier ==
+                PremiumTier.TIER_2
+            ) {
+                4000
+            } else {
+                2000
+            }
 
             counter?.apply {
                 visibility = if (chars >= settings.threshold) View.VISIBLE else View.GONE

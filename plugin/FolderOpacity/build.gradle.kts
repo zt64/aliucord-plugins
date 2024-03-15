@@ -8,6 +8,6 @@ aliucord {
             # 1.3.0
             * Support V96
 
-            """.trimIndent()
+        """.trimIndent()
     )
 }

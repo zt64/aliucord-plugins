@@ -29,5 +29,7 @@ class DisablePreviewsOnData : Plugin() {
         connectivityManager.registerDefaultNetworkCallback(networkCallback)
     }
 
-    override fun stop(context: Context) = connectivityManager.unregisterNetworkCallback(networkCallback)
+    override fun stop(context: Context) {
+        connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
 }

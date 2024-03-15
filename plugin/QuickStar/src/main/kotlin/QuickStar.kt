@@ -23,7 +23,9 @@ class QuickStar : Plugin() {
         .getDeclaredMethod("getBinding")
         .apply { isAccessible = true }
 
-    private fun WidgetChatListActions.getBinding() = getBindingMethod(this) as WidgetChatListActionsBinding
+    private fun WidgetChatListActions.getBinding() =
+        getBindingMethod(this) as WidgetChatListActionsBinding
+
     private fun WidgetChatListActions.addReaction(emoji: Emoji) =
         WidgetChatListActions.`access$addReaction`(this, emoji)
 
@@ -34,11 +36,22 @@ class QuickStar : Plugin() {
         val starEmoji = StoreStream.getEmojis().unicodeEmojisNamesMap["star"]!!
         val icon = ContextCompat.getDrawable(context, R.e.ic_star_24dp)
 
-        patcher.after<WidgetChatListActions>("configureUI", WidgetChatListActions.Model::class.java) {
+        patcher.after<WidgetChatListActions>(
+            "configureUI",
+            WidgetChatListActions.Model::class.java
+        ) {
             val root = getBinding().root.findViewById<LinearLayout>(actionsContainerId)
 
             root.findViewById<TextView>(quickStarId).apply {
-                visibility = if ((it.args[0] as WidgetChatListActions.Model).manageMessageContext.canAddReactions) View.VISIBLE else View.GONE
+                visibility =
+                    if ((it.args[0] as WidgetChatListActions.Model)
+                            .manageMessageContext
+                            .canAddReactions
+                    ) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
                 setOnClickListener {
                     addReaction(starEmoji)
                     dismiss()
@@ -46,7 +59,11 @@ class QuickStar : Plugin() {
             }
         }
 
-        patcher.after<WidgetChatListActions>("onViewCreated", View::class.java, Bundle::class.java) {
+        patcher.after<WidgetChatListActions>(
+            "onViewCreated",
+            View::class.java,
+            Bundle::class.java
+        ) {
             val linearLayout = (it.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
             val ctx = linearLayout.context
 

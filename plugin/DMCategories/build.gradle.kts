@@ -14,5 +14,5 @@ aliucord.changelog.set(
     
     # 1.0.1
     * Fixed collapse/expand animation
-""".trimIndent()
+    """.trimIndent()
 )

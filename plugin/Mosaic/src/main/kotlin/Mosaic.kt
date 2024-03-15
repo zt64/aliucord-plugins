@@ -1,7 +1,19 @@
 import android.content.Context
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.*
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component10
+import com.aliucord.patcher.component11
+import com.aliucord.patcher.component12
+import com.aliucord.patcher.component2
+import com.aliucord.patcher.component3
+import com.aliucord.patcher.component4
+import com.aliucord.patcher.component5
+import com.aliucord.patcher.component6
+import com.aliucord.patcher.component7
+import com.aliucord.patcher.component8
+import com.aliucord.patcher.component9
+import com.aliucord.patcher.instead
 import com.aliucord.wrappers.ChannelWrapper.Companion.guildId
 import com.aliucord.wrappers.embeds.MessageEmbedWrapper.Companion.url
 import com.aliucord.wrappers.messages.AttachmentWrapper.Companion.type
@@ -14,7 +26,10 @@ import com.discord.api.role.GuildRole
 import com.discord.models.member.GuildMember
 import com.discord.models.message.Message
 import com.discord.stores.StoreMessageState
-import com.discord.widgets.chat.list.entries.*
+import com.discord.widgets.chat.list.entries.AttachmentEntry
+import com.discord.widgets.chat.list.entries.AutoModSystemMessageEmbedEntry
+import com.discord.widgets.chat.list.entries.ChatListEntry
+import com.discord.widgets.chat.list.entries.EmbedEntry
 
 @AliucordPlugin
 class Mosaic : Plugin() {
@@ -94,7 +109,10 @@ class Mosaic : Plugin() {
             val entries = ArrayList<ChatListEntry>(arrayList.size)
 
             if (size != 0) {
-                val (images, others) = attachments.partition { it.type == MessageAttachmentType.IMAGE }
+                val (images, others) = attachments.partition {
+                    it.type ==
+                        MessageAttachmentType.IMAGE
+                }
 
                 fun List<MessageAttachment>.populateEntries() {
                     forEachIndexed { index, messageAttachment ->
@@ -251,6 +269,7 @@ class Mosaic : Plugin() {
 
 private class MosaicEntry(val attachments: List<MessageAttachment>) : ChatListEntry() {
     override fun getKey(): String = ""
+
     override fun getType(): Int = TYPE
 
     companion object {

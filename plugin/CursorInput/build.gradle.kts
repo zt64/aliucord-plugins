@@ -6,5 +6,5 @@ aliucord.changelog.set(
     """
     # 1.4.1
     * Support Discord V112.4
-""".trimIndent()
+    """.trimIndent()
 )

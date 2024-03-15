@@ -41,7 +41,10 @@ class InviteDetails : Plugin() {
             val barrierButton = Utils.getResId("barrier_button", "id")
         }
 
-        patcher.after<WidgetChatListAdapterItemInvite>("configureResolvedUI", WidgetChatListAdapterItemInvite.Model.Resolved::class.java) {
+        patcher.after<WidgetChatListAdapterItemInvite>(
+            "configureResolvedUI",
+            WidgetChatListAdapterItemInvite.Model.Resolved::class.java
+        ) {
             val (invite) = it.args[0] as WidgetChatListAdapterItemInvite.Model.Resolved
             val guild = invite.guild
             val layout = itemView as ConstraintLayout
@@ -51,49 +54,83 @@ class InviteDetails : Plugin() {
                 clone(layout)
 
                 // Info button
-                (layout.findViewById(viewIds.infoButton) ?: ImageButton(ctx, null, 0, R.i.UiKit_ImageButton).apply {
-                    id = viewIds.infoButton
-                    layoutParams = LayoutParams(0.dp, MATCH_PARENT).apply {
-                        topToTop = viewIds.itemInviteName
-                        bottomToBottom = viewIds.itemInviteMemberContainer
-                        endToEnd = ConstraintSet.PARENT_ID
-                        marginEnd = 16.dp
+                (
+                    layout.findViewById(viewIds.infoButton) ?: ImageButton(
+                        ctx,
+                        null,
+                        0,
+                        R.i.UiKit_ImageButton
+                    ).apply {
+                        id = viewIds.infoButton
+                        layoutParams = LayoutParams(0.dp, MATCH_PARENT).apply {
+                            topToTop = viewIds.itemInviteName
+                            bottomToBottom = viewIds.itemInviteMemberContainer
+                            endToEnd = ConstraintSet.PARENT_ID
+                            marginEnd = 16.dp
+                        }
+
+                        setPadding(0.dp, 0.dp, 0.dp, 0.dp)
+
+                        setImageResource(R.e.ic_info_outline_white_24dp)
+
+                        connect(
+                            viewIds.itemInviteName,
+                            ConstraintSet.END,
+                            id,
+                            ConstraintSet.START
+                        )
+                        connect(
+                            viewIds.itemInviteMemberContainer,
+                            ConstraintSet.END,
+                            id,
+                            ConstraintSet.START
+                        )
+
+                        layout.addView(this)
                     }
-
-                    setPadding(0.dp, 0.dp, 0.dp, 0.dp)
-
-                    setImageResource(R.e.ic_info_outline_white_24dp)
-
-                    connect(viewIds.itemInviteName, ConstraintSet.END, id, ConstraintSet.START)
-                    connect(viewIds.itemInviteMemberContainer, ConstraintSet.END, id, ConstraintSet.START)
-
-                    layout.addView(this)
-                }).run {
+                ).run {
                     setOnClickListener {
-                        WidgetGuildProfileSheet.show(adapter.fragmentManager, false, guild.id, 0, false)
+                        WidgetGuildProfileSheet.show(
+                            adapter.fragmentManager,
+                            false,
+                            guild.id,
+                            0,
+                            false
+                        )
                     }
                 }
 
                 // Banner
-                (layout.findViewById(viewIds.banner) ?: SimpleDraweeView(ctx).apply {
-                    id = viewIds.banner
-                    adjustViewBounds = true
-                    layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
-                        height = 150.dp
+                (
+                    layout.findViewById(viewIds.banner) ?: SimpleDraweeView(ctx).apply {
+                        id = viewIds.banner
+                        adjustViewBounds = true
+                        layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+                            height = 150.dp
 
-                        topToBottom = viewIds.itemInviteHeader
-                        bottomToTop = viewIds.barrierHeader
+                            topToBottom = viewIds.itemInviteHeader
+                            bottomToTop = viewIds.barrierHeader
 
-                        setMargins(16.dp, 0, 16.dp, 0)
-                        setPadding(0, 0, 0, 8.dp)
+                            setMargins(16.dp, 0, 16.dp, 0)
+                            setPadding(0, 0, 0, 8.dp)
+                        }
+
+                        connect(
+                            viewIds.itemInviteHeader,
+                            ConstraintSet.BOTTOM,
+                            viewIds.banner,
+                            ConstraintSet.TOP
+                        )
+
+                        layout.addView(this)
                     }
-
-                    connect(viewIds.itemInviteHeader, ConstraintSet.BOTTOM, viewIds.banner, ConstraintSet.TOP)
-
-                    layout.addView(this)
-                }).run {
+                ).run {
                     visibility = if (guild.banner != null) {
-                        val banner = IconUtils.INSTANCE.getBannerForGuild(Guild(guild), layout.width, false)
+                        val banner = IconUtils.INSTANCE.getBannerForGuild(
+                            Guild(guild),
+                            layout.width,
+                            false
+                        )
 
                         setOnClickListener {
                             Utils.openMediaViewer(banner, guild.name)
@@ -103,24 +140,43 @@ class InviteDetails : Plugin() {
                         MGImages.setRoundingParams(this, 20f, false, null, null, 0f)
 
                         View.VISIBLE
-                    } else View.GONE
+                    } else {
+                        View.GONE
+                    }
                 }
 
                 // Description
-                (layout.findViewById(viewIds.description) ?: TextView(ctx, null, 0, R.i.UiKit_Chat_Embed_Subtext).apply {
-                    id = viewIds.description
-                    layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
-                        topToBottom = viewIds.itemInviteMemberContainer
-                        bottomToTop = viewIds.barrierButton
+                (
+                    layout.findViewById(viewIds.description) ?: TextView(
+                        ctx,
+                        null,
+                        0,
+                        R.i.UiKit_Chat_Embed_Subtext
+                    ).apply {
+                        id = viewIds.description
+                        layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+                            topToBottom = viewIds.itemInviteMemberContainer
+                            bottomToTop = viewIds.barrierButton
 
-                        setMargins(16.dp, 8.dp, 16.dp, 0)
+                            setMargins(16.dp, 8.dp, 16.dp, 0)
+                        }
+
+                        connect(
+                            viewIds.itemInviteMemberContainer,
+                            ConstraintSet.BOTTOM,
+                            viewIds.description,
+                            ConstraintSet.TOP
+                        )
+                        connect(
+                            viewIds.itemInviteImage,
+                            ConstraintSet.BOTTOM,
+                            viewIds.description,
+                            ConstraintSet.TOP
+                        )
+
+                        layout.addView(this)
                     }
-
-                    connect(viewIds.itemInviteMemberContainer, ConstraintSet.BOTTOM, viewIds.description, ConstraintSet.TOP)
-                    connect(viewIds.itemInviteImage, ConstraintSet.BOTTOM, viewIds.description, ConstraintSet.TOP)
-
-                    layout.addView(this)
-                }).run {
+                ).run {
                     visibility = guild.description?.let { description ->
                         text = description
 

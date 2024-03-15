@@ -21,15 +21,33 @@ class Weather : Plugin() {
     }
 
     override fun start(context: Context) {
-        val arguments = listOf(Utils.createCommandOption(ApplicationCommandType.STRING, "location", "The location to query"))
+        val arguments =
+            listOf(
+                Utils.createCommandOption(
+                    ApplicationCommandType.STRING,
+                    "location",
+                    "The location to query"
+                )
+            )
 
-        commands.registerCommand("weather", "Get the weather for the current location, or a specific location", arguments) {
+        commands.registerCommand(
+            "weather",
+            "Get the weather for the current location, or a specific location",
+            arguments
+        ) {
             val location = it.getString("location")
             val weather = try {
-                Http.simpleJsonGet("https://wttr.in/${location.orEmpty()}?format=j1", WeatherResponse::class.java)
+                Http.simpleJsonGet(
+                    "https://wttr.in/${location.orEmpty()}?format=j1",
+                    WeatherResponse::class.java
+                )
             } catch (throwable: Throwable) {
                 logger.error(throwable)
-                return@registerCommand CommandResult("Uh oh, failed to fetch weather data", null, false)
+                return@registerCommand CommandResult(
+                    "Uh oh, failed to fetch weather data",
+                    null,
+                    false
+                )
             }
 
             val condition = weather.current_condition.first()
@@ -45,18 +63,23 @@ class Weather : Plugin() {
                 .setDescription(
                     buildString {
                         appendLine("**Temp**:")
-                        appendLine("$thermometerEmoji **Feels Like**: `${condition.FeelsLikeF}°F`  |  `${condition.FeelsLikeC}°C`")
-                        appendLine("$thermometerEmoji **Temperature**: `${condition.temp_F}°F`  |  `${condition.temp_C}°C`")
+                        appendLine(
+                            "$thermometerEmoji **Feels Like**: `${condition.FeelsLikeF}°F`  |  `${condition.FeelsLikeC}°C`"
+                        )
+                        appendLine(
+                            "$thermometerEmoji **Temperature**: `${condition.temp_F}°F`  |  `${condition.temp_C}°C`"
+                        )
                         appendLine("**Wind**:")
                         appendLine("$windEmoji **Wind Direction**: `${condition.winddir16Point}`")
-                        appendLine("$windEmoji **Wind Speed**: `${condition.windspeedMiles} MPH`  |  `${condition.windspeedKmph} KMPH`")
+                        appendLine(
+                            "$windEmoji **Wind Speed**: `${condition.windspeedMiles} MPH`  |  `${condition.windspeedKmph} KMPH`"
+                        )
                         appendLine("**Other**:")
                         appendLine("$cloudEmoji  **Cloud Cover**: `${condition.cloudcover}%`")
                         appendLine("$humidityEmoji **Humidity**: `${condition.humidity}`")
                         appendLine("$uvIndexEmoji **UV Index**: `${condition.uvIndex}`")
                     }
-                )
-                .setFooter("$areaName, $region, $country", null)
+                ).setFooter("$areaName, $region, $country", null)
 
             if (location != null) {
                 try {

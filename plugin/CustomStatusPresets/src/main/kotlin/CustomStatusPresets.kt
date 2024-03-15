@@ -30,10 +30,11 @@ import customstatuspresets.PresetAdapter
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class CustomStatusPresets : Plugin() {
-    private val presetType = TypeToken.getParameterized(
-        ArrayList::class.java,
-        UserStatusPresenceCustomView.ViewState.WithStatus::class.javaObjectType
-    ).getType()
+    private val presetType = TypeToken
+        .getParameterized(
+            ArrayList::class.java,
+            UserStatusPresenceCustomView.ViewState.WithStatus::class.javaObjectType
+        ).getType()
 
     companion object {
         lateinit var mSettings: SettingsAPI
@@ -57,22 +58,38 @@ class CustomStatusPresets : Plugin() {
                 val ctx = this.context
 
                 addView(Divider(ctx))
-                addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-                    text = "Presets"
-                })
-                addView(RecyclerView(ctx).apply {
-                    adapter = presetAdapter
-                    layoutManager = LinearLayoutManager(ctx)
-                    layoutParams =
-                        LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250.dp)
-                })
+                addView(
+                    TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
+                        text = "Presets"
+                    }
+                )
+                addView(
+                    RecyclerView(ctx).apply {
+                        adapter = presetAdapter
+                        layoutManager = LinearLayoutManager(ctx)
+                        layoutParams =
+                            LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                250.dp
+                            )
+                    }
+                )
             }
 
             rootView.findViewById<FloatingActionButton>(saveButtonId).setOnLongClickListener {
                 val formState =
-                    (WidgetUserSetCustomStatus.`access$getViewModel$p`(this).viewState as WidgetUserSetCustomStatusViewModel.ViewState.Loaded).formState
+                    (
+                        WidgetUserSetCustomStatus
+                            .`access$getViewModel$p`(
+                                this
+                            ).viewState as WidgetUserSetCustomStatusViewModel.ViewState.Loaded
+                    ).formState
 
-                if (formState.emoji == null && formState.text.isEmpty()) return@setOnLongClickListener false
+                if (formState.emoji == null &&
+                    formState.text.isEmpty()
+                ) {
+                    return@setOnLongClickListener false
+                }
 
                 val emoji = when (formState.emoji) {
                     is ModelEmojiUnicode -> UserStatusPresenceCustomView.Emoji(
@@ -81,15 +98,17 @@ class CustomStatusPresets : Plugin() {
                         false
                     )
 
-                    is ModelEmojiCustom -> StoreStream.getEmojis()
-                        .getCustomEmojiInternal(formState.emoji.uniqueId.toLong())
-                        .let { emoji ->
-                            UserStatusPresenceCustomView.Emoji(
-                                emoji.id.toString(),
-                                emoji.name,
-                                emoji.isAnimated
-                            )
-                        }
+                    is ModelEmojiCustom ->
+                        StoreStream
+                            .getEmojis()
+                            .getCustomEmojiInternal(formState.emoji.uniqueId.toLong())
+                            .let { emoji ->
+                                UserStatusPresenceCustomView.Emoji(
+                                    emoji.id.toString(),
+                                    emoji.name,
+                                    emoji.isAnimated
+                                )
+                            }
 
                     else -> null
                 }

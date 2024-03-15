@@ -48,10 +48,16 @@ class SystemInfo : Plugin() {
         commands.registerCommand(
             "system-info",
             "Get system information",
-            Utils.createCommandOption(ApplicationCommandType.BOOLEAN, "send", "send result visible to everyone")
+            Utils.createCommandOption(
+                ApplicationCommandType.BOOLEAN,
+                "send",
+                "send result visible to everyone"
+            )
         ) {
             val memInfo = ActivityManager.MemoryInfo()
-            (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memInfo)
+            (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(
+                memInfo
+            )
 
             val totalMem = memInfo.totalMem
             val availMem = memInfo.availMem
@@ -65,8 +71,9 @@ class SystemInfo : Plugin() {
                 "Architecture" to getArch(),
                 "Bootloader" to BOOTLOADER,
                 "Rooted" to isRooted.toString(),
-                "OS Version" to "$CODENAME $RELEASE (SDK v${SDK_INT})",
-                "Memory Usage" to "${usedMem.GB}/${totalMem.GB}GB (${availMem.GB}GB / $percentAvail% free)",
+                "OS Version" to "$CODENAME $RELEASE (SDK v$SDK_INT)",
+                "Memory Usage" to
+                    "${usedMem.GB}/${totalMem.GB}GB (${availMem.GB}GB / $percentAvail% free)",
                 "Uptime" to DateUtils.formatElapsedTime(SystemClock.elapsedRealtime() / 1000)
             )
 

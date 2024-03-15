@@ -22,33 +22,36 @@ class CategorySheet(private val category: DMCategory) : BottomSheet() {
 
         val ctx = requireContext()
 
-        fun textView(text: String, @StyleRes style: Int) = TextView(ctx, null, 0, style).apply {
+        fun textView(
+            text: String,
+            @StyleRes style: Int
+        ) = TextView(ctx, null, 0, style).apply {
             this.text = text
         }
 
-        fun addAction(
-            text: String,
-            drawable: Int,
-            tint: Int,
-            onClick: () -> Unit
-        ) {
-            addView(textView(text, R.i.UiKit_Settings_Item_Icon).apply {
-                setOnClickListener {
-                    dismiss()
-                    onClick()
+        fun addAction(text: String, drawable: Int, tint: Int, onClick: () -> Unit) {
+            addView(
+                textView(text, R.i.UiKit_Settings_Item_Icon).apply {
+                    setOnClickListener {
+                        dismiss()
+                        onClick()
+                    }
+                    setCompoundDrawablesWithIntrinsicBounds(
+                        ContextCompat
+                            .getDrawable(ctx, drawable)!!
+                            .mutate()
+                            .apply {
+                                setTint(ColorCompat.getThemedColor(ctx, tint))
+                            },
+                        null,
+                        null,
+                        null
+                    )
                 }
-                setCompoundDrawablesWithIntrinsicBounds(
-                    ContextCompat.getDrawable(ctx, drawable)!!
-                        .mutate()
-                        .apply {
-                            setTint(ColorCompat.getThemedColor(ctx, tint))
-                        }, null, null, null
-                )
-            })
+            )
         }
 
         addView(textView(category.name, R.i.UiKit_Settings_Item_Header))
-
 
         addAction("Rename Category", R.e.ic_edit_24dp, R.b.colorInteractiveNormal) {
             CategoryDialog(category.name).show(parentFragmentManager, "EditCategory")

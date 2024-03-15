@@ -18,11 +18,16 @@ class RestartButton : Plugin() {
         patcher.after<WidgetSettings>("configureToolbar") {
             icon?.setTint(ColorCompat.getThemedColor(requireContext(), R.b.colorInteractiveNormal))
 
-            requireAppActivity().u.menu.add("Restart")
+            requireAppActivity()
+                .u
+                .menu
+                .add("Restart")
                 .setIcon(icon)
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
                 .setOnMenuItemClickListener {
-                    val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+                    val intent = context.packageManager.getLaunchIntentForPackage(
+                        context.packageName
+                    )
                     context.startActivity(Intent.makeRestartActivityTask(intent?.component))
                     Runtime.getRuntime().exit(0)
                     false

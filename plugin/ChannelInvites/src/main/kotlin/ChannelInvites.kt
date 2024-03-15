@@ -22,35 +22,58 @@ class ChannelInvites : Plugin() {
         val invitesLayoutId = View.generateViewId()
         val scrollViewId = Utils.getResId("scroll_view", "id")
 
-        patcher.after<WidgetTextChannelSettings>("configureUI", WidgetTextChannelSettings.Model::class.java) {
+        patcher.after<WidgetTextChannelSettings>(
+            "configureUI",
+            WidgetTextChannelSettings.Model::class.java
+        ) {
             val root = WidgetTextChannelSettings.`access$getBinding$p`(this).root
-            val content = root.findViewById<NestedScrollView>(scrollViewId).getChildAt(0) as LinearLayout
+            val content = root
+                .findViewById<NestedScrollView>(
+                    scrollViewId
+                ).getChildAt(0) as LinearLayout
 
             if (content.findViewById<LinearLayout>(invitesLayoutId) != null) return@after
 
             val model = it.args[0] as WidgetTextChannelSettings.Model
 
-            content.addView(LinearLayout(context, null, 0, R.i.UiKit_ViewGroup_LinearLayout).apply {
-                id = invitesLayoutId
+            content.addView(
+                LinearLayout(context, null, 0, R.i.UiKit_ViewGroup_LinearLayout).apply {
+                    id = invitesLayoutId
 
-                addView(TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-                    text = "Invites"
-                })
+                    addView(
+                        TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply {
+                            text = "Invites"
+                        }
+                    )
 
-                addView(TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-                    val icon = ContextCompat.getDrawable(context, R.e.ic_guild_invite_24dp)!!.mutate().apply {
-                        setTint(ColorCompat.getThemedColor(context, R.b.colorInteractiveNormal))
+                    addView(
+                        TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
+                            val icon = ContextCompat
+                                .getDrawable(
+                                    context,
+                                    R.e.ic_guild_invite_24dp
+                                )!!
+                                .mutate()
+                                .apply {
+                                    setTint(
+                                        ColorCompat.getThemedColor(
+                                            context,
+                                            R.b.colorInteractiveNormal
+                                        )
+                                    )
+                                }
+
+                            text = "Invites"
+
+                            setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+                        }
+                    )
+
+                    setOnClickListener {
+                        Utils.openPageWithProxy(context, InvitesPage(model.channel))
                     }
-
-                    text = "Invites"
-
-                    setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
-                })
-
-                setOnClickListener {
-                    Utils.openPageWithProxy(context, InvitesPage(model.channel))
                 }
-            })
+            )
         }
     }
 

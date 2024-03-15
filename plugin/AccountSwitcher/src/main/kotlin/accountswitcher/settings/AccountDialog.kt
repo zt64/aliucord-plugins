@@ -30,29 +30,37 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
         if (token == null) {
             setTitle("Add Account")
             setDescription("Please input the account token")
-        } else setTitle("Edit Account")
+        } else {
+            setTitle("Edit Account")
+        }
 
         setPlaceholderText("Token")
 
         setOnOkListener {
             val inputToken = input.trim()
 
-            if (adapter.accounts.any { it != account && it.token == inputToken }) return@setOnOkListener Utils.showToast(
-                "An account with this token already exists"
-            )
+            if (adapter.accounts.any { it != account && it.token == inputToken }) {
+                return@setOnOkListener Utils.showToast(
+                    "An account with this token already exists"
+                )
+            }
 
             if (account?.token == inputToken) return@setOnOkListener dismiss()
 
             Utils.threadPool.execute {
-                val userId =
-                    fetchUser(inputToken)?.id ?: return@execute Utils.showToast("Invalid token")
+                val userId = fetchUser(inputToken)?.id
+                    ?: return@execute Utils.showToast("Invalid token")
 
                 if (account?.token != null) adapter.removeAccount(account.token)
 
                 adapter.addAccount(inputToken, userId)
                 StoreStream.getUsers().fetchUsers(listOf(userId))
 
-                Utils.mainThread.post { adapter.notifyItemChanged(adapter.accounts.indexOfFirst { it.token == inputToken }) }
+                Utils.mainThread.post {
+                    adapter.notifyItemChanged(
+                        adapter.accounts.indexOfFirst { it.token == inputToken }
+                    )
+                }
 
                 dismiss()
             }
@@ -67,7 +75,8 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
 
         okButton.isEnabled = token != null
         okButton.backgroundTintList = ColorStateList(
-            buttonStates, intArrayOf(
+            buttonStates,
+            intArrayOf(
                 resources.getColor(
                     R.c.uikit_btn_bg_color_selector_brand,
                     context?.theme
@@ -82,8 +91,12 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
         inputLayout.editText?.addTextChangedListener(object : TextWatcher {
             private val pattern = Pattern.compile(TOKEN_REGEX, Pattern.CASE_INSENSITIVE)
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
             override fun afterTextChanged(s: Editable?) {
                 okButton.isEnabled = pattern.matcher(s?.trim().toString()).matches()
             }

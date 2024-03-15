@@ -54,8 +54,10 @@ class UnreadCounter : Plugin() {
                 id = unreadCounterId
                 visibility = View.GONE
                 background =
-                    ContextCompat.getDrawable(root.context, R.e.drawable_overlay_mentions)!!
-                        .mutate().apply {
+                    ContextCompat
+                        .getDrawable(root.context, R.e.drawable_overlay_mentions)!!
+                        .mutate()
+                        .apply {
                             setTint(Color.GRAY)
                         }
                 layoutParams = RelativeLayout.LayoutParams(20.dp, 20.dp).apply {
@@ -74,19 +76,21 @@ class UnreadCounter : Plugin() {
 
 //            counter.visibility = if (this > 0) View.VISIBLE else View.GONE
 //            counter.text = this.toString()
-            StoreStream.getReadStates()
+            StoreStream
+                .getReadStates()
                 .observeUnreadCountForChannel(
                     textChannel.channel.id,
                     UtcDateTime(System.currentTimeMillis())
-                )
-                .subscribe(object : Subscriber<Int>() {
+                ).subscribe(object : Subscriber<Int>() {
                     override fun onCompleted() {}
 
                     override fun onError(e: Throwable?) {}
 
                     override fun onNext(count: Int) {
                         unsubscribe()
-                        Utils.showToast("${textChannel.channel.name} ${textChannel.isUnread} $count")
+                        Utils.showToast(
+                            "${textChannel.channel.name} ${textChannel.isUnread} $count"
+                        )
                         counter.visibility = if (count > 0) View.VISIBLE else View.GONE
                         counter.text = count.toString()
                     }

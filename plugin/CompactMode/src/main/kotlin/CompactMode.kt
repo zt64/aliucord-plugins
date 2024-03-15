@@ -1,10 +1,12 @@
-
 import android.content.Context
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Guideline
@@ -16,7 +18,20 @@ import com.aliucord.patcher.after
 import com.aliucord.settings.delegate
 import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.utils.lazyField
-import com.discord.widgets.chat.list.adapter.*
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemAttachment
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemBotComponentRow
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemEmbed
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemEphemeralMessage
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemGameInvite
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemGift
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemInvite
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemReactions
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemSpotifyListenTogether
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemStageInvite
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemSticker
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemUploadProgress
+import com.discord.widgets.chat.list.adapter.WidgetChatListItem
 import com.discord.widgets.chat.list.entries.ChatListEntry
 import compactmode.PluginSettings
 
@@ -25,9 +40,9 @@ class CompactMode : Plugin() {
     private val itemAvatarField by lazyField<WidgetChatListAdapterItemMessage>("itemAvatar")
 
     private val WidgetChatListAdapterItemMessage.avatarView
-        get() = itemAvatarField[this] as ImageView?
+        inline get() = itemAvatarField[this] as ImageView?
     private val WidgetChatListAdapterItemMessage.messageTextView
-        get() = WidgetChatListAdapterItemMessage.`access$getItemText$p`(this)
+        inline get() = WidgetChatListAdapterItemMessage.`access$getItemText$p`(this)
 
     private val SettingsAPI.contentMargin by settings.delegate(8)
     private val SettingsAPI.avatarScale by settings.delegate(28)
@@ -85,8 +100,11 @@ class CompactMode : Plugin() {
                 is WidgetChatListAdapterItemSpotifyListenTogether -> itemView
 
                 is WidgetChatListAdapterItemBotComponentRow -> itemView.findViewById(componentRowId)
+
                 is WidgetChatListAdapterItemReactions -> itemView.findViewById(reactionsFlexBoxId)
+
                 is WidgetChatListAdapterItemEmbed -> itemView.findViewById(embedContainerCardId)
+
                 else -> null
             }?.layoutParams<MarginLayoutParams>()
 
@@ -103,7 +121,9 @@ class CompactMode : Plugin() {
             when (itemView.id) {
                 // Regular message
                 messageRootId -> {
-                    itemView.findViewById<View>(loadingTextId).layoutParams<MarginLayoutParams>()
+                    itemView
+                        .findViewById<View>(loadingTextId)
+                        .layoutParams<MarginLayoutParams>()
                         .marginStart = 0
 
                     val headerView = itemView.findViewById<ConstraintLayout>(headerLayoutId)
@@ -155,6 +175,7 @@ class CompactMode : Plugin() {
 
                     constraintSet.applyTo(constraintLayout)
                 }
+
                 // Failed message
                 failedMessageRootId -> {
                     val root = itemView as RelativeLayout
@@ -203,6 +224,7 @@ class CompactMode : Plugin() {
                         }
                     }
                 }
+
                 // Minimal message
                 else -> {
                     messageTextView.layoutParams<MarginLayoutParams>().marginStart =
@@ -216,4 +238,4 @@ class CompactMode : Plugin() {
 }
 
 @Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
-inline fun <T : LayoutParams> View.layoutParams() = layoutParams as T
+private inline fun <T : LayoutParams> View.layoutParams() = layoutParams as T

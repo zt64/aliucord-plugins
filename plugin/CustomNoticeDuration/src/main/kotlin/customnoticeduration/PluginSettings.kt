@@ -52,13 +52,20 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
             })
         }
 
-        addView(TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
-            text = "Custom Notice Duration"
-        })
+        addView(
+            TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Label).apply {
+                text = "Custom Notice Duration"
+            }
+        )
 
         addView(
-            Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, "Auto-Dismiss Notice", "Whether the notice should automatically dismiss")
-                .apply {
+            Utils
+                .createCheckedSetting(
+                    ctx,
+                    CheckedSetting.ViewType.SWITCH,
+                    "Auto-Dismiss Notice",
+                    "Whether the notice should automatically dismiss"
+                ).apply {
                     isChecked = autoDismissNotice
                     setOnCheckedListener {
                         settings.setBool("autoDismissNotice", it)
@@ -67,9 +74,11 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
                 }
         )
 
-        addView(LinearLayout(ctx, null, 0, R.i.UiKit_Settings_Item).apply {
-            addView(currentTimeout)
-            addView(seekBar)
-        })
+        addView(
+            LinearLayout(ctx, null, 0, R.i.UiKit_Settings_Item).apply {
+                addView(currentTimeout)
+                addView(seekBar)
+            }
+        )
     }
 }

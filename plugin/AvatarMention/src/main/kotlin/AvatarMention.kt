@@ -10,7 +10,10 @@ import com.discord.widgets.chat.list.adapter.`WidgetChatListAdapterItemMessage$o
 @AliucordPlugin
 class AvatarMention : Plugin() {
     override fun start(context: Context) {
-        patcher.instead<`WidgetChatListAdapterItemMessage$onConfigure$5`>("onClick", View::class.java) {
+        patcher.instead<`WidgetChatListAdapterItemMessage$onConfigure$5`>(
+            "onClick",
+            View::class.java
+        ) {
             val adapter = WidgetChatListAdapterItemMessage.`access$getAdapter$p`(`this$0`)
 
             adapter.eventHandler.onMessageAuthorNameClicked(`$message`, adapter.data.guildId)

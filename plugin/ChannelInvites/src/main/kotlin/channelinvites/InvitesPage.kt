@@ -23,7 +23,10 @@ import com.google.gson.stream.JsonReader
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class InvitesPage(private val channel: Channel) :
     AppFragment(Utils.getResId("widget_server_settings_instant_invites", "layout")) {
-    private val viewFlipperId = Utils.getResId("server_settings_instant_invites_view_flipper", "id")
+    private val viewFlipperId = Utils.getResId(
+        "server_settings_instant_invites_view_flipper",
+        "id"
+    )
     private val recyclerId = Utils.getResId("server_settings_instant_invites_recycler", "id")
 
     override fun onViewBound(view: View?) {
@@ -41,13 +44,21 @@ class InvitesPage(private val channel: Channel) :
         val invitesRecycler = view.findViewById<RecyclerView>(recyclerId)
 
         Utils.threadPool.execute {
-            val json = Http.Request.newDiscordRequest("/channels/${channel.id}/invites")
+            val json = Http.Request
+                .newDiscordRequest("/channels/${channel.id}/invites")
                 .execute()
                 .text()
 
-            val invites = InboundGatewayGsonParser.fromJson(JsonReader(json.reader()), Array<ModelInvite>::class.java)
+            val invites = InboundGatewayGsonParser.fromJson(
+                JsonReader(json.reader()),
+                Array<ModelInvite>::class.java
+            )
             val inviteItems = invites.map { modelInvite ->
-                WidgetServerSettingsInstantInvites.Model.InviteItem(modelInvite, channel.guildId, null)
+                WidgetServerSettingsInstantInvites.Model.InviteItem(
+                    modelInvite,
+                    channel.guildId,
+                    null
+                )
             }
 
             Utils.mainThread.post {
@@ -58,14 +69,21 @@ class InvitesPage(private val channel: Channel) :
                     invitesRecycler.run {
                         adapter = WidgetServerSettingsInstantInvites.Adapter(this).also { adapter ->
                             val onInviteSelectedListener = { modelInvite: ModelInvite ->
-                                WidgetServerSettingsInstantInvitesActions.create(parentFragmentManager, modelInvite.code)
+                                WidgetServerSettingsInstantInvitesActions.create(
+                                    parentFragmentManager,
+                                    modelInvite.code
+                                )
                             }
 
                             val onInviteExpiredListener = { modelInvite: ModelInvite ->
                                 StoreStream.getInstantInvites().onInviteRemoved(modelInvite)
                             }
 
-                            adapter.configure(inviteItems, onInviteSelectedListener, onInviteExpiredListener)
+                            adapter.configure(
+                                inviteItems,
+                                onInviteSelectedListener,
+                                onInviteExpiredListener
+                            )
                         }
                         layoutManager = LinearLayoutManager(context)
                     }
@@ -74,7 +92,11 @@ class InvitesPage(private val channel: Channel) :
             }
         }
 
-        (WidgetServerSettingsInstantInvites.Model.Companion).get(channel.guildId, StoreStream.getGuilds(), StoreStream.getInstantInvites())
+        (WidgetServerSettingsInstantInvites.Model.Companion).get(
+            channel.guildId,
+            StoreStream.getGuilds(),
+            StoreStream.getInstantInvites()
+        )
     }
 
     //    private fun configureUI(model: WidgetServerSettingsInstantInvites.Model) {
@@ -106,9 +128,27 @@ class InvitesPage(private val channel: Channel) :
 //
     override fun onViewBoundOrOnResume() {
         super.onViewBoundOrOnResume()
-        ObservableExtensionsKt.appSubscribe(ObservableExtensionsKt.ui((WidgetServerSettingsInstantInvites.Model.Companion).get(channel.guildId, StoreStream.getGuilds(), StoreStream.getInstantInvites()), this, null), InvitesPage::class.java, null, { }, { }, { }, { }, {
-            Utils.showToast("guh")
+        ObservableExtensionsKt.appSubscribe(
+            ObservableExtensionsKt.ui(
+                (WidgetServerSettingsInstantInvites.Model.Companion).get(
+                    channel.guildId,
+                    StoreStream.getGuilds(),
+                    StoreStream.getInstantInvites()
+                ),
+                this,
+                null
+            ),
+            InvitesPage::class.java,
+            null,
+            {
+            },
+            { },
+            { },
+            { },
+            {
+                Utils.showToast("guh")
 //            configureUI(it)
-        })
+            }
+        )
     }
 }

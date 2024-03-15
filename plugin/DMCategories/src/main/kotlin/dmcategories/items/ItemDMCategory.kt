@@ -17,7 +17,9 @@ import dmcategories.sheets.CategorySheet
 
 class ChannelListItemDMCategory(val category: DMCategory) : ChannelListItem {
     override fun getKey(): String = ""
+
     override fun getType(): Int = TYPE
+
     operator fun component1() = category
 
     companion object {
@@ -30,14 +32,28 @@ class ItemDMCategory(
     @LayoutRes i: Int,
     adapter: WidgetChannelsListAdapter
 ) : WidgetChannelsListAdapter.Item(i, adapter) {
-    private val nameView = itemView.findViewById<TextView>(Utils.getResId("channels_item_category_name", "id"))
-    private val arrowView = itemView.findViewById<ImageView>(Utils.getResId("channels_item_category_arrow", "id"))
-    private val collapsedDrawable = AppCompatResources.getDrawable(adapter.context, R.e.ic_chevron_right_grey_12dp)
-    private val openedDrawable = AppCompatResources.getDrawable(adapter.context, R.e.ic_chevron_down_grey_12dp)
+    private val nameView = itemView.findViewById<TextView>(
+        Utils.getResId("channels_item_category_name", "id")
+    )
+    private val arrowView = itemView.findViewById<ImageView>(
+        Utils.getResId("channels_item_category_arrow", "id")
+    )
+    private val collapsedDrawable = AppCompatResources.getDrawable(
+        adapter.context,
+        R.e.ic_chevron_right_grey_12dp
+    )
+    private val openedDrawable = AppCompatResources.getDrawable(
+        adapter.context,
+        R.e.ic_chevron_down_grey_12dp
+    )
     private var isCollapsed = false
 
     init {
-        itemView.findViewById<ImageView>(Utils.getResId("channels_item_category_add", "id")).visibility = View.GONE
+        itemView
+            .findViewById<ImageView>(
+                Utils.getResId("channels_item_category_add", "id")
+            ).visibility =
+            View.GONE
     }
 
     override fun onConfigure(i: Int, channelListItem: ChannelListItem) {
@@ -52,13 +68,19 @@ class ItemDMCategory(
 
         if (isCollapsed != category.collapsed) {
             isCollapsed = category.collapsed
-            arrowView.startAnimation(if (category.collapsed) Util.collapseAnimation else Util.expandAnimation)
+            arrowView.startAnimation(
+                if (category.collapsed) Util.collapseAnimation else Util.expandAnimation
+            )
         }
 
         itemView.setOnClickListener {
             category.collapsed = !category.collapsed
 
-            DMCategories.categories[DMCategories.categories.indexOf(DMCategories.getCategory(category.name))] = category
+            DMCategories.categories[
+                DMCategories.categories.indexOf(
+                    DMCategories.getCategory(category.name)
+                )
+            ] = category
 
             Util.updateChannels()
 
@@ -66,7 +88,10 @@ class ItemDMCategory(
         }
 
         itemView.setOnLongClickListener {
-            CategorySheet(category).show((itemView.context as AppCompatActivity).supportFragmentManager, "CategoriesSheet")
+            CategorySheet(category).show(
+                (itemView.context as AppCompatActivity).supportFragmentManager,
+                "CategoriesSheet"
+            )
             true
         }
     }

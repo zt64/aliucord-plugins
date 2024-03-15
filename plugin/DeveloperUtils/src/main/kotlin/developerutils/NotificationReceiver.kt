@@ -60,7 +60,9 @@ class NotificationReceiver(
 
                 devMode = !devMode
 
-                notificationBuilder.setContentText("Tap to ${if (devMode) "disable" else "enable"} inspector")
+                notificationBuilder.setContentText(
+                    "Tap to ${if (devMode) "disable" else "enable"} inspector"
+                )
                 NotificationManagerCompat.from(context).notify(0, notificationBuilder.build())
 
                 Utils.showToast("${if (devMode) "Enabled" else "Disabled"} inspector")

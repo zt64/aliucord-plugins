@@ -405,7 +405,7 @@ class Frecents : Plugin() {
         }
 
         patcher.after<WidgetStickerSheet>("onViewCreated") {
-            val binding =
+            
         }
     }
 

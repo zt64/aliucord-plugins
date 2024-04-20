@@ -7,8 +7,13 @@ insert_final_newline = false
 max_line_length = 100
 tab_width = 4
 ij_continuation_indent_size = 8
+ij_any_line_comment_at_first_column = false
+ij_any_line_comment_add_space = true
 ij_smart_tabs = false
 ij_wrap_on_typing = false
+
+[plugin/Frecents/src/main/java/*.java]
+ij_formatter_enabled = false
 
 [*.{kt,kts}]
 ij_kotlin_allow_trailing_comma = false

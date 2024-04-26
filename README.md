@@ -8,6 +8,9 @@ Adds the ability to quickly switch accounts
 - [AlwaysAnimate](https://github.com/zt64/aliucord-plugins/raw/builds/AlwaysAnimate.zip )
 Allows making server icons and user avatars always animate
 
+- [AnonymousFiles](https://github.com/zt64/aliucord-plugins/raw/builds/AnonymousFiles.zip )
+Randomizes uploaded file names.
+
 - [AppendGifAsUrl](https://github.com/zt64/aliucord-plugins/raw/builds/AppendGifAsUrl.zip )
 Makes selecting a GIF add as a URL to the message, instead of sending and clearing your message.
 

@@ -2,7 +2,7 @@
 discord = "aliucord-SNAPSHOT"
 aliucord = "main-SNAPSHOT"
 #noinspection GradleDependency
-kotlin = "1.5.21"
+kotlin = "2.0.20"
 android = "7.4.2"
 ktlintPlugin = "12.1.1"
 #noinspection GradleDependency Newer versions incompatible with other plugins

@@ -29,6 +29,7 @@ subprojects {
             shaders = false
             buildConfig = true
             resValues = false
+            androidResources = false
             aidl = false
         }
 

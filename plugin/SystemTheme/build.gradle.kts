@@ -1,4 +1,2 @@
 version = "1.0.0"
-description = ""
-
-aliucord.excludeFromUpdaterJson.set(true)
+description = "Sync your Discord theme with your system theme"

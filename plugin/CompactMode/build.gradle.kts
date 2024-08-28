@@ -3,6 +3,9 @@ description = "Modifies chat to have a more compact appearance, with several opt
 
 aliucord.changelog.set(
     """
+    # 1.3.4 
+    * Added a setting to disable jumbo emojis
+    
     # 1.3.3
     * Fixed not working on some devices (Cynosphere)
     

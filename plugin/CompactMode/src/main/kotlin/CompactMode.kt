@@ -15,9 +15,11 @@ import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
+import com.aliucord.patcher.instead
 import com.aliucord.settings.delegate
 import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.utils.lazyField
+import com.discord.utilities.textprocessing.node.EmojiNode
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemAttachment
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemBotComponentRow
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemEmbed
@@ -35,7 +37,7 @@ import com.discord.widgets.chat.list.adapter.WidgetChatListItem
 import com.discord.widgets.chat.list.entries.ChatListEntry
 import compactmode.PluginSettings
 
-@AliucordPlugin
+@AliucordPlugin(requiresRestart = true)
 class CompactMode : Plugin() {
     private val itemAvatarField by lazyField<WidgetChatListAdapterItemMessage>("itemAvatar")
 
@@ -50,6 +52,7 @@ class CompactMode : Plugin() {
     private val SettingsAPI.messagePadding by settings.delegate(10)
     private val SettingsAPI.hideReplyIcon by settings.delegate(true)
     private val SettingsAPI.hideAvatar by settings.delegate(false)
+    private val SettingsAPI.compactEmojis by settings.delegate(false)
 
     init {
         settingsTab = SettingsTab(
@@ -98,13 +101,9 @@ class CompactMode : Plugin() {
                 is WidgetChatListAdapterItemGift,
                 is WidgetChatListAdapterItemGameInvite,
                 is WidgetChatListAdapterItemSpotifyListenTogether -> itemView
-
                 is WidgetChatListAdapterItemBotComponentRow -> itemView.findViewById(componentRowId)
-
                 is WidgetChatListAdapterItemReactions -> itemView.findViewById(reactionsFlexBoxId)
-
                 is WidgetChatListAdapterItemEmbed -> itemView.findViewById(embedContainerCardId)
-
                 else -> null
             }?.layoutParams<MarginLayoutParams>()
 
@@ -175,7 +174,6 @@ class CompactMode : Plugin() {
 
                     constraintSet.applyTo(constraintLayout)
                 }
-
                 // Failed message
                 failedMessageRootId -> {
                     val root = itemView as RelativeLayout
@@ -224,13 +222,17 @@ class CompactMode : Plugin() {
                         }
                     }
                 }
-
                 // Minimal message
                 else -> {
                     messageTextView.layoutParams<MarginLayoutParams>().marginStart =
                         contentMargin
                 }
             }
+        }
+
+        if (settings.compactEmojis) {
+            // Do nothing
+            patcher.instead<EmojiNode<*>>("setJumbo", Boolean::class.java) { }
         }
     }
 

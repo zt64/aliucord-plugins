@@ -80,12 +80,17 @@ class PluginSettings(val settings: SettingsAPI) : BottomSheet() {
             }
         )
 
-        addCheckedSetting("Hide Avatar", "Whether the avatar should be hidden", "hideAvatar", false)
+        addCheckedSetting("Hide Avatar", "Whether the avatar should be hidden", "hideAvatar")
         addCheckedSetting(
             "Hide Reply Icon",
             "Whether the reply icon should be hidden",
             "hideReplyIcon",
             true
+        )
+        addCheckedSetting(
+            "Compact emojis",
+            "Whether emojis should be compacted",
+            "compactEmojis"
         )
 
         addView(

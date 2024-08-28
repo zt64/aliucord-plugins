@@ -11,6 +11,7 @@ ij_any_line_comment_at_first_column = false
 ij_any_line_comment_add_space = true
 ij_smart_tabs = false
 ij_wrap_on_typing = false
+ij_kotlin_line_break_after_multiline_when_entry = false
 
 [plugin/Frecents/src/main/java/*.java]
 ij_formatter_enabled = false

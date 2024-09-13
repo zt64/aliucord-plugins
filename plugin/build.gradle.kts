@@ -37,6 +37,10 @@ subprojects {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
         }
+
+        lint {
+            disable += "SetTextI18n"
+        }
     }
 
     configure<AliucordExtension> {

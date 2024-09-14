@@ -1,0 +1,7 @@
+* text=auto
+* eol=lf
+*.png binary
+*.jar binary
+gradlew.bat eol=crlf
+
+plugin/Frecents/src/main/java/com/google/protobuf/* linguist-vendored

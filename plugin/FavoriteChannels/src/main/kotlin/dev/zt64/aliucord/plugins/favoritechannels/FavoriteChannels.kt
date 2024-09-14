@@ -17,6 +17,7 @@ import com.aliucord.patcher.component3
 import com.aliucord.wrappers.ChannelWrapper.Companion.guildId
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
+import com.aliucord.wrappers.ChannelWrapper.Companion.parentId
 import com.discord.api.channel.Channel
 import com.discord.databinding.WidgetChannelsListItemActionsBinding
 import com.discord.utilities.color.ColorCompat
@@ -25,6 +26,7 @@ import com.discord.widgets.channels.list.WidgetChannelsList
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions
 import com.discord.widgets.channels.list.items.ChannelListItemTextChannel
+import com.discord.widgets.channels.list.items.ChannelListItemThread
 import com.google.gson.reflect.TypeToken
 import com.lytefast.flexinput.R
 import dev.zt64.aliucord.plugins.favoritechannels.items.ChannelListItemDivider
@@ -151,11 +153,19 @@ class FavoriteChannels : Plugin() {
 
             if (favoriteChannels.isNullOrEmpty()) return@before
 
-            val channelItems = model.items.filterIsInstance<ChannelListItemTextChannel>()
+            val channelItems = model.items.filter { item ->
+                item is ChannelListItemTextChannel || item is ChannelListItemThread
+            }
             val items = buildList(channelItems.size) {
                 add(ChannelListItemFavoriteCategory)
 
-                val channels = channelItems.filter { (channel) -> channel.id in favoriteChannels }
+                val channels = channelItems.filter {
+                    if (it is ChannelListItemTextChannel) {
+                        it.channel.id
+                    } else {
+                        (it as ChannelListItemThread).channel.parentId
+                    } in favoriteChannels
+                }
 
                 model.items.removeAll(channels)
 

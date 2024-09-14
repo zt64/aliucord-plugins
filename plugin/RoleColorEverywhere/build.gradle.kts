@@ -3,6 +3,9 @@ description = "Displays the highest role color in more places like mentions and 
 
 aliucord.changelog.set(
     """
+    # 1.11.3
+    * Fixed typo that was causing errors to occur
+        
     # 1.11.2
     * Fixed colored messages
     

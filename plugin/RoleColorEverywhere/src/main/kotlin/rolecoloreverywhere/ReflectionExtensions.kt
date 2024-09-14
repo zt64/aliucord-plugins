@@ -44,7 +44,7 @@ private val reactionListBinding = ManageReactionsResultsAdapter.ReactionUserView
     .getDeclaredField("binding")
     .apply { isAccessible = true }
 private val mDraweeStringBuilderField = SimpleDraweeSpanTextView::class.java
-    .getDeclaredField("binding")
+    .getDeclaredField("mDraweeStringBuilder")
     .apply { isAccessible = true }
 
 val WidgetChatOverlay.TypingIndicatorViewHolder.binding

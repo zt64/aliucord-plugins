@@ -2,6 +2,7 @@
 
 package rolecoloreverywhere
 
+import RoleColorEverywhere
 import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -14,6 +15,7 @@ import androidx.core.graphics.ColorUtils
 import com.aliucord.Utils
 import com.aliucord.api.PatcherAPI
 import com.aliucord.patcher.after
+import com.discord.restapi.RestAPIParams.Role
 import com.discord.stores.StoreStream
 import com.discord.utilities.color.ColorCompat
 import com.discord.utilities.mg_recycler.MGRecyclerDataPayload
@@ -66,7 +68,7 @@ fun PatcherAPI.patchMentions() {
                 val guild = guildStore.getGuild(StoreStream.getGuildSelected().selectedGuildId)
                 val member = guildStore.getMember(guild.id, userMentionNode.userId) ?: return
 
-                val foregroundColor = if (member.color == Color.BLACK) Color.WHITE else member.color
+                val foregroundColor = if (member.color == Color.BLACK) Color.WHITE else RoleColorEverywhere.hookColor(member.color)
                 val backgroundColor = ColorUtils.setAlphaComponent(
                     ColorUtils.blendARGB(foregroundColor, Color.BLACK, 0.65f),
                     70
@@ -98,7 +100,7 @@ fun PatcherAPI.patchMentions() {
             if (v !is UserAutocompletable) return@after
 
             val color = v.guildMember?.color ?: return@after
-            if (color != Color.BLACK) res.spans[k] = listOf(FontColorSpan(color), StyleSpan(1))
+            if (color != Color.BLACK) res.spans[k] = listOf(FontColorSpan(RoleColorEverywhere.hookColor(color)), StyleSpan(1))
         }
     }
 }
@@ -122,7 +124,7 @@ fun PatcherAPI.patchVoiceChannels() {
             if (color == Color.BLACK) {
                 ColorCompat.getThemedColor(ctx, R.b.colorChannelDefault)
             } else {
-                color
+                RoleColorEverywhere.hookColor(color)
             }
         )
     }
@@ -137,7 +139,9 @@ fun PatcherAPI.patchVoiceChannels() {
 
         if (color != Color.BLACK) {
             binding.root.findViewById<TextView>(voiceUserListId).setTextColor(
-                color
+                RoleColorEverywhere.hookColor(
+                    color
+                )
             )
         }
     }
@@ -148,7 +152,9 @@ fun PatcherAPI.patchVoiceChannels() {
 
         if (color != Color.BLACK) {
             binding.root.findViewById<TextView>(stageAudienceNameId).setTextColor(
-                color
+                RoleColorEverywhere.hookColor(
+                    color
+                )
             )
         }
     }
@@ -159,7 +165,9 @@ fun PatcherAPI.patchVoiceChannels() {
 
         if (color != Color.BLACK) {
             binding.root.findViewById<TextView>(stageSpeakerNameId).setTextColor(
-                color
+                RoleColorEverywhere.hookColor(
+                    color
+                )
             )
         }
     }
@@ -174,7 +182,9 @@ fun PatcherAPI.patchMentionsList() {
 
         if (color != Color.BLACK) {
             binding.root.findViewById<TextView>(mentionNameId).setTextColor(
-                color
+                RoleColorEverywhere.hookColor(
+                    color
+                )
             )
         }
     }
@@ -205,7 +215,9 @@ fun PatcherAPI.patchProfileName(profileTag: Boolean) {
             }
 
             j.setSpan(
-                ForegroundColorSpan(guildMember.color),
+                ForegroundColorSpan(
+                    RoleColorEverywhere.hookColor(guildMember.color)
+                ),
                 0,
                 end,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -229,7 +241,7 @@ fun PatcherAPI.patchMessages() {
 
         val stringBuilder = textView.mDraweeStringBuilder?.apply {
             setSpan(
-                ForegroundColorSpan(member.color),
+                ForegroundColorSpan(RoleColorEverywhere.hookColor(member.color)),
                 0,
                 length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -256,7 +268,7 @@ fun PatcherAPI.patchMemberStatuses() {
             val textView = binding.root.findViewById<SimpleDraweeSpanTextView>(statusGameId)
 
             textView.mDraweeStringBuilder?.apply {
-                setSpan(ForegroundColorSpan(color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(ForegroundColorSpan(RoleColorEverywhere.hookColor(color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 textView.setDraweeSpanStringBuilder(this)
             }
         }
@@ -280,7 +292,7 @@ fun PatcherAPI.patchMemberStatuses() {
 
             textView.mDraweeStringBuilder?.apply {
                 setSpan(
-                    ForegroundColorSpan(guildMember.color),
+                    ForegroundColorSpan(RoleColorEverywhere.hookColor(guildMember.color)),
                     0,
                     length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -307,7 +319,7 @@ fun PatcherAPI.patchReactionsList() {
         if (guildMember.color != Color.BLACK) {
             binding.root
                 .findViewById<TextView>(reactionUsersTextViewId)
-                .setTextColor(guildMember.color)
+                .setTextColor(RoleColorEverywhere.hookColor(guildMember.color))
         }
     }
 }

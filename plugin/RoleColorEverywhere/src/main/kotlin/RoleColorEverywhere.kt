@@ -81,7 +81,7 @@ class RoleColorEverywhere : Plugin() {
                             val start =
                                 text.indexOf(username).takeUnless { it == -1 } ?: return@forEach
                             setSpan(
-                                ForegroundColorSpan(color),
+                                ForegroundColorSpan(hookColor(color)),
                                 start,
                                 start + username.length,
                                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -110,5 +110,15 @@ class RoleColorEverywhere : Plugin() {
     override fun stop(context: Context) {
         patcher.unpatchAll()
         typingUsers.clear()
+    }
+
+    companion object {
+        /**
+         * This function allows other plugins to hook the rendered color, for example RoleColorContrast adding contrast
+         */
+        @JvmStatic
+        fun hookColor(original: Int): Int {
+            return original
+        }
     }
 }

@@ -13,7 +13,7 @@ object ChannelListItemDivider : ChannelListItem {
 
 class ItemDivider(adapter: WidgetChannelsListAdapter) :
     WidgetChannelsListAdapter.Item(Utils.getResId("widget_channels_list_item_stage_events_separator", "layout"), adapter) {
-    init {
-        itemView.layoutParams.height = 2.dp
+        init {
+            itemView.layoutParams.height = 2.dp
+        }
     }
-}

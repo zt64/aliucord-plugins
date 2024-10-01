@@ -1,3 +1,5 @@
+@file:Suppress("MISSING_DEPENDENCY_CLASS")
+
 package dev.zt64.aliucord.plugins.favoritechannels
 
 import android.content.Context
@@ -7,11 +9,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.after
-import com.aliucord.patcher.before
-import com.aliucord.patcher.component1
-import com.aliucord.patcher.component2
-import com.aliucord.patcher.component3
+import com.aliucord.patcher.*
+import com.aliucord.wrappers.ChannelWrapper.Companion.guildId
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
 import com.aliucord.wrappers.ChannelWrapper.Companion.parentId
@@ -20,17 +19,11 @@ import com.discord.restapi.RestAPIParams
 import com.discord.stores.StoreStream
 import com.discord.stores.StoreUserGuildSettings
 import com.discord.utilities.color.ColorCompat
-import com.discord.widgets.channels.list.WidgetChannelListModel
-import com.discord.widgets.channels.list.WidgetChannelsList
-import com.discord.widgets.channels.list.WidgetChannelsListAdapter
-import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions
+import com.discord.widgets.channels.list.*
 import com.discord.widgets.channels.list.items.ChannelListItemTextChannel
 import com.discord.widgets.channels.list.items.ChannelListItemThread
 import com.lytefast.flexinput.R
-import dev.zt64.aliucord.plugins.favoritechannels.items.ChannelListItemDivider
-import dev.zt64.aliucord.plugins.favoritechannels.items.ChannelListItemFavoriteCategory
-import dev.zt64.aliucord.plugins.favoritechannels.items.ItemDivider
-import dev.zt64.aliucord.plugins.favoritechannels.items.ItemFavoriteCategory
+import dev.zt64.aliucord.plugins.favoritechannels.items.*
 
 private const val FLAG_FAVORITE = 1 shl 11
 
@@ -48,6 +41,7 @@ class FavoriteChannels : Plugin() {
             .getDeclaredMethod("getBinding")
             .apply { isAccessible = true }
 
+        // Add favorite/unfavorite button to the channel item context menu
         patcher.after<WidgetChannelsListItemChannelActions>(
             "configureUI",
             WidgetChannelsListItemChannelActions.Model::class.java
@@ -56,8 +50,7 @@ class FavoriteChannels : Plugin() {
             if (model.channel.isDM()) return@after
 
             val flags = userGuildSettings.guildSettings[model.guild.id]
-                ?.channelOverrides
-                ?.find { it.channelId == model.channel.id }
+                ?.getChannelOverride(model.channel.id)
                 ?.flags ?: 0
 
             val root = (getBindingMethod(this) as WidgetChannelsListItemActionsBinding).root as ViewGroup
@@ -70,7 +63,7 @@ class FavoriteChannels : Plugin() {
                     0,
                     R.i.UiKit_Settings_Item_Icon
                 ).apply {
-                    if (flags and (1 shl 11) != 0) {
+                    if (flags and FLAG_FAVORITE != 0) {
                         text = "Remove from favorites"
                         setOnClickListener {
                             dismiss()
@@ -172,6 +165,31 @@ class FavoriteChannels : Plugin() {
                 ChannelListItemFavoriteCategory.type -> ItemFavoriteCategory(this)
                 ChannelListItemDivider.type -> ItemDivider(this)
                 else -> return@before
+            }
+        }
+
+        // This unholy patch makes it so that collapsed categories do not remove channels if they are favorited
+        @Suppress("CAST_NEVER_SUCCEEDS")
+        patcher.instead<`WidgetChannelListModel$Companion$guildListBuilder$$inlined$forEach$lambda$1$2`>("invoke") {
+            with((`this$0` as `WidgetChannelListModel$Companion$guildListBuilder$$inlined$forEach$lambda$1`)) {
+                val noMentions = `$mentionCount` <= 0
+                val isCollapsed = `$textChannel`.parentId in `$collapsedCategories$inlined`
+                val isChannelOrChildFavorited = userGuildSettings.guildSettings[`$textChannel`.guildId]
+                    ?.getChannelOverride(`$textChannelId`)
+                    ?.let { it.flags and FLAG_FAVORITE != 0 } ?: false
+                val isChannelOrChildSelected = `$channelSelected` ||
+                    (`$areAnyChildThreadsSelected$5$inlined` as `WidgetChannelListModel$Companion$guildListBuilder$5`)
+                        .invoke(`$textChannel`.id)
+                val areAllChildThreadsRead = (`$areAllChildThreadsRead$4$inlined` as `WidgetChannelListModel$Companion$guildListBuilder$4`)
+                    .invoke(`$textChannel`.id)
+                val shouldHideChannel = (isCollapsed && noMentions && (`$isCategoryMuted` || `$isMuted` || !`$unread`)) ||
+                    (`$isMuted` && `$guild$inlined`.hideMutedChannels)
+                val shouldBeHidden =
+                    !(isChannelOrChildFavorited || isChannelOrChildSelected || !areAllChildThreadsRead || !shouldHideChannel)
+
+                if (shouldBeHidden) `$hiddenChannelsIds$inlined`.add(`$textChannelId`)
+
+                shouldBeHidden
             }
         }
     }

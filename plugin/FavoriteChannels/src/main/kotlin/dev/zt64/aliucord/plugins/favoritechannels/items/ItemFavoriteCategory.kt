@@ -15,25 +15,25 @@ object ChannelListItemFavoriteCategory : ChannelListItem {
 
 class ItemFavoriteCategory(adapter: WidgetChannelsListAdapter) :
     WidgetChannelsListAdapter.Item(Utils.getResId("widget_channels_list_item_category", "layout"), adapter) {
-    private val nameView = itemView.findViewById<TextView>(
-        Utils.getResId("channels_item_category_name", "id")
-    )
+        private val nameView = itemView.findViewById<TextView>(
+            Utils.getResId("channels_item_category_name", "id")
+        )
 
-    init {
-        itemView
-            .findViewById<ImageView>(Utils.getResId("channels_item_category_add", "id"))
-            .visibility = View.GONE
+        init {
+            itemView
+                .findViewById<ImageView>(Utils.getResId("channels_item_category_add", "id"))
+                .visibility = View.GONE
 
-        itemView
-            .findViewById<ImageView>(Utils.getResId("channels_item_category_arrow", "id"))
-            .visibility = View.INVISIBLE
+            itemView
+                .findViewById<ImageView>(Utils.getResId("channels_item_category_arrow", "id"))
+                .visibility = View.INVISIBLE
 
-        nameView.text = "Favorites"
+            nameView.text = "Favorites"
+        }
+
+        override fun onConfigure(i: Int, channelListItem: ChannelListItem) {
+            super.onConfigure(i, channelListItem)
+
+            channelListItem as ChannelListItemFavoriteCategory
+        }
     }
-
-    override fun onConfigure(i: Int, channelListItem: ChannelListItem) {
-        super.onConfigure(i, channelListItem)
-
-        channelListItem as ChannelListItemFavoriteCategory
-    }
-}

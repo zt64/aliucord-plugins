@@ -1,8 +1,11 @@
-version = "1.3.4"
+version = "1.4.0"
 description = "Modifies chat to have a more compact appearance, with several options to change"
 
 aliucord.changelog.set(
     """
+    # 1.4.0
+    * Support guild scheduled invite messages
+        
     # 1.3.4 
     * Added a setting to disable jumbo emojis
     

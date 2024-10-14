@@ -3,10 +3,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Guideline
@@ -20,20 +17,7 @@ import com.aliucord.settings.delegate
 import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.utils.lazyField
 import com.discord.utilities.textprocessing.node.EmojiNode
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemAttachment
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemBotComponentRow
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemEmbed
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemEphemeralMessage
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemGameInvite
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemGift
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemInvite
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemReactions
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemSpotifyListenTogether
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemStageInvite
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemSticker
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemUploadProgress
-import com.discord.widgets.chat.list.adapter.WidgetChatListItem
+import com.discord.widgets.chat.list.adapter.*
 import com.discord.widgets.chat.list.entries.ChatListEntry
 import compactmode.PluginSettings
 
@@ -55,13 +39,9 @@ class CompactMode : Plugin() {
     private val SettingsAPI.compactEmojis by settings.delegate(false)
 
     init {
-        settingsTab = SettingsTab(
-            PluginSettings::class.java,
-            SettingsTab.Type.BOTTOM_SHEET
-        ).withArgs(settings)
+        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
     }
 
-    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val reactionsFlexBoxId = getResId("chat_list_item_reactions", "id")
         val headerLayoutId = getResId("chat_list_adapter_item_text_header", "id")
@@ -100,6 +80,7 @@ class CompactMode : Plugin() {
                 is WidgetChatListAdapterItemUploadProgress,
                 is WidgetChatListAdapterItemGift,
                 is WidgetChatListAdapterItemGameInvite,
+                is WidgetChatListAdapterItemGuildScheduledEventInvite,
                 is WidgetChatListAdapterItemSpotifyListenTogether -> itemView
                 is WidgetChatListAdapterItemBotComponentRow -> itemView.findViewById(componentRowId)
                 is WidgetChatListAdapterItemReactions -> itemView.findViewById(reactionsFlexBoxId)
@@ -136,8 +117,7 @@ class CompactMode : Plugin() {
                     if (settings.hideAvatar) {
                         avatarView!!.visibility = View.GONE
 
-                        headerView.layoutParams<ConstraintLayout.LayoutParams>().marginStart =
-                            contentMargin
+                        headerView.layoutParams<ConstraintLayout.LayoutParams>().marginStart = contentMargin
 
                         return@after
                     }
@@ -224,8 +204,7 @@ class CompactMode : Plugin() {
                 }
                 // Minimal message
                 else -> {
-                    messageTextView.layoutParams<MarginLayoutParams>().marginStart =
-                        contentMargin
+                    messageTextView.layoutParams<MarginLayoutParams>().marginStart = contentMargin
                 }
             }
         }

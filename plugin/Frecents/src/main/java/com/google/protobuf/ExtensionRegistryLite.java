@@ -1,32 +1,9 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
 //
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are
-// met:
-//
-//     * Redistributions of source code must retain the above copyright
-// notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above
-// copyright notice, this list of conditions and the following disclaimer
-// in the documentation and/or other materials provided with the
-// distribution.
-//     * Neither the name of Google Inc. nor the names of its
-// contributors may be used to endorse or promote products derived from
-// this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file or at
+// https://developers.google.com/open-source/licenses/bsd
 
 package com.google.protobuf;
 
@@ -69,169 +46,164 @@ import java.util.Map;
  */
 public class ExtensionRegistryLite {
 
-    // Visible for testing.
-    static final String EXTENSION_CLASS_NAME = "com.google.protobuf.Extension";
-    static final ExtensionRegistryLite EMPTY_REGISTRY_LITE = new ExtensionRegistryLite(true);
-    // short circuit the ExtensionRegistryFactory via assumevalues trickery
-    @SuppressWarnings("JavaOptionalSuggestions")
-    private static final boolean doFullRuntimeInheritanceCheck = true;
-    // Set true to enable lazy parsing feature for MessageSet.
-    //
-    // TODO(xiangl): Now we use a global flag to control whether enable lazy
-    // parsing feature for MessageSet, which may be too crude for some
-    // applications. Need to support this feature on smaller granularity.
-    private static volatile boolean eagerlyParseMessageSets = false;
-    private static volatile ExtensionRegistryLite emptyRegistry;
-    private final Map<ObjectIntPair, GeneratedMessageLite.GeneratedExtension<?, ?>>
-            extensionsByNumber;
+  // Set true to enable lazy parsing feature for MessageSet.
+  //
+  // TODO: Now we use a global flag to control whether enable lazy
+  // parsing feature for MessageSet, which may be too crude for some
+  // applications. Need to support this feature on smaller granularity.
+  private static volatile boolean eagerlyParseMessageSets = false;
 
-    ExtensionRegistryLite() {
-        this.extensionsByNumber =
-                new HashMap<ObjectIntPair, GeneratedMessageLite.GeneratedExtension<?, ?>>();
+  // Visible for testing.
+  static final String EXTENSION_CLASS_NAME = "com.google.protobuf.Extension";
+
+  private static class ExtensionClassHolder {
+    static final Class<?> INSTANCE = resolveExtensionClass();
+
+    static Class<?> resolveExtensionClass() {
+      try {
+        return Class.forName(EXTENSION_CLASS_NAME);
+      } catch (ClassNotFoundException e) {
+        // See comment in ExtensionRegistryFactory on the potential expense of this.
+        return null;
+      }
     }
+  }
 
-    ExtensionRegistryLite(ExtensionRegistryLite other) {
-        if (other == EMPTY_REGISTRY_LITE) {
-            this.extensionsByNumber = Collections.emptyMap();
-        } else {
-            this.extensionsByNumber = Collections.unmodifiableMap(other.extensionsByNumber);
-        }
+  public static boolean isEagerlyParseMessageSets() {
+    return eagerlyParseMessageSets;
+  }
+
+  public static void setEagerlyParseMessageSets(boolean isEagerlyParse) {
+    eagerlyParseMessageSets = isEagerlyParse;
+  }
+
+  /**
+   * Construct a new, empty instance.
+   *
+   * <p>This may be an {@code ExtensionRegistry} if the full (non-Lite) proto libraries are
+   * available.
+   */
+  public static ExtensionRegistryLite newInstance() {
+    return Protobuf.assumeLiteRuntime
+        ? new ExtensionRegistryLite()
+        : ExtensionRegistryFactory.create();
+  }
+
+  private static volatile ExtensionRegistryLite emptyRegistry;
+
+  /**
+   * Get the unmodifiable singleton empty instance of either ExtensionRegistryLite or {@code
+   * ExtensionRegistry} (if the full (non-Lite) proto libraries are available).
+   */
+  public static ExtensionRegistryLite getEmptyRegistry() {
+    if (Protobuf.assumeLiteRuntime) {
+      return EMPTY_REGISTRY_LITE;
     }
-
-    ExtensionRegistryLite(boolean empty) {
-        this.extensionsByNumber = Collections.emptyMap();
-    }
-
-    public static boolean isEagerlyParseMessageSets() {
-        return eagerlyParseMessageSets;
-    }
-
-    public static void setEagerlyParseMessageSets(boolean isEagerlyParse) {
-        eagerlyParseMessageSets = isEagerlyParse;
-    }
-
-    /**
-     * Construct a new, empty instance.
-     *
-     * <p>This may be an {@code ExtensionRegistry} if the full (non-Lite) proto libraries are
-     * available.
-     */
-    public static ExtensionRegistryLite newInstance() {
-        return doFullRuntimeInheritanceCheck
-                ? ExtensionRegistryFactory.create()
-                : new ExtensionRegistryLite();
-    }
-
-    /**
-     * Get the unmodifiable singleton empty instance of either ExtensionRegistryLite or {@code
-     * ExtensionRegistry} (if the full (non-Lite) proto libraries are available).
-     */
-    public static ExtensionRegistryLite getEmptyRegistry() {
-        if (!doFullRuntimeInheritanceCheck) {
-            return EMPTY_REGISTRY_LITE;
-        }
-        ExtensionRegistryLite result = emptyRegistry;
+    ExtensionRegistryLite result = emptyRegistry;
+    if (result == null) {
+      synchronized (ExtensionRegistryLite.class) {
+        result = emptyRegistry;
         if (result == null) {
-            synchronized (ExtensionRegistryLite.class) {
-                result = emptyRegistry;
-                if (result == null) {
-                    result = emptyRegistry = ExtensionRegistryFactory.createEmpty();
-                }
-            }
+          result = emptyRegistry = ExtensionRegistryFactory.createEmpty();
         }
-        return result;
+      }
+    }
+    return result;
+  }
+
+  /** Returns an unmodifiable view of the registry. */
+  public ExtensionRegistryLite getUnmodifiable() {
+    return new ExtensionRegistryLite(this);
+  }
+
+  /**
+   * Find an extension by containing type and field number.
+   *
+   * @return Information about the extension if found, or {@code null} otherwise.
+   */
+  @SuppressWarnings("unchecked")
+  public <ContainingType extends MessageLite>
+      GeneratedMessageLite.GeneratedExtension<ContainingType, ?> findLiteExtensionByNumber(
+          final ContainingType containingTypeDefaultInstance, final int fieldNumber) {
+    return (GeneratedMessageLite.GeneratedExtension<ContainingType, ?>)
+        extensionsByNumber.get(new ObjectIntPair(containingTypeDefaultInstance, fieldNumber));
+  }
+
+  /** Add an extension from a lite generated file to the registry. */
+  public final void add(final GeneratedMessageLite.GeneratedExtension<?, ?> extension) {
+    extensionsByNumber.put(
+        new ObjectIntPair(extension.getContainingTypeDefaultInstance(), extension.getNumber()),
+        extension);
+  }
+
+  /**
+   * Add an extension from a lite generated file to the registry only if it is a non-lite extension
+   * i.e. {@link GeneratedMessageLite.GeneratedExtension}.
+   */
+  public final void add(ExtensionLite<?, ?> extension) {
+    if (GeneratedMessageLite.GeneratedExtension.class.isAssignableFrom(extension.getClass())) {
+      add((GeneratedMessageLite.GeneratedExtension<?, ?>) extension);
+    }
+    if (!Protobuf.assumeLiteRuntime && ExtensionRegistryFactory.isFullRegistry(this)) {
+      try {
+        this.getClass().getMethod("add", ExtensionClassHolder.INSTANCE).invoke(this, extension);
+      } catch (Exception e) {
+        throw new IllegalArgumentException(
+            String.format("Could not invoke ExtensionRegistry#add for %s", extension), e);
+      }
+    }
+  }
+
+  // =================================================================
+  // Private stuff.
+
+  // Constructors are package-private so that ExtensionRegistry can subclass
+  // this.
+
+  ExtensionRegistryLite() {
+    this.extensionsByNumber =
+        new HashMap<ObjectIntPair, GeneratedMessageLite.GeneratedExtension<?, ?>>();
+  }
+
+  static final ExtensionRegistryLite EMPTY_REGISTRY_LITE = new ExtensionRegistryLite(true);
+
+  ExtensionRegistryLite(ExtensionRegistryLite other) {
+    if (other == EMPTY_REGISTRY_LITE) {
+      this.extensionsByNumber = Collections.emptyMap();
+    } else {
+      this.extensionsByNumber = Collections.unmodifiableMap(other.extensionsByNumber);
+    }
+  }
+
+  private final Map<ObjectIntPair, GeneratedMessageLite.GeneratedExtension<?, ?>>
+      extensionsByNumber;
+
+  ExtensionRegistryLite(boolean empty) {
+    this.extensionsByNumber = Collections.emptyMap();
+  }
+
+  /** A (Object, int) pair, used as a map key. */
+  private static final class ObjectIntPair {
+    private final Object object;
+    private final int number;
+
+    ObjectIntPair(final Object object, final int number) {
+      this.object = object;
+      this.number = number;
     }
 
-    // =================================================================
-    // Private stuff.
-
-    // Constructors are package-private so that ExtensionRegistry can subclass
-    // this.
-
-    /**
-     * Returns an unmodifiable view of the registry.
-     */
-    public ExtensionRegistryLite getUnmodifiable() {
-        return new ExtensionRegistryLite(this);
+    @Override
+    public int hashCode() {
+      return System.identityHashCode(object) * ((1 << 16) - 1) + number;
     }
 
-    /**
-     * Find an extension by containing type and field number.
-     *
-     * @return Information about the extension if found, or {@code null} otherwise.
-     */
-    @SuppressWarnings("unchecked")
-    public <ContainingType extends MessageLite>
-    GeneratedMessageLite.GeneratedExtension<ContainingType, ?> findLiteExtensionByNumber(
-            final ContainingType containingTypeDefaultInstance, final int fieldNumber) {
-        return (GeneratedMessageLite.GeneratedExtension<ContainingType, ?>)
-                extensionsByNumber.get(new ObjectIntPair(containingTypeDefaultInstance, fieldNumber));
+    @Override
+    public boolean equals(final Object obj) {
+      if (!(obj instanceof ObjectIntPair)) {
+        return false;
+      }
+      final ObjectIntPair other = (ObjectIntPair) obj;
+      return object == other.object && number == other.number;
     }
-
-    /**
-     * Add an extension from a lite generated file to the registry.
-     */
-    public final void add(final GeneratedMessageLite.GeneratedExtension<?, ?> extension) {
-        extensionsByNumber.put(
-                new ObjectIntPair(extension.getContainingTypeDefaultInstance(), extension.getNumber()),
-                extension);
-    }
-
-    /**
-     * Add an extension from a lite generated file to the registry only if it is a non-lite extension
-     * i.e. {@link GeneratedMessageLite.GeneratedExtension}.
-     */
-    public final void add(ExtensionLite<?, ?> extension) {
-        if (GeneratedMessageLite.GeneratedExtension.class.isAssignableFrom(extension.getClass())) {
-            add((GeneratedMessageLite.GeneratedExtension<?, ?>) extension);
-        }
-        if (doFullRuntimeInheritanceCheck && ExtensionRegistryFactory.isFullRegistry(this)) {
-            try {
-                this.getClass().getMethod("add", ExtensionClassHolder.INSTANCE).invoke(this, extension);
-            } catch (Exception e) {
-                throw new IllegalArgumentException(
-                        String.format("Could not invoke ExtensionRegistry#add for %s", extension), e);
-            }
-        }
-    }
-
-    private static class ExtensionClassHolder {
-        static final Class<?> INSTANCE = resolveExtensionClass();
-
-        static Class<?> resolveExtensionClass() {
-            try {
-                return Class.forName(EXTENSION_CLASS_NAME);
-            } catch (ClassNotFoundException e) {
-                // See comment in ExtensionRegistryFactory on the potential expense of this.
-                return null;
-            }
-        }
-    }
-
-    /**
-     * A (Object, int) pair, used as a map key.
-     */
-    private static final class ObjectIntPair {
-        private final Object object;
-        private final int number;
-
-        ObjectIntPair(final Object object, final int number) {
-            this.object = object;
-            this.number = number;
-        }
-
-        @Override
-        public int hashCode() {
-            return System.identityHashCode(object) * ((1 << 16) - 1) + number;
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (!(obj instanceof ObjectIntPair)) {
-                return false;
-            }
-            final ObjectIntPair other = (ObjectIntPair) obj;
-            return object == other.object && number == other.number;
-        }
-    }
+  }
 }

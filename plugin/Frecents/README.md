@@ -9,4 +9,5 @@ protoc --java_out=lite:java proto/FrecencyUserSettings.proto
 Thank you Dolfies :blobcatcozy:
 [discord-protos/FrecencyUserSettings.proto](https://github.com/dolfies/discord-protos/blob/master/discord_protos/FrecencyUserSettings.proto)
 
-Using [protocolbuffers/protobuf v29.0-rc2/java](https://github.com/protocolbuffers/protobuf/tree/v29.0-rc2/java)
+Using [protocolbuffers/protobuf v4.28.3/java](https://github.com/protocolbuffers/protobuf/tree/v28.3/java)
+Download the kotlin-lite sources jar and extract into directories

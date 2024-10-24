@@ -1,6 +1,5 @@
 @file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 
-import FrecencyUserSettingsOuterClass.FrecencyUserSettings
 import android.content.Context
 import android.util.Base64
 import android.widget.*
@@ -29,6 +28,9 @@ import com.lytefast.flexinput.R
 import dev.zt64.aliucord.plugins.frecents.*
 import dev.zt64.aliucord.plugins.frecents.gif.GifCategoryItemFavorites
 import dev.zt64.aliucord.plugins.frecents.sticker.FavoritesItem
+import discord_protos.discord_users.v1.FrecencyUserSettingsKt
+import discord_protos.discord_users.v1.FrecencyUserSettingsOuterClass.FrecencyUserSettings
+import discord_protos.discord_users.v1.copy
 import rx.Observable
 import rx.subjects.BehaviorSubject
 import java.util.regex.Pattern
@@ -265,11 +267,12 @@ class Frecents : Plugin() {
             }
         }
 
+        // Add favorites section to the gif categories list
         patcher.before<WidgetGifPicker>(
             "handleViewState",
             GifPickerViewModel.ViewState::class.java
         ) { (param, viewState: GifPickerViewModel.ViewState) ->
-            if (frecencyUserSettings.favoriteStickers.stickerIdsCount != 0) {
+            if (frecencyUserSettings.favoriteGifs.gifsCount != 0) {
                 param.args[0] = GifPickerViewModel.ViewState(
                     listOf(GifCategoryItemFavorites(null)) + viewState.gifCategoryItems
                 )
@@ -283,16 +286,16 @@ class Frecents : Plugin() {
             Function1::class.java
         ) { (_, item: GifAdapterItem.GifItem) ->
             itemView.setOnLongClickListener {
-                val gif = item.gif
-
                 frecencyUserSettings = frecencyUserSettings.copy {
                     favoriteGifs = favoriteGifs.copy {
+                        val gif = item.gif
+
                         if (gif.tenorGifUrl in gifs) {
                             gifs.remove(gif.tenorGifUrl)
                             Utils.showToast("Removed GIF from favorites")
                         } else {
                             gifs[gif.tenorGifUrl] = FrecencyUserSettingsKt.favoriteGIF {
-                                format = FrecencyUserSettings.GIFType.IMAGE
+                                format = FrecencyUserSettings.GIFType.GIFTYPE_IMAGE
                                 width = gif.width
                                 height = gif.height
                                 src = gif.gifImageUrl

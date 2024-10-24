@@ -1,4 +1,4 @@
-package frecents
+package dev.zt64.aliucord.plugins.frecents
 
 import com.aliucord.Utils
 

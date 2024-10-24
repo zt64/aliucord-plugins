@@ -1,6 +1,6 @@
 @file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 
-package frecents
+package dev.zt64.aliucord.plugins.frecents
 
 import android.widget.ImageButton
 import com.discord.databinding.WidgetChatListAdapterItemAttachmentBinding
@@ -28,7 +28,12 @@ val WidgetChatListAdapterItemAttachment.binding: WidgetChatListAdapterItemAttach
     get() = WidgetChatListAdapterItemAttachment.`access$getBinding$p`(this)
 
 var WidgetChatListAdapterItemAttachmentBinding.starButton: ImageButton by Delegates.notNull()
-val WidgetStickerSheet.binding: WidgetStickerSheetBinding by property("binding")
+
+private val stickerSheetGetBindingMethod = WidgetStickerSheet::class.java
+    .getDeclaredMethod("getBinding")
+    .apply { isAccessible = true }
+val WidgetStickerSheet.binding: WidgetStickerSheetBinding
+    get() = stickerSheetGetBindingMethod(this) as WidgetStickerSheetBinding
 
 private inline fun <reified T : Any, V> property(name: String): ReadWriteProperty<T, V> {
     return object : ReadWriteProperty<T, V> {

@@ -1,4 +1,4 @@
-package frecents.sticker
+package dev.zt64.aliucord.plugins.frecents.sticker
 
 import com.discord.widgets.chat.input.sticker.HeaderType
 

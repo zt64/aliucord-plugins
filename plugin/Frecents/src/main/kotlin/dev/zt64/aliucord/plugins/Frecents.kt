@@ -51,7 +51,7 @@ private data class GatewayResponse(val settings: Settings, val partial: Boolean)
 
 private data class Patch(val settings: String)
 
-@AliucordPlugin
+@AliucordPlugin(requiresRestart = true)
 class Frecents : Plugin() {
     private val bindingField by lazyField<OwnedHeaderViewHolder>("binding")
     private val OwnedHeaderViewHolder.binding
@@ -132,7 +132,7 @@ class Frecents : Plugin() {
             patcher.instead<`StoreMediaFavorites$addFavorite$1`>("invoke") {
                 val favorite = `$favorite` as FavoriteEmoji
                 frecencyUserSettings.copy {
-                    favoriteEmojis.emojisList.add(favorite.emojiUniqueId)
+                    favoriteEmojis.emojisList += favorite.emojiUniqueId
                 }
 
                 `this$0`.markChanged()
@@ -272,11 +272,9 @@ class Frecents : Plugin() {
             "handleViewState",
             GifPickerViewModel.ViewState::class.java
         ) { (param, viewState: GifPickerViewModel.ViewState) ->
-            if (frecencyUserSettings.favoriteGifs.gifsCount != 0) {
-                param.args[0] = GifPickerViewModel.ViewState(
-                    listOf(GifCategoryItemFavorites(null)) + viewState.gifCategoryItems
-                )
-            }
+            param.args[0] = GifPickerViewModel.ViewState(
+                listOf(GifCategoryItemFavorites(null)) + viewState.gifCategoryItems
+            )
         }
 
         patcher.after<GifViewHolder.Gif>(
@@ -288,6 +286,7 @@ class Frecents : Plugin() {
             itemView.setOnLongClickListener {
                 frecencyUserSettings = frecencyUserSettings.copy {
                     favoriteGifs = favoriteGifs.copy {
+                        val gifs = gifs
                         val gif = item.gif
 
                         if (gif.tenorGifUrl in gifs) {
@@ -299,7 +298,7 @@ class Frecents : Plugin() {
                                 width = gif.width
                                 height = gif.height
                                 src = gif.gifImageUrl
-                                order = this@copy.gifs.values.maxOf { it.order } + 1
+                                order = if (gifs.isEmpty()) 1 else gifs.values.maxOf { it.order } + 1
                             }
 
                             Utils.showToast("Added GIF to favorites")
@@ -320,7 +319,10 @@ class Frecents : Plugin() {
         ) { (_, gifCategoryItem: GifCategoryItem?) ->
             if (gifCategoryItem !is GifCategoryItemFavorites) return@after
 
-            setPreviewImage(frecencyUserSettings.favoriteGifs.gifsMap.values.random().src)
+            if (frecencyUserSettings.favoriteGifs.gifsCount > 0) {
+                setPreviewImage(frecencyUserSettings.favoriteGifs.gifsMap.values.random().src)
+            }
+
             itemView
                 .findViewById<ImageView>(Id.gif_category_item_icon)
                 .setImageDrawable(starDrawable)
@@ -337,7 +339,7 @@ class Frecents : Plugin() {
                 is GifCategoryItem.Standard -> gifCategoryItem.gifCategory.categoryName
                 is GifCategoryItem.Trending -> resources.getString(Id.gif_picker_result_type_trending_gifs)
                 is GifCategoryItemFavorites -> "Favorites"
-                else -> throw NoWhenBranchMatchedException()
+                else -> error("Unknown gif category item. This should never happen.")
             }
 
             null
@@ -404,6 +406,9 @@ class Frecents : Plugin() {
         //     }
         // }
 
+        /**
+         * Patch to use the frecency user settings for the favorite gifs
+         */
         patcher.instead<GifCategoryViewModel.Companion>(
             "observeStoreState",
             GifCategoryItem::class.java,

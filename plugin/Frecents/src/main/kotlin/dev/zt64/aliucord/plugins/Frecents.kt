@@ -2,6 +2,7 @@
 
 import android.content.Context
 import android.util.Base64
+import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
 import com.aliucord.Http
@@ -323,9 +324,11 @@ class Frecents : Plugin() {
                 setPreviewImage(frecencyUserSettings.favoriteGifs.gifsMap.values.random().src)
             }
 
-            itemView
-                .findViewById<ImageView>(Id.gif_category_item_icon)
-                .setImageDrawable(starDrawable)
+            itemView.findViewById<ImageView>(Id.gif_category_item_icon).apply {
+                visibility = View.VISIBLE
+                setImageDrawable(starDrawable)
+            }
+
             itemView.findViewById<TextView>(Id.gif_category_item_title).text = "Favorites"
 
             gifCategoryItem.previewUrl?.let(::setPreviewImage)

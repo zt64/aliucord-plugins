@@ -5,12 +5,15 @@ plugins {
     id("com.google.protobuf") version "0.9.4"
 }
 
-version = "1.0.2"
+version = "1.0.3"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.excludeFromUpdaterJson.set(true)
 aliucord.changelog.set(
     """
+    # 1.0.3
+    - Fix favorites icon disappearing
+    
     # 1.0.2
     - Fix crash caused by having no favorites
     

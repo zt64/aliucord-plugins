@@ -76,30 +76,35 @@ subprojects {
     }
 }
 
-project.gradle.taskGraph.whenReady {
-    val readMe = rootProject.file("README.md")
-    val content = buildString {
-        appendLine("## Plugins for [Aliucord](https://github.com/Aliucord)")
-        appendLine()
-        appendLine(
-            "Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder"
-        )
-        appendLine()
+tasks.register("generateReadMe") {
+    group = "aliucord"
+    description = "Generates the README.md file with download links for all plugins"
 
-        subprojects
-            .filterNot {
-                it.extensions.getByType<AliucordExtension>().excludeFromUpdaterJson.get()
-            }.joinToString("\n") { subproject ->
-                buildString {
-                    with(subproject) {
-                        appendLine(
-                            "- [$name](https://github.com/zt64/aliucord-plugins/raw/builds/$name.zip )"
-                        )
-                        appendLine(description)
+    doLast {
+        val readMe = rootProject.file("README.md")
+        val content = buildString {
+            appendLine("## Plugins for [Aliucord](https://github.com/Aliucord)")
+            appendLine()
+            appendLine(
+                "Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder"
+            )
+            appendLine()
+
+            subprojects
+                .filterNot {
+                    it.extensions.getByType<AliucordExtension>().excludeFromUpdaterJson.get()
+                }.joinToString("\n") { subproject ->
+                    buildString {
+                        with(subproject) {
+                            appendLine(
+                                "- [$name](https://github.com/zt64/aliucord-plugins/raw/builds/$name.zip )"
+                            )
+                            appendLine(description)
+                        }
                     }
-                }
-            }.let(::append)
-    }
+                }.let(::append)
+        }
 
-    readMe.writeText(content)
+        readMe.writeText(content)
+    }
 }

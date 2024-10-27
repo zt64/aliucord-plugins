@@ -274,7 +274,7 @@ class Frecents : Plugin() {
             GifPickerViewModel.ViewState::class.java
         ) { (param, viewState: GifPickerViewModel.ViewState) ->
             param.args[0] = GifPickerViewModel.ViewState(
-                listOf(GifCategoryItemFavorites(null)) + viewState.gifCategoryItems
+                listOf(GifCategoryItemFavorites) + viewState.gifCategoryItems
             )
         }
 
@@ -321,7 +321,10 @@ class Frecents : Plugin() {
             if (gifCategoryItem !is GifCategoryItemFavorites) return@after
 
             if (frecencyUserSettings.favoriteGifs.gifsCount > 0) {
-                setPreviewImage(frecencyUserSettings.favoriteGifs.gifsMap.values.random().src)
+                setPreviewImage(mqGifUrl(frecencyUserSettings.favoriteGifs.gifsMap.values.random().src))
+            } else {
+                // Clear it out, so it doesn't show the last preview
+                setPreviewImage("")
             }
 
             itemView.findViewById<ImageView>(Id.gif_category_item_icon).apply {
@@ -331,7 +334,7 @@ class Frecents : Plugin() {
 
             itemView.findViewById<TextView>(Id.gif_category_item_title).text = "Favorites"
 
-            gifCategoryItem.previewUrl?.let(::setPreviewImage)
+            // gifCategoryItem.previewUrl?.let(::setPreviewImage)
         }
 
         patcher.instead<WidgetGifCategory>("setUpTitle") {
@@ -421,26 +424,12 @@ class Frecents : Plugin() {
                 is GifCategoryItem.Standard -> store.observeGifsForSearchQuery(item.gifCategory.categoryName)
                 is GifCategoryItem.Trending -> store.observeTrendingCategoryGifs()
                 is GifCategoryItemFavorites -> {
-                    val pattern = Pattern.compile("(https/.*?)$")
                     val favs = frecencyUserSettings.favoriteGifs
                         .gifsMap
                         .asSequence()
                         .sortedByDescending { it.value.order }
                         .map { (tenorUrl, v) ->
-                            val srcUrl = when {
-                                v.src.startsWith("//") -> "https:${v.src}"
-                                else -> {
-                                    val matcher = pattern.matcher(v.src)
-                                    if (matcher.find()) {
-                                        matcher.group(0)!!.replace("https/", "https://")
-                                    } else {
-                                        v.src
-                                    }
-                                }
-                            }.replace("AAAPo", "AAAAM")
-                                .replace(".mp4", ".gif")
-
-                            ModelGif(srcUrl, tenorUrl, v.width, v.height)
+                            ModelGif(mqGifUrl(v.src), tenorUrl, v.width, v.height)
                         }.toList()
 
                     ScalarSynchronousObservable(favs)
@@ -560,4 +549,21 @@ class LazyMutable<T>(val initializer: () -> T) : ReadWriteProperty<Any?, T> {
             prop = value
         }
     }
+}
+
+private val pattern = Pattern.compile("(https/.*?)$")
+
+private fun mqGifUrl(src: String): String {
+    return when {
+        src.startsWith("//") -> "https:$src"
+        else -> {
+            val matcher = pattern.matcher(src)
+            if (matcher.find()) {
+                matcher.group(0)!!.replace("https/", "https://")
+            } else {
+                src
+            }
+        }
+    }.replace("AAAPo", "AAAAM")
+        .replace(".mp4", ".gif")
 }

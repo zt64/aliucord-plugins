@@ -12,33 +12,26 @@ import com.lytefast.flexinput.R
 
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
-    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 
         val ctx = requireContext()
 
-        fun addCheckedSetting(
-            title: String,
-            subtext: String,
-            setting: String,
-            default: Boolean = true
-        ) {
+        fun addCheckedSetting(title: String, subtext: String, setting: String, default: Boolean = true) {
             addView(
-                Utils
-                    .createCheckedSetting(
-                        ctx,
-                        CheckedSetting.ViewType.SWITCH,
-                        title,
-                        subtext
-                    ).apply {
-                        isChecked = settings.getBool(setting, default)
-                        setOnCheckedListener {
-                            settings.setBool(setting, it)
-                            PluginManager.stopPlugin("RoleColorEverywhere")
-                            PluginManager.startPlugin("RoleColorEverywhere")
-                        }
+                Utils.createCheckedSetting(
+                    ctx,
+                    CheckedSetting.ViewType.SWITCH,
+                    title,
+                    subtext
+                ).apply {
+                    isChecked = settings.getBool(setting, default)
+                    setOnCheckedListener {
+                        settings.setBool(setting, it)
+                        PluginManager.stopPlugin("RoleColorEverywhere")
+                        PluginManager.startPlugin("RoleColorEverywhere")
                     }
+                }
             )
         }
 

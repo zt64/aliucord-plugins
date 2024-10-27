@@ -1,4 +1,3 @@
-
 import android.content.Context
 import android.util.TypedValue
 import android.view.Gravity
@@ -32,13 +31,9 @@ class CharCounter : Plugin() {
     private var SettingsAPI.threshold: Int by settings.delegate(0)
 
     init {
-        settingsTab =
-            SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(
-                settings
-            )
+        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
     }
 
-    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val textSizeDimenId = Utils.getResId("uikit_textsize_small", "dimen")
         val typingOverlayId = Utils.getResId("chat_overlay_typing", "id")
@@ -71,12 +66,9 @@ class CharCounter : Plugin() {
                 root.addView(this)
             }
 
-            (
-                root
-                    .findViewById<RelativeLayout>(
-                        typingOverlayId
-                    ).layoutParams as ConstraintLayout.LayoutParams
-            ).apply {
+            with(
+                root.findViewById<RelativeLayout>(typingOverlayId).layoutParams as ConstraintLayout.LayoutParams
+            ) {
                 startToStart = PARENT_ID
                 endToStart = counter!!.id
                 width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
@@ -89,9 +81,7 @@ class CharCounter : Plugin() {
             Boolean::class.javaObjectType
         ) {
             val chars = (it.args[0] as String).length
-            val maxChars = if (StoreStream.getUsers().me.premiumTier ==
-                PremiumTier.TIER_2
-            ) {
+            val maxChars = if (StoreStream.getUsers().me.premiumTier == PremiumTier.TIER_2) {
                 4000
             } else {
                 2000

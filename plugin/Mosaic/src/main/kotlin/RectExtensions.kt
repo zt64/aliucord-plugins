@@ -14,7 +14,7 @@ fun Rect.isAdjacentTo(rect: Rect): Boolean {
             this.top == rect.bottom ||
             this.left == rect.right ||
             this.bottom == rect.top
-    )
+        )
 }
 
 fun Rect.intersects(rect: Rect): Boolean {

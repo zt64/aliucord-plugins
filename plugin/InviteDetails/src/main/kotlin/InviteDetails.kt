@@ -73,18 +73,8 @@ class InviteDetails : Plugin() {
 
                         setImageResource(R.e.ic_info_outline_white_24dp)
 
-                        connect(
-                            viewIds.itemInviteName,
-                            ConstraintSet.END,
-                            id,
-                            ConstraintSet.START
-                        )
-                        connect(
-                            viewIds.itemInviteMemberContainer,
-                            ConstraintSet.END,
-                            id,
-                            ConstraintSet.START
-                        )
+                        connect(viewIds.itemInviteName, ConstraintSet.END, id, ConstraintSet.START)
+                        connect(viewIds.itemInviteMemberContainer, ConstraintSet.END, id, ConstraintSet.START)
 
                         layout.addView(this)
                     }
@@ -115,12 +105,7 @@ class InviteDetails : Plugin() {
                             setPadding(0, 0, 0, 8.dp)
                         }
 
-                        connect(
-                            viewIds.itemInviteHeader,
-                            ConstraintSet.BOTTOM,
-                            viewIds.banner,
-                            ConstraintSet.TOP
-                        )
+                        connect(viewIds.itemInviteHeader, ConstraintSet.BOTTOM, viewIds.banner, ConstraintSet.TOP)
 
                         layout.addView(this)
                     }

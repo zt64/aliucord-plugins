@@ -3,13 +3,9 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.LinearLayout
+import android.widget.*
 import android.widget.LinearLayout.LayoutParams
-import android.widget.RelativeLayout
-import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import com.aliucord.Utils.getResId
@@ -43,24 +39,19 @@ class FolderOpacity : Plugin() {
         .getDeclaredMethod("getBinding")
         .apply { isAccessible = true }
 
-    private fun WidgetGuildFolderSettings.getBinding() =
-        getBindingMethod(this) as WidgetGuildFolderSettingsBinding
+    private fun WidgetGuildFolderSettings.getBinding() = getBindingMethod(this) as WidgetGuildFolderSettingsBinding
 
     private val folderContainerId = getResId("guilds_item_folder_container", "id")
 
     private fun GuildListViewHolder.FolderViewHolder.setAlpha(alpha: Int) {
         val root = binding.root
         val color = ColorUtils.setAlphaComponent(color ?: Color.WHITE, alpha)
-        val background = ContextCompat.getDrawable(
-            root.context,
-            R.e.drawable_squircle_white_alpha_30
-        )
+        val background = ContextCompat.getDrawable(root.context, R.e.drawable_squircle_white_alpha_30)
 
         background?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC)
         root.findViewById<FrameLayout>(folderContainerId).background = background
     }
 
-    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val folderColorPickerId = getResId("guild_folder_settings_color", "id")
         val saveButtonId = getResId("guild_folder_settings_save", "id")
@@ -88,10 +79,8 @@ class FolderOpacity : Plugin() {
         ) {
             val root = getBinding().root
             val ctx = requireContext()
-            val linearLayout = root
-                .findViewById<RelativeLayout>(
-                    folderColorPickerId
-                ).parent as LinearLayout
+
+            val linearLayout = root.findViewById<RelativeLayout>(folderColorPickerId).parent as LinearLayout
             if (linearLayout.findViewById<View>(seekBarId) != null) return@after
 
             val opacity = settings.getInt(
@@ -115,29 +104,17 @@ class FolderOpacity : Plugin() {
                         addView(
                             SeekBar(ctx, null, 0, R.i.UiKit_SeekBar).apply {
                                 id = seekBarId
-                                layoutParams =
-                                    LayoutParams(
-                                        LayoutParams.MATCH_PARENT,
-                                        LayoutParams.WRAP_CONTENT
-                                    )
+                                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                                 max = 255
                                 progress = opacity
                                 12.dp.let { dp -> setPadding(dp, 0, dp, 0) }
                                 setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-                                    override fun onProgressChanged(
-                                        seekBar: SeekBar,
-                                        progress: Int,
-                                        fromUser: Boolean
-                                    ) {
+                                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                                         currentOpacity.text = progress.toString()
                                     }
 
                                     override fun onStartTrackingTouch(seekBar: SeekBar) {
-                                        root
-                                            .findViewById<FloatingActionButton>(
-                                                saveButtonId
-                                            ).visibility =
-                                            View.VISIBLE
+                                        root.findViewById<FloatingActionButton>(saveButtonId).visibility = View.VISIBLE
                                     }
 
                                     override fun onStopTrackingTouch(seekBar: SeekBar) {}
@@ -152,13 +129,8 @@ class FolderOpacity : Plugin() {
         // Patch save button
         patcher.after<`WidgetGuildFolderSettings$configureUI$3`>("onClick", View::class.java) {
             val widgetGuildFolderSettings = `this$0`
-            val folderId = WidgetGuildFolderSettings
-                .`access$getViewModel$p`(
-                    widgetGuildFolderSettings
-                ).folderId
-            val seekBar = widgetGuildFolderSettings.getBinding().root.findViewById<SeekBar>(
-                seekBarId
-            )
+            val folderId = WidgetGuildFolderSettings.`access$getViewModel$p`(widgetGuildFolderSettings).folderId
+            val seekBar = widgetGuildFolderSettings.getBinding().root.findViewById<SeekBar>(seekBarId)
 
             settings.setInt(folderId.toString() + "opacity", seekBar.progress)
 

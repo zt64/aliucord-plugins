@@ -1,32 +1,9 @@
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
+
 import android.content.Context
-import android.graphics.Color
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import android.widget.TextView
-import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.after
-import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
-import com.discord.models.member.GuildMember
-import com.discord.models.user.User
-import com.discord.stores.StoreStream
-import com.discord.widgets.chat.overlay.ChatTypingModel
-import com.discord.widgets.chat.overlay.`ChatTypingModel$Companion$getTypingUsers$1$1`
-import com.discord.widgets.chat.overlay.WidgetChatOverlay
-import rolecoloreverywhere.PluginSettings
-import rolecoloreverywhere.binding
-import rolecoloreverywhere.patchMemberStatuses
-import rolecoloreverywhere.patchMentions
-import rolecoloreverywhere.patchMentionsList
-import rolecoloreverywhere.patchMessages
-import rolecoloreverywhere.patchProfileName
-import rolecoloreverywhere.patchReactionsList
-import rolecoloreverywhere.patchVoiceChannels
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
+import rolecoloreverywhere.*
 
 @AliucordPlugin
 class RoleColorEverywhere : Plugin() {
@@ -39,7 +16,6 @@ class RoleColorEverywhere : Plugin() {
             )
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun start(context: Context) {
         if (settings.getBool("typingText", true)) {
             val typingUsersTextViewId = Utils.getResId("chat_typing_users_typing", "id")
@@ -96,29 +72,20 @@ class RoleColorEverywhere : Plugin() {
             if (settings.getBool("userMentions", true)) patchMentions()
             if (settings.getBool("voiceChannel", true)) patchVoiceChannels()
             if (settings.getBool("userMentionList", true)) patchMentionsList()
-            if (settings.getBool("profileName", true)) {
-                patchProfileName(
-                    settings.getBool("profileTag", true)
-                )
-            }
+            if (settings.getBool("profileName", true)) patchProfileName(settings.getBool("profileTag", true))
             if (settings.getBool("messages", false)) patchMessages()
             if (settings.getBool("status", true)) patchMemberStatuses()
             if (settings.getBool("reactionList", true)) patchReactionsList()
         }
     }
 
-    override fun stop(context: Context) {
-        patcher.unpatchAll()
-        typingUsers.clear()
-    }
+    override fun stop(context: Context) = patcher.unpatchAll()
 
     companion object {
         /**
          * This function allows other plugins to hook the rendered color, for example RoleColorContrast adding contrast
          */
         @JvmStatic
-        fun hookColor(original: Int): Int {
-            return original
-        }
+        fun hookColor(original: Int): Int = original
     }
 }

@@ -1,4 +1,4 @@
-@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS", "UNCHECKED_CAST")
 
 package rolecoloreverywhere
 
@@ -53,8 +53,7 @@ fun PatcherAPI.patchMentions() {
             SpannableStringBuilder::class.java,
             UserMentionNode.RenderContext::class.java
         ),
-        object :
-            XC_MethodHook() {
+        object : XC_MethodHook() {
             private var mentionLength: Int = 0
 
             override fun beforeHookedMethod(param: MethodHookParam) {
@@ -62,7 +61,6 @@ fun PatcherAPI.patchMentions() {
             }
 
             override fun afterHookedMethod(param: MethodHookParam) {
-                @Suppress("UNCHECKED_CAST")
                 val userMentionNode =
                     param.thisObject as UserMentionNode<UserMentionNode.RenderContext>
                 val guild = guildStore.getGuild(StoreStream.getGuildSelected().selectedGuildId)
@@ -139,9 +137,7 @@ fun PatcherAPI.patchVoiceChannels() {
 
         if (color != Color.BLACK) {
             binding.root.findViewById<TextView>(voiceUserListId).setTextColor(
-                RoleColorEverywhere.hookColor(
-                    color
-                )
+                RoleColorEverywhere.hookColor(color)
             )
         }
     }
@@ -152,9 +148,7 @@ fun PatcherAPI.patchVoiceChannels() {
 
         if (color != Color.BLACK) {
             binding.root.findViewById<TextView>(stageAudienceNameId).setTextColor(
-                RoleColorEverywhere.hookColor(
-                    color
-                )
+                RoleColorEverywhere.hookColor(color)
             )
         }
     }
@@ -165,9 +159,7 @@ fun PatcherAPI.patchVoiceChannels() {
 
         if (color != Color.BLACK) {
             binding.root.findViewById<TextView>(stageSpeakerNameId).setTextColor(
-                RoleColorEverywhere.hookColor(
-                    color
-                )
+                RoleColorEverywhere.hookColor(color)
             )
         }
     }
@@ -182,9 +174,7 @@ fun PatcherAPI.patchMentionsList() {
 
         if (color != Color.BLACK) {
             binding.root.findViewById<TextView>(mentionNameId).setTextColor(
-                RoleColorEverywhere.hookColor(
-                    color
-                )
+                RoleColorEverywhere.hookColor(color)
             )
         }
     }
@@ -215,9 +205,7 @@ fun PatcherAPI.patchProfileName(profileTag: Boolean) {
             }
 
             j.setSpan(
-                ForegroundColorSpan(
-                    RoleColorEverywhere.hookColor(guildMember.color)
-                ),
+                ForegroundColorSpan(RoleColorEverywhere.hookColor(guildMember.color)),
                 0,
                 end,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -227,6 +215,7 @@ fun PatcherAPI.patchProfileName(profileTag: Boolean) {
     }
 }
 
+// Colored messages
 fun PatcherAPI.patchMessages() {
     after<WidgetChatListAdapterItemMessage>(
         "processMessageText",
@@ -252,6 +241,7 @@ fun PatcherAPI.patchMessages() {
     }
 }
 
+// Colored statuses
 fun PatcherAPI.patchMemberStatuses() {
     val statusGameId = Utils.getResId("channel_members_list_item_game", "id")
     val customStatusId = Utils.getResId("user_profile_header_custom_status", "id")
@@ -283,12 +273,9 @@ fun PatcherAPI.patchMemberStatuses() {
 
         if (guildMember.color != Color.BLACK) {
             val textView = UserProfileHeaderView
-                .`access$getBinding$p`(
-                    this
-                ).root
-                .findViewById<SimpleDraweeSpanTextView>(
-                    customStatusId
-                )
+                .`access$getBinding$p`(this)
+                .root
+                .findViewById<SimpleDraweeSpanTextView>(customStatusId)
 
             textView.mDraweeStringBuilder?.apply {
                 setSpan(

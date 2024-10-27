@@ -1,4 +1,3 @@
-
 import android.content.Context
 import android.view.View
 import android.widget.LinearLayout
@@ -17,7 +16,6 @@ import com.lytefast.flexinput.R
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class ChannelInvites : Plugin() {
-    @Suppress("SetTextI18n")
     override fun start(c: Context) {
         val invitesLayoutId = View.generateViewId()
         val scrollViewId = Utils.getResId("scroll_view", "id")
@@ -27,10 +25,7 @@ class ChannelInvites : Plugin() {
             WidgetTextChannelSettings.Model::class.java
         ) {
             val root = WidgetTextChannelSettings.`access$getBinding$p`(this).root
-            val content = root
-                .findViewById<NestedScrollView>(
-                    scrollViewId
-                ).getChildAt(0) as LinearLayout
+            val content = root.findViewById<NestedScrollView>(scrollViewId).getChildAt(0) as LinearLayout
 
             if (content.findViewById<LinearLayout>(invitesLayoutId) != null) return@after
 
@@ -55,12 +50,7 @@ class ChannelInvites : Plugin() {
                                 )!!
                                 .mutate()
                                 .apply {
-                                    setTint(
-                                        ColorCompat.getThemedColor(
-                                            context,
-                                            R.b.colorInteractiveNormal
-                                        )
-                                    )
+                                    setTint(ColorCompat.getThemedColor(context, R.b.colorInteractiveNormal))
                                 }
 
                             text = "Invites"

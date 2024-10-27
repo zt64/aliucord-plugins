@@ -1,4 +1,3 @@
-
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -31,14 +30,15 @@ import com.lytefast.flexinput.R
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class PermissionsSync : Plugin() {
-    private val getBindingMethod = WidgetChannelSettingsPermissionsAdvanced::class.java
-        .getDeclaredMethod("getViewBinding")
-        .apply { isAccessible = true }
+    private val getBindingMethod by lazy {
+        WidgetChannelSettingsPermissionsAdvanced::class.java
+            .getDeclaredMethod("getViewBinding")
+            .apply { isAccessible = true }
+    }
 
     private fun WidgetChannelSettingsPermissionsAdvanced.getBinding() =
         getBindingMethod(this) as WidgetChannelSettingsPermissionsAdvancedBinding
 
-    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val textViewId = View.generateViewId()
 
@@ -50,11 +50,7 @@ class PermissionsSync : Plugin() {
             if (model == null || !model.canManage || model.channel.parentId == 0L) return@after
 
             val binding = getBinding()
-            val parent = (
-                (binding.root as ViewGroup).getChildAt(
-                    0
-                ) as ViewGroup
-            ).getChildAt(0) as LinearLayout
+            val parent = Utils.nestedChildAt<LinearLayout>(binding.root as ViewGroup, 0, 0)
             val ctx = parent.context
 
             val textView = parent.findViewById(textViewId) ?: TextView(
@@ -70,13 +66,11 @@ class PermissionsSync : Plugin() {
             val categoryName = StoreStream.getChannels().getChannel(model.channel.parentId).name
 
             (WidgetChannelSettingsPermissionsAdvanced.Model.Companion)
-                .get(
-                    model.channel.parentId
-                ).subscribe {
+                .get(model.channel.parentId)
+                .subscribe {
                     val parentModel = this
-                    val synced =
-                        model.memberItems == parentModel.memberItems &&
-                            model.roleItems == parentModel.roleItems
+                    val synced = model.memberItems == parentModel.memberItems &&
+                        model.roleItems == parentModel.roleItems
 
                     parentModel.channel.s()
                     textView.apply {
@@ -84,26 +78,17 @@ class PermissionsSync : Plugin() {
 
                         if (synced) {
                             text = "Permissions synced with: $categoryName"
-                            icon =
-                                ContextCompat.getDrawable(ctx, R.e.ic_info_24dp)?.mutate()?.apply {
-                                    setTint(
-                                        ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal)
-                                    )
-                                }
+                            icon = ContextCompat.getDrawable(ctx, R.e.ic_info_24dp)?.mutate()?.apply {
+                                setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
+                            }
                         } else {
                             text = "Permissions not synced with: $categoryName\nTap to sync"
-                            icon =
-                                ContextCompat
-                                    .getDrawable(ctx, R.e.ic_warning_circle_24dp)
-                                    ?.mutate()
-                                    ?.apply {
-                                        setTint(
-                                            ColorCompat.getThemedColor(
-                                                ctx,
-                                                R.b.colorInteractiveNormal
-                                            )
-                                        )
-                                    }
+                            icon = ContextCompat
+                                .getDrawable(ctx, R.e.ic_warning_circle_24dp)
+                                ?.mutate()
+                                ?.apply {
+                                    setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
+                                }
 
                             setOnClickListener {
                                 isClickable = false
@@ -112,10 +97,8 @@ class PermissionsSync : Plugin() {
                                 Utils.threadPool.execute {
                                     model.channel.permissionOverwrites.forEach { permissionOverwrite ->
                                         val th = RestAPI.api
-                                            .deletePermissionOverwrites(
-                                                model.channel.id,
-                                                permissionOverwrite.id
-                                            ).await()
+                                            .deletePermissionOverwrites(model.channel.id, permissionOverwrite.id)
+                                            .await()
                                             .second
 
                                         if (th != null) {
@@ -131,9 +114,7 @@ class PermissionsSync : Plugin() {
                                                 model.channel.id,
                                                 permissionOverwrite.id,
                                                 (RestAPIParams.ChannelPermissionOverwrites.Companion)
-                                                    .fromPermissionOverwrite(
-                                                        permissionOverwrite
-                                                    )
+                                                    .fromPermissionOverwrite(permissionOverwrite)
                                             ).await()
                                             .second
 
@@ -145,11 +126,7 @@ class PermissionsSync : Plugin() {
                                     }
 
                                     Utils.mainThread.post {
-                                        WidgetChannelSettingsPermissionsAdvanced
-                                            .`access$configureUI`(
-                                                this@after,
-                                                parentModel
-                                            )
+                                        WidgetChannelSettingsPermissionsAdvanced.`access$configureUI`(this@after, parentModel)
                                     }
                                 }
                             }

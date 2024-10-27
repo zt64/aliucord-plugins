@@ -17,8 +17,7 @@ private const val TOKEN_REGEX =
     """(mfa\.[a-z0-9_-]{20,})|([a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.([a-z0-9_-]{27,38}))"""
 
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
-class AccountDialog(private val adapter: AccountAdapter, private val account: Account? = null) :
-    InputDialog() {
+class AccountDialog(private val adapter: AccountAdapter, private val account: Account? = null) : InputDialog() {
     private val token = account?.token
 
     private val buttonStates = arrayOf(

@@ -13,7 +13,6 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
     private var SettingsAPI.showSelected: Boolean by settings.delegate(true)
     private var SettingsAPI.showUnread: Boolean by settings.delegate(false)
 
-    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 

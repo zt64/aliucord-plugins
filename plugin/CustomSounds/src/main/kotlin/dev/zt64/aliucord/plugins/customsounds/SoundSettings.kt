@@ -20,7 +20,6 @@ import com.aliucord.views.ToolbarButton
 import com.lytefast.flexinput.R
 
 class SoundSettings(private val settings: SettingsAPI) : SettingsPage() {
-    @Suppress("SetTextI18n")
     override fun onViewBound(p0: View?) {
         super.onViewBound(p0)
 

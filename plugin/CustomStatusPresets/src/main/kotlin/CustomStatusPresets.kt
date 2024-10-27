@@ -1,4 +1,3 @@
-
 import android.content.Context
 import android.view.View
 import android.widget.LinearLayout
@@ -30,11 +29,10 @@ import customstatuspresets.PresetAdapter
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class CustomStatusPresets : Plugin() {
-    private val presetType = TypeToken
-        .getParameterized(
-            ArrayList::class.java,
-            UserStatusPresenceCustomView.ViewState.WithStatus::class.javaObjectType
-        ).getType()
+    private val presetType = TypeToken.getParameterized(
+        ArrayList::class.java,
+        UserStatusPresenceCustomView.ViewState.WithStatus::class.javaObjectType
+    ).getType()
 
     companion object {
         lateinit var mSettings: SettingsAPI
@@ -51,8 +49,7 @@ class CustomStatusPresets : Plugin() {
             "onViewBound",
             View::class.java
         ) { (_, rootView: CoordinatorLayout) ->
-            val presetAdapter =
-                PresetAdapter(this, settings.getObject("presets", ArrayList(), presetType))
+            val presetAdapter = PresetAdapter(this, settings.getObject("presets", ArrayList(), presetType))
 
             with(rootView.findViewById<RadioGroup>(statusExpirationId).parent as LinearLayout) {
                 val ctx = this.context
@@ -67,27 +64,18 @@ class CustomStatusPresets : Plugin() {
                     RecyclerView(ctx).apply {
                         adapter = presetAdapter
                         layoutManager = LinearLayoutManager(ctx)
-                        layoutParams =
-                            LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                250.dp
-                            )
+                        layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250.dp)
                     }
                 )
             }
 
             rootView.findViewById<FloatingActionButton>(saveButtonId).setOnLongClickListener {
-                val formState =
-                    (
-                        WidgetUserSetCustomStatus
-                            .`access$getViewModel$p`(
-                                this
-                            ).viewState as WidgetUserSetCustomStatusViewModel.ViewState.Loaded
-                    ).formState
+                val formState = (
+                    WidgetUserSetCustomStatus
+                        .`access$getViewModel$p`(this).viewState as WidgetUserSetCustomStatusViewModel.ViewState.Loaded
+                ).formState
 
-                if (formState.emoji == null &&
-                    formState.text.isEmpty()
-                ) {
+                if (formState.emoji == null && formState.text.isEmpty()) {
                     return@setOnLongClickListener false
                 }
 
@@ -97,7 +85,6 @@ class CustomStatusPresets : Plugin() {
                         (formState.emoji as ModelEmojiUnicode).surrogates,
                         false
                     )
-
                     is ModelEmojiCustom ->
                         StoreStream
                             .getEmojis()
@@ -109,17 +96,13 @@ class CustomStatusPresets : Plugin() {
                                     emoji.isAnimated
                                 )
                             }
-
                     else -> null
                 }
 
                 Utils.showToast("Added Current Status")
 
                 presetAdapter.addPreset(
-                    UserStatusPresenceCustomView.ViewState.WithStatus(
-                        emoji,
-                        formState.text
-                    )
+                    UserStatusPresenceCustomView.ViewState.WithStatus(emoji, formState.text)
                 )
                 presetAdapter.notifyItemInserted(presetAdapter.itemCount)
                 true

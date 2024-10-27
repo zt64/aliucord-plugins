@@ -5,8 +5,7 @@ import android.view.View
 import com.aliucord.Utils
 import com.aliucord.fragments.InputDialog
 
-class CategoryDialog(private val channelId: Long?, private val name: String? = null) :
-    InputDialog() {
+class CategoryDialog(private val channelId: Long?, private val name: String? = null) : InputDialog() {
     constructor(name: String) : this(null, name)
 
     override fun onViewBound(view: View) {

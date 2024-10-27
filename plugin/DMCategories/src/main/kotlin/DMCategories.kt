@@ -8,30 +8,20 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.after
-import com.aliucord.patcher.before
-import com.aliucord.patcher.component1
-import com.aliucord.patcher.component2
-import com.aliucord.patcher.component3
+import com.aliucord.patcher.*
 import com.aliucord.settings.delegate
 import com.aliucord.wrappers.ChannelWrapper.Companion.id
 import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
 import com.discord.databinding.WidgetChannelsListItemActionsBinding
 import com.discord.utilities.color.ColorCompat
-import com.discord.widgets.channels.list.WidgetChannelListModel
-import com.discord.widgets.channels.list.WidgetChannelsList
-import com.discord.widgets.channels.list.WidgetChannelsListAdapter
-import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions
+import com.discord.widgets.channels.list.*
 import com.discord.widgets.channels.list.items.ChannelListItemPrivate
 import com.google.gson.reflect.TypeToken
 import com.lytefast.flexinput.R
 import dmcategories.DMCategory
 import dmcategories.PluginSettings
 import dmcategories.Util
-import dmcategories.items.ChannelListItemDMCategory
-import dmcategories.items.ChannelListItemDivider
-import dmcategories.items.ItemDMCategory
-import dmcategories.items.ItemDivider
+import dmcategories.items.*
 import dmcategories.sheets.CategoriesSheet
 
 private val categoryType = TypeToken
@@ -47,17 +37,13 @@ class DMCategories : Plugin() {
         .getDeclaredMethod("getBinding")
         .apply { isAccessible = true }
 
-    private fun WidgetChannelsListItemChannelActions.getBinding() =
-        getBindingMethod(this) as WidgetChannelsListItemActionsBinding
+    private fun WidgetChannelsListItemChannelActions.getBinding() = getBindingMethod(this) as WidgetChannelsListItemActionsBinding
 
     private val SettingsAPI.showSelected: Boolean by settings.delegate(true)
     private val SettingsAPI.showUnread: Boolean by settings.delegate(false)
 
     init {
-        settingsTab =
-            SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(
-                settings
-            )
+        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
     }
 
     companion object {
@@ -70,9 +56,8 @@ class DMCategories : Plugin() {
 
         fun addCategory(name: String, channelIds: ArrayList<Long> = ArrayList()) {
             categories
-                .add(
-                    DMCategory(Util.getCurrentId(), name, channelIds)
-                ).also { if (it) saveCategories() }
+                .add(DMCategory(Util.getCurrentId(), name, channelIds))
+                .also { if (it) saveCategories() }
         }
 
         fun removeCategory(category: DMCategory) = categories.remove(category).also {
@@ -82,11 +67,9 @@ class DMCategories : Plugin() {
         fun getCategory(name: String) = categories.find { dmCategory -> dmCategory.name == name }
     }
 
-    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val categoryLayoutId = Utils.getResId("widget_channels_list_item_category", "layout")
-        val stageEventsSeparatorId =
-            Utils.getResId("widget_channels_list_item_stage_events_separator", "layout")
+        val stageEventsSeparatorId = Utils.getResId("widget_channels_list_item_stage_events_separator", "layout")
 
         mSettings = settings
 
@@ -100,12 +83,7 @@ class DMCategories : Plugin() {
             val ctx = root.context
 
             (root.getChildAt(0) as LinearLayout).addView(
-                TextView(
-                    ctx,
-                    null,
-                    0,
-                    R.i.UiKit_Settings_Item_Icon
-                ).apply {
+                TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
                     categories
                         .find { category -> category.channelIds.contains(model.channel.id) }
                         ?.let { category ->
@@ -121,18 +99,10 @@ class DMCategories : Plugin() {
                             }
                             setCompoundDrawablesWithIntrinsicBounds(
                                 ContextCompat
-                                    .getDrawable(
-                                        ctx,
-                                        R.e.ic_remove_circle_outline_red_24dp
-                                    )!!
+                                    .getDrawable(ctx, R.e.ic_remove_circle_outline_red_24dp)!!
                                     .mutate()
                                     .apply {
-                                        setTint(
-                                            ColorCompat.getThemedColor(
-                                                ctx,
-                                                R.b.colorInteractiveNormal
-                                            )
-                                        )
+                                        setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
                                     },
                                 null,
                                 null,
@@ -142,22 +112,14 @@ class DMCategories : Plugin() {
                         text = "Set Category"
                         setOnClickListener {
                             dismiss()
-                            CategoriesSheet(model.channel.id).show(
-                                parentFragmentManager,
-                                "Categories"
-                            )
+                            CategoriesSheet(model.channel.id).show(parentFragmentManager, "Categories")
                         }
                         setCompoundDrawablesWithIntrinsicBounds(
                             ContextCompat
                                 .getDrawable(ctx, R.e.ic_group_add_white_24dp)!!
                                 .mutate()
                                 .apply {
-                                    setTint(
-                                        ColorCompat.getThemedColor(
-                                            ctx,
-                                            R.b.colorInteractiveNormal
-                                        )
-                                    )
+                                    setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
                                 },
                             null,
                             null,
@@ -184,7 +146,7 @@ class DMCategories : Plugin() {
                     add(ChannelListItemDMCategory(category))
 
                     val channels = privateChannels.filter { channel ->
-                        category.channelIds.contains(channel.channel.id)
+                        channel.channel.id in category.channelIds
                     }
 
                     model.items.removeAll(channels)

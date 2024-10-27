@@ -13,7 +13,6 @@ import com.discord.views.RadioManager
 
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
-    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 
@@ -21,24 +20,18 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
             if (settings.getBool("hideToolbar", false)) View.GONE else View.VISIBLE
         val ctx = requireContext()
 
-        fun addCheckedSetting(
-            title: String,
-            subtext: String,
-            setting: String,
-            default: Boolean
-        ): CheckedSetting {
-            return Utils
-                .createCheckedSetting(
-                    ctx,
-                    CheckedSetting.ViewType.SWITCH,
-                    title,
-                    subtext
-                ).apply {
-                    isChecked = settings.getBool(setting, default)
-                    visibility = extraSettingsVisibility
-                    setOnCheckedListener { settings.setBool(setting, it) }
-                    linearLayout.addView(this)
-                }
+        fun addCheckedSetting(title: String, subtext: String, setting: String, default: Boolean): CheckedSetting {
+            return Utils.createCheckedSetting(
+                ctx,
+                CheckedSetting.ViewType.SWITCH,
+                title,
+                subtext
+            ).apply {
+                isChecked = settings.getBool(setting, default)
+                visibility = extraSettingsVisibility
+                setOnCheckedListener { settings.setBool(setting, it) }
+                linearLayout.addView(this)
+            }
         }
 
         val radios = listOf(

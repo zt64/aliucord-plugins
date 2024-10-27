@@ -4,15 +4,11 @@ import accountswitcher.settings.PluginSettings
 import android.content.Context
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
-import com.aliucord.api.PatcherAPI
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.after
 import com.aliucord.patcher.instead
 import com.discord.utilities.rest.RestAPI
 import com.discord.widgets.settings.WidgetSettings
-import de.robv.android.xposed.XC_MethodHook
-import kotlin.properties.ReadOnlyProperty
 
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
@@ -25,7 +21,6 @@ class AccountSwitcher : Plugin() {
         lateinit var mSettings: SettingsAPI
     }
 
-    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         mSettings = settings
 
@@ -64,39 +59,4 @@ class AccountSwitcher : Plugin() {
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()
-}
-
-open class Arguments {
-    var rawArguments: List<Any> = emptyList()
-    var argumentClasses: Array<Class<*>> = arrayOf()
-
-    private var size: Int = 0
-
-    fun <T> argument(clazz: Class<T>): ReadOnlyProperty<Any?, T> {
-        argumentClasses += clazz
-
-        val greg = ReadOnlyProperty<Any?, T> { _, _ ->
-            @Suppress("UNCHECKED_CAST")
-            rawArguments.getOrNull(argumentClasses.lastIndex) as T
-        }
-
-        return greg
-    }
-}
-
-class TestArgs : Arguments() {
-    val test by argument(String::class.java)
-}
-
-inline fun <reified T : Any, reified R> PatcherAPI.a(
-    method: String,
-    arguments: () -> R,
-    crossinline body: T.(param: XC_MethodHook.MethodHookParam, args: R) -> Unit
-): Runnable where R : Arguments {
-    val args = arguments()
-
-    return after<T>(method, paramTypes = args.argumentClasses) {
-        args.rawArguments = it.args.asList()
-        body(it, args)
-    }
 }

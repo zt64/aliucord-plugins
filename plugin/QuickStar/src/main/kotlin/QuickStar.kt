@@ -9,6 +9,8 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component2
 import com.discord.databinding.WidgetChatListActionsBinding
 import com.discord.models.domain.emoji.Emoji
 import com.discord.stores.StoreStream
@@ -23,13 +25,10 @@ class QuickStar : Plugin() {
         .getDeclaredMethod("getBinding")
         .apply { isAccessible = true }
 
-    private fun WidgetChatListActions.getBinding() =
-        getBindingMethod(this) as WidgetChatListActionsBinding
+    private fun WidgetChatListActions.getBinding() = getBindingMethod(this) as WidgetChatListActionsBinding
 
-    private fun WidgetChatListActions.addReaction(emoji: Emoji) =
-        WidgetChatListActions.`access$addReaction`(this, emoji)
+    private fun WidgetChatListActions.addReaction(emoji: Emoji) = WidgetChatListActions.`access$addReaction`(this, emoji)
 
-    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         val actionsContainerId = Utils.getResId("dialog_chat_actions_container", "id")
         val quickStarId = View.generateViewId()
@@ -39,19 +38,15 @@ class QuickStar : Plugin() {
         patcher.after<WidgetChatListActions>(
             "configureUI",
             WidgetChatListActions.Model::class.java
-        ) {
+        ) { (_, model: WidgetChatListActions.Model) ->
             val root = getBinding().root.findViewById<LinearLayout>(actionsContainerId)
 
             root.findViewById<TextView>(quickStarId).apply {
-                visibility =
-                    if ((it.args[0] as WidgetChatListActions.Model)
-                            .manageMessageContext
-                            .canAddReactions
-                    ) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    }
+                visibility = if (model.manageMessageContext.canAddReactions) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
                 setOnClickListener {
                     addReaction(starEmoji)
                     dismiss()

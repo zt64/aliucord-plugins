@@ -39,6 +39,10 @@ import java.util.concurrent.TimeUnit
 object Patches {
     private var settings: SettingsAPI = PluginManager.plugins["BetterMediaViewer"]?.settings!!
 
+    // Add a mute button to the media player
+    fun PatcherAPI.patchMuteButton() {
+    }
+
     fun PatcherAPI.patchWidget() {
         val downloadManager = Utils.appContext
             .getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -106,12 +110,9 @@ object Patches {
                 WindowInsetsControllerCompat(Utils.appActivity.window, binding.root).hide(
                     when (settings.getInt("immersiveModeType", 0)) {
                         0 -> WindowInsetsCompat.Type.statusBars()
-
                         1 -> WindowInsetsCompat.Type.navigationBars()
-
                         2 -> WindowInsetsCompat.Type.statusBars() or
                             WindowInsetsCompat.Type.statusBars()
-
                         else -> return@after
                     }
                 )
@@ -126,7 +127,7 @@ object Patches {
                     binding.root
                         .findViewById<AppBarLayout>(R.f.action_bar_toolbar_layout)
                         .layoutParams as FrameLayout.LayoutParams
-                ).gravity = Gravity.BOTTOM
+                    ).gravity = Gravity.BOTTOM
             }
         }
     }
@@ -152,12 +153,9 @@ object Patches {
                             ObservableExtensionsKt.ui(timer, this, null),
                             WidgetMedia::class.java,
                             null,
-                            `WidgetMedia$showControls$1`(
-                                this
-                            ),
+                            `WidgetMedia$showControls$1`(this),
                             null,
-                            {
-                            },
+                            {},
                             { },
                             `WidgetMedia$showControls$2`(this)
                         )
@@ -203,7 +201,7 @@ object Patches {
                     (
                         widgetMedia.toolbarHeight.toFloat() /
                             widgetMedia.playerControlsHeight.toFloat()
-                    )
+                        )
             }
         }
     }

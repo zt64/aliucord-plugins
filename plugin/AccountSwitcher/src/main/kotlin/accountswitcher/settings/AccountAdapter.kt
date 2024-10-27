@@ -35,10 +35,9 @@ class AccountAdapter(
         if (it) saveAccounts()
     }
 
-    fun removeAccount(token: String) = accounts
-        .removeIf {
-            it.token == token
-        }.also { if (it) saveAccounts() }
+    fun removeAccount(token: String) = accounts.removeIf {
+        it.token == token
+    }.also { if (it) saveAccounts() }
 
     override fun getItemCount() = accounts.size
 
@@ -50,30 +49,24 @@ class AccountAdapter(
         isSettings = isSettings
     )
 
-    @Suppress("SetTextI18n")
-    override fun onBindViewHolder(holder: AccountViewHolder, position: Int): Unit =
-        accounts[position].let { account ->
-            Utils.threadPool.execute {
-                val user = StoreStream.getUsers().users[account.id] ?: RestAPI.api
-                    .userGet(account.id)
-                    .await()
-                    .first
-                    ?.let { user -> CoreUser(user) }
+    override fun onBindViewHolder(holder: AccountViewHolder, position: Int): Unit = accounts[position].let { account ->
+        Utils.threadPool.execute {
+            val user = StoreStream.getUsers().users[account.id] ?: RestAPI.api
+                .userGet(account.id)
+                .await()
+                .first
+                ?.let(::CoreUser)
 
-                holder.name.text = if (user == null) {
-                    "Failed to load user"
-                } else {
-                    UserUtils.INSTANCE.getUserNameWithDiscriminator(
-                        user,
-                        null,
-                        null
-                    )
-                }
-                holder.userId.text = "ID: ${user?.id ?: "Unknown"}"
-
-                IconUtils.setIcon(holder.avatar, user)
+            holder.name.text = if (user == null) {
+                "Failed to load user"
+            } else {
+                UserUtils.INSTANCE.getUserNameWithDiscriminator(user, null, null)
             }
+            holder.userId.text = "ID: ${user?.id ?: "Unknown"}"
+
+            IconUtils.setIcon(holder.avatar, user)
         }
+    }
 
     fun onEdit(position: Int) {
         AccountDialog(this, getAccounts()[position])

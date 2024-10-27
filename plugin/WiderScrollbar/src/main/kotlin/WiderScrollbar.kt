@@ -40,12 +40,14 @@ class WiderScrollbar : Plugin() {
                 setText(settings.getInt("scrollbarWidth", 50).toString())
                 addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
                     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+
                     override fun afterTextChanged(s: Editable) {
                         try {
                             val width = s.toString().toInt()
                             if (width != 0) settings.setInt("scrollbarWidth", width)
-                        } catch (ignored: Throwable) {
+                        } catch (_: Throwable) {
                             settings.setInt("scrollbarWidth", 50)
                         }
                     }

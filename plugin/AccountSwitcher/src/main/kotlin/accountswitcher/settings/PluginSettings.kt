@@ -25,7 +25,6 @@ import com.lytefast.flexinput.R
 
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
-    @Suppress("SetTextI18n")
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 
@@ -93,15 +92,11 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
                         text = "Add Current Account"
                         setOnClickListener {
                             when {
-                                getAccounts().any { it.token == token } -> Utils.showToast(
-                                    "Account already added"
-                                )
-
+                                getAccounts().any { it.token == token } -> Utils.showToast("Account already added")
                                 token != null -> {
                                     accountAdapter.addAccount(token, StoreStream.getUsers().me.id)
                                     Utils.showToast("Added current account")
                                 }
-
                                 else -> Utils.showToast("Failed to fetch token")
                             }
 

@@ -21,7 +21,6 @@ import dmcategories.Util
 
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class CategoriesSheet(private val channelId: Long) : BottomSheet() {
-    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 

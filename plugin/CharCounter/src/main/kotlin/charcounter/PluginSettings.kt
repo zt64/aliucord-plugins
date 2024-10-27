@@ -20,7 +20,6 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
     private var SettingsAPI.reverse: Boolean by settings.delegate(false)
     private var SettingsAPI.threshold: Int by settings.delegate(1)
 
-    @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 
@@ -45,20 +44,10 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
                     inputType = InputType.TYPE_CLASS_NUMBER
                     setText(settings.threshold.toString())
                     addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(
-                            s: CharSequence,
-                            start: Int,
-                            count: Int,
-                            after: Int
-                        ) {
+                        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
                         }
 
-                        override fun onTextChanged(
-                            s: CharSequence,
-                            start: Int,
-                            before: Int,
-                            count: Int
-                        ) {
+                        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                         }
 
                         override fun afterTextChanged(s: Editable) {
@@ -72,8 +61,7 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
         )
         addView(
             TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Addition).apply {
-                text =
-                    "Minimum number of characters for the counter to appear. Set to zero for it to always be visible"
+                text = "Minimum number of characters for the counter to appear. Set to zero for it to always be visible"
             }
         )
     }

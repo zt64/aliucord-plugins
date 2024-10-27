@@ -27,18 +27,12 @@ import java.io.File
 class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
     private var launcher: ActivityResultLauncher<Intent>? = null
 
-    @Suppress("SetTextI18n")
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 
         val ctx = requireContext()
 
-        fun createCheckedSetting(
-            title: String,
-            subtitle: String,
-            setting: String,
-            defValue: Boolean
-        ): CheckedSetting {
+        fun createCheckedSetting(title: String, subtitle: String, setting: String, defValue: Boolean): CheckedSetting {
             return Utils
                 .createCheckedSetting(
                     ctx,
@@ -73,16 +67,14 @@ class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
             progress = controlsTimeout - offset
             12.dp.let { setPadding(it, 0, it, 0) }
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) =
-                    with((progress / 100) * 100) {
-                        seekBar.progress = this
-                        currentTimeout.text = "${this + offset} ms"
-                    }
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) = with((progress / 100) * 100) {
+                    seekBar.progress = this
+                    currentTimeout.text = "${this + offset} ms"
+                }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
-                override fun onStopTrackingTouch(seekBar: SeekBar) =
-                    settings.setInt("controlsTimeout", seekBar.progress + offset)
+                override fun onStopTrackingTouch(seekBar: SeekBar) = settings.setInt("controlsTimeout", seekBar.progress + offset)
             })
         }
         val timeoutSection = LinearLayout(ctx, null, 0, R.i.UiKit_Settings_Item).apply {

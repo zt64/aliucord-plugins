@@ -19,7 +19,6 @@ import com.lytefast.flexinput.R
 
 @Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class SwitcherPage(private val accounts: ArrayList<Account>) : SettingsPage() {
-    @Suppress("SetTextI18n")
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 
@@ -54,10 +53,7 @@ class SwitcherPage(private val accounts: ArrayList<Account>) : SettingsPage() {
                 Button(ctx).apply {
                     text = "Log Out"
                     setBackgroundColor(
-                        view.resources.getColor(
-                            R.c.uikit_btn_bg_color_selector_red,
-                            view.context.theme
-                        )
+                        view.resources.getColor(R.c.uikit_btn_bg_color_selector_red, view.context.theme)
                     )
                     setOnClickListener { StoreStream.getAuthentication().setAuthed(null) }
                 }

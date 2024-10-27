@@ -60,34 +60,24 @@ class Frecents : Plugin() {
 
     private val frecencyUserSettingsSubject = BehaviorSubject.k0<FrecencyUserSettings>()
 
+    private fun getFrecencyUserSettingsObservable(): Observable<FrecencyUserSettings> = frecencyUserSettingsSubject
+
     private var frecencyUserSettings: FrecencyUserSettings by LazyMutable {
-        Utils.threadPool
-            .submit<FrecencyUserSettings> {
-                val res = get()
+        Utils.threadPool.submit<FrecencyUserSettings> {
+            val res = Http.Request
+                .newDiscordRNRequest(ROUTE, "GET")
+                .execute()
+                .json(Response::class.java)
 
-                FrecencyUserSettings.parseFrom(Base64.decode(res.settings, Base64.DEFAULT))
-            }.get()
-            .also {
-                frecencyUserSettingsSubject.onNext(it)
-            }
+            FrecencyUserSettings.parseFrom(Base64.decode(res.settings, Base64.DEFAULT))
+        }.get().also {
+            frecencyUserSettingsSubject.onNext(it)
+        }
     }
 
-    private fun getFrecencyUserSettingsObservable(): Observable<FrecencyUserSettings> {
-        return frecencyUserSettingsSubject
-        // return BehaviorSubject.k0<FrecencyUserSettings>().also { subject ->
-        //     frecencyUserSettings
-        //     Utils.threadPool.submit {
-        //         val res = get()
-        //         val initialSettings = FrecencyUserSettings.parseFrom(Base64.decode(res.settings, Base64.DEFAULT))
-        //         subject.onNext(initialSettings)
-        //     }
-        // }
+    private fun updateFrecencyUserSettings(frecencyUserSettings: FrecencyUserSettings) {
+        frecencyUserSettingsSubject.onNext(frecencyUserSettings)
     }
-
-    private fun get() = Http.Request
-        .newDiscordRNRequest(ROUTE, "GET")
-        .execute()
-        .json(Response::class.java)
 
     private fun patchSettings() {
         val encoded = Base64.encodeToString(frecencyUserSettings.toByteArray(), Base64.DEFAULT)
@@ -107,7 +97,7 @@ class Frecents : Plugin() {
         GatewayAPI.onEvent<GatewayResponse>("USER_SETTINGS_PROTO_UPDATE") {
             val new = FrecencyUserSettings.parseFrom(Base64.decode(it.settings.proto, Base64.DEFAULT))
 
-            frecencyUserSettings = if (it.partial) frecencyUserSettings.toBuilder().mergeFrom(new).build() else new
+            updateFrecencyUserSettings(if (it.partial) frecencyUserSettings.toBuilder().mergeFrom(new).build() else new)
         }
 
         if (PATCH_FRECENT_EMOJIS) {
@@ -423,16 +413,13 @@ class Frecents : Plugin() {
             when (item) {
                 is GifCategoryItem.Standard -> store.observeGifsForSearchQuery(item.gifCategory.categoryName)
                 is GifCategoryItem.Trending -> store.observeTrendingCategoryGifs()
-                is GifCategoryItemFavorites -> {
-                    val favs = frecencyUserSettings.favoriteGifs
-                        .gifsMap
+                is GifCategoryItemFavorites -> frecencyUserSettingsSubject.map {
+                    it.favoriteGifs.gifsMap
                         .asSequence()
                         .sortedByDescending { it.value.order }
                         .map { (tenorUrl, v) ->
                             ModelGif(mqGifUrl(v.src), tenorUrl, v.width, v.height)
                         }.toList()
-
-                    ScalarSynchronousObservable(favs)
                 }
                 else -> throw NoWhenBranchMatchedException()
             }.map(GifCategoryViewModel::StoreState)

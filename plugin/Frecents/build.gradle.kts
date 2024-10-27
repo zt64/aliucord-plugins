@@ -5,12 +5,15 @@ plugins {
     id("com.google.protobuf") version "0.9.4"
 }
 
-version = "1.0.4"
+version = "1.0.5"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.excludeFromUpdaterJson.set(true)
 aliucord.changelog.set(
     """
+    # 1.0.5
+    - Fix gifs not updating in real time
+    
     # 1.0.4
     - Fix preview gif sometimes not appearing
     

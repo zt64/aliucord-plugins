@@ -1,9 +1,26 @@
 @file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 
 import android.content.Context
+import android.graphics.Color
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.widget.TextView
+import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
+import com.aliucord.patcher.after
+import com.aliucord.wrappers.ChannelWrapper.Companion.isDM
+import com.discord.models.member.GuildMember
+import com.discord.models.user.User
+import com.discord.stores.StoreStream
+import com.discord.widgets.chat.overlay.ChatTypingModel
+import com.discord.widgets.chat.overlay.`ChatTypingModel$Companion$getTypingUsers$1$1`
+import com.discord.widgets.chat.overlay.WidgetChatOverlay
 import rolecoloreverywhere.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 @AliucordPlugin
 class RoleColorEverywhere : Plugin() {

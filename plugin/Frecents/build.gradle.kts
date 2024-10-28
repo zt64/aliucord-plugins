@@ -8,7 +8,6 @@ plugins {
 version = "1.0.5"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
-aliucord.excludeFromUpdaterJson.set(true)
 aliucord.changelog.set(
     """
     # 1.0.5

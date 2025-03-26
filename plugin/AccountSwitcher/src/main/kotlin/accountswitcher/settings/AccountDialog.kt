@@ -61,6 +61,9 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
                     )
                 }
 
+                // Save the accounts to JSON
+                adapter.saveAccounts()
+
                 dismiss()
             }
         }
@@ -90,11 +93,9 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
         inputLayout.editText?.addTextChangedListener(object : TextWatcher {
             private val pattern = Pattern.compile(TOKEN_REGEX, Pattern.CASE_INSENSITIVE)
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
                 okButton.isEnabled = pattern.matcher(s?.trim().toString()).matches()

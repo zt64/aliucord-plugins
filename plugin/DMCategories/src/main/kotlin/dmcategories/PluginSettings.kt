@@ -12,6 +12,7 @@ import com.lytefast.flexinput.R
 class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
     private var SettingsAPI.showSelected: Boolean by settings.delegate(true)
     private var SettingsAPI.showUnread: Boolean by settings.delegate(false)
+    private var SettingsAPI.hideEmpty: Boolean by settings.delegate(false)
 
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
@@ -44,6 +45,16 @@ class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
                     isChecked = settings.showUnread
                     setOnCheckedListener { settings.showUnread = it }
                 }
+        )
+        addView(
+            Util.createSwitch(
+                ctx,
+                "Hide if empty",
+                "Whether categories should be hidden if they have no channels"
+            ).apply {
+                isChecked = settings.hideEmpty
+                setOnCheckedListener { settings.hideEmpty = it }
+            }
         )
     }
 }

@@ -41,6 +41,7 @@ class DMCategories : Plugin() {
 
     private val SettingsAPI.showSelected: Boolean by settings.delegate(true)
     private val SettingsAPI.showUnread: Boolean by settings.delegate(false)
+    private val SettingsAPI.hideEmpty: Boolean by settings.delegate(false)
 
     init {
         settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
@@ -131,23 +132,23 @@ class DMCategories : Plugin() {
         }
 
         @OptIn(ExperimentalStdlibApi::class)
-        patcher.before<WidgetChannelsList>(
-            "configureUI",
-            WidgetChannelListModel::class.java
-        ) { (_, model: WidgetChannelListModel) ->
+        patcher.before<WidgetChannelsList>("configureUI", WidgetChannelListModel::class.java) { (_, model: WidgetChannelListModel) ->
+            // Only run if this is the DMs tab
             if (model.selectedGuild != null) return@before
 
             // I hate this but it works
             if (categories.none { (userId) -> userId == Util.getCurrentId() }) return@before
 
             val privateChannels = model.items.filterIsInstance<ChannelListItemPrivate>()
-            val items = buildList(1000) {
+            val items = buildList(100) {
                 categories.forEach { category ->
-                    add(ChannelListItemDMCategory(category))
-
                     val channels = privateChannels.filter { channel ->
                         channel.channel.id in category.channelIds
                     }
+
+                    if (settings.hideEmpty && channels.isEmpty()) return@forEach
+
+                    add(ChannelListItemDMCategory(category))
 
                     model.items.removeAll(channels)
 

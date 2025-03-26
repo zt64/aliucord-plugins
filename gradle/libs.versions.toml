@@ -4,7 +4,7 @@ aliucord = "main-SNAPSHOT"
 #noinspection GradleDependency
 kotlin = "1.5.21"
 android = "7.4.2"
-ktlintPlugin = "12.1.2"
+ktlintPlugin = "12.2.0"
 #noinspection GradleDependency Newer versions incompatible with other plugins
 ktlint = "0.50.0"
 

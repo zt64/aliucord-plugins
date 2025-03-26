@@ -45,6 +45,12 @@ class NoBurnIn : Plugin() {
             )
         }
 
+        if (settings.getBool("hideToolbar", false)) {
+            patcher.before<WidgetHome>("setPanelCorners", Float::class.java) {
+                it.args[0] = 0f
+            }
+        }
+
         patcher.after<WidgetHomeHeaderManager>(
             "configure",
             WidgetHome::class.java,

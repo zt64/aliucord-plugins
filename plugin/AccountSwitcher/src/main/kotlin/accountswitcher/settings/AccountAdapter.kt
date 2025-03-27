@@ -29,7 +29,7 @@ class AccountAdapter(
     val accounts: ArrayList<Account>,
     private val isSettings: Boolean = true
 ) : RecyclerView.Adapter<AccountViewHolder>() {
-    private fun saveAccounts() = AccountSwitcher.mSettings.setObject("accounts", accounts)
+    fun saveAccounts() = AccountSwitcher.mSettings.setObject("accounts", accounts)
 
     fun addAccount(token: String, id: Long) = accounts.add(Account(token, id)).also {
         if (it) saveAccounts()

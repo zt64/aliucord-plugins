@@ -1,8 +1,12 @@
-version = "1.2.5"
+version = "1.2.6"
 description = "Adds the ability to quickly switch accounts"
 
 aliucord.changelog.set(
     """
+    # 1.2.6
+    * Fix "add token" button not working even if the token is valid
+    * "Add Current Account" button now actually works after the first try -serinova
+    
     # 1.2.5
     * Fix out of date token regex
     

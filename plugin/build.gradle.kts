@@ -80,29 +80,45 @@ tasks.register("generateReadMe") {
     group = "aliucord"
     description = "Generates the README.md file with download links for all plugins"
 
+    outputs.file(rootProject.file("README.md"))
+
     doLast {
         val readMe = rootProject.file("README.md")
+        val plugins = subprojects
+            .filterNot {
+                it.extensions.getByType<AliucordExtension>().excludeFromUpdaterJson.get()
+            }
+            .sortedBy { it.name }
+
         val content = buildString {
-            appendLine("## Plugins for [Aliucord](https://github.com/Aliucord)")
+            // Header with badges
+            appendLine("# Aliucord Plugins")
             appendLine()
             appendLine(
-                "Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder"
+                "[![Plugins](https://img.shields.io/badge/Plugins-${plugins.size}-blue?style=for-the-badge)](https://github.com/zt64/aliucord-plugins)"
             )
             appendLine()
+            appendLine("A collection of plugins for [Aliucord](https://github.com/Aliucord), a Discord mobile client mod.")
+            appendLine()
 
-            subprojects
-                .filterNot {
-                    it.extensions.getByType<AliucordExtension>().excludeFromUpdaterJson.get()
-                }.joinToString("\n") { subproject ->
-                    buildString {
-                        with(subproject) {
-                            appendLine(
-                                "- [$name](https://github.com/zt64/aliucord-plugins/raw/builds/$name.zip )"
-                            )
-                            appendLine(description)
-                        }
-                    }
-                }.let(::append)
+            // Installation section with emoji
+            appendLine("## 📥 Installation")
+            appendLine()
+            appendLine("Click on a plugin name to download, then move the downloaded file to the `Aliucord/plugins` folder on your device.")
+            appendLine()
+
+            // Plugin list in table format
+            appendLine("## 🧩 Available Plugins")
+            appendLine()
+            appendLine("| Plugin | Description |")
+            appendLine("|:-------|:------------|")
+
+            plugins.forEach { subproject ->
+                val description = subproject.description ?: "No description provided."
+                appendLine(
+                    "| [**${subproject.name}**](https://github.com/zt64/aliucord-plugins/raw/builds/${subproject.name}.zip) | $description |"
+                )
+            }
         }
 
         readMe.writeText(content)

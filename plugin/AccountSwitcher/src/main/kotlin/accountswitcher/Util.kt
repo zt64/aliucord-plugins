@@ -47,13 +47,13 @@ class SharedPreferencesBackedMap(context: Context) : AbstractMutableMap<Long, Ac
         return previousValue
     }
 
-    fun export(): String {
-        return GsonUtils.gson.toJson(getMap().values)
+    fun toJson(): String {
+        return GsonUtils.gsonPretty.toJson(getMap().values)
     }
 
     fun import(json: String): Int {
         val accounts: List<Account> = GsonUtils.gson.fromJson(json, type)
-        getMap().putAll(accounts.associateBy { it.id })
+        putAll(accounts.associateBy { it.id })
         return accounts.size
     }
 }

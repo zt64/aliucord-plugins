@@ -2,8 +2,10 @@
 
 package accountswitcher
 
+import AccountSwitcher.Companion.accounts
 import android.content.Context
 import com.aliucord.Http
+import com.aliucord.api.SettingsAPI
 import com.aliucord.utils.GsonUtils
 import com.aliucord.utils.GsonUtils.fromJson
 import com.aliucord.utils.GsonUtils.toJson
@@ -12,9 +14,10 @@ import com.discord.utilities.rest.RestAPI
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
+private val type: Type = object : TypeToken<ArrayList<Account>>() {}.type
+
 class SharedPreferencesBackedMap(context: Context) : AbstractMutableMap<Long, Account>() {
     private val prefs = context.getSharedPreferences("AccountSwitcher", Context.MODE_PRIVATE)
-    private val type: Type = object : TypeToken<ArrayList<Account>>() {}.type
 
     private fun getMap(): MutableMap<Long, Account> {
         val json = prefs.getString("accounts", "[]")
@@ -53,6 +56,16 @@ class SharedPreferencesBackedMap(context: Context) : AbstractMutableMap<Long, Ac
         getMap().putAll(accounts.associateBy { it.id })
         return accounts.size
     }
+}
+
+fun migrate(oldSettings: SettingsAPI) {
+    if (!oldSettings.exists("accounts")) return
+
+    oldSettings
+        .getObject("accounts", ArrayList<Account>(), type)
+        .forEach { accounts[it.id] = it }
+
+    oldSettings.resetSettings()
 }
 
 fun fetchUser(token: String): MeUser? = try {

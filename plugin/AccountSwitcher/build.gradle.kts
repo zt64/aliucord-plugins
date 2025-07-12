@@ -1,8 +1,11 @@
-version = "1.3.0"
+version = "1.3.1"
 description = "Adds the ability to quickly switch accounts"
 
 aliucord.changelog.set(
     """
+    # 1.3.1
+    * Added automatic migration for accounts from the old storage format to the new one.
+    
     # 1.3.0
     * Redesigned how accounts are stored, now using a SharedPreferences backed map, which allows for better security and less error prone code.
     * Added helper text to explain how to access the switcher and add accounts.

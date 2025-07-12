@@ -2,6 +2,7 @@
 
 import accountswitcher.SharedPreferencesBackedMap
 import accountswitcher.SwitcherPage
+import accountswitcher.migrate
 import accountswitcher.settings.PluginSettings
 import android.content.Context
 import com.aliucord.Utils
@@ -21,6 +22,8 @@ class AccountSwitcher : Plugin() {
     }
 
     override fun start(context: Context) {
+        migrate(settings)
+
         patcher.instead<WidgetSettings>("showLogoutDialog", Context::class.java) {
             Utils.openPageWithProxy(Utils.appActivity, SwitcherPage())
         }

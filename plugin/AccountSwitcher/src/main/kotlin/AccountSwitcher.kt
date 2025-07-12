@@ -1,38 +1,28 @@
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS", "MISSING_DEPENDENCY_SUPERCLASS_WARNING")
+
+import accountswitcher.SharedPreferencesBackedMap
 import accountswitcher.SwitcherPage
-import accountswitcher.getAccounts
 import accountswitcher.settings.PluginSettings
 import android.content.Context
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
-import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.instead
-import com.discord.utilities.rest.RestAPI
 import com.discord.widgets.settings.WidgetSettings
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class AccountSwitcher : Plugin() {
     init {
-        settingsTab = SettingsTab(PluginSettings::class.java).withArgs(settings)
+        settingsTab = SettingsTab(PluginSettings::class.java).withArgs()
     }
 
     companion object {
-        lateinit var mSettings: SettingsAPI
+        val accounts by lazy { SharedPreferencesBackedMap(Utils.appContext) }
     }
 
     override fun start(context: Context) {
-        mSettings = settings
-
         patcher.instead<WidgetSettings>("showLogoutDialog", Context::class.java) {
-            val accounts = getAccounts().apply {
-                removeIf { it.token == RestAPI.AppHeadersProvider.INSTANCE.authToken }
-            }
-
-            Utils.openPageWithProxy(
-                context = Utils.appActivity,
-                fragment = SwitcherPage(accounts)
-            )
+            Utils.openPageWithProxy(Utils.appActivity, SwitcherPage())
         }
 
         // Eventually add a switcher button to the login page

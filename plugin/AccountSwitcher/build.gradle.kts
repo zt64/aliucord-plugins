@@ -1,8 +1,15 @@
-version = "1.2.6"
+version = "1.3.0"
 description = "Adds the ability to quickly switch accounts"
 
 aliucord.changelog.set(
     """
+    # 1.3.0
+    * Redesigned how accounts are stored, now using a SharedPreferences backed map, which allows for better security and less error prone code.
+    * Added helper text to explain how to access the switcher and add accounts.
+    * Changed the current account to be greyed out, rather than removed, to prevent confusion.
+    * Added an indicator to show which account is currently active.
+    * Temporarily disable "Edit" functionality, as it is basic in its current state and can lead to confusion. It will be reintroduced in a future update.
+    
     # 1.2.6
     * Fix "add token" button not working even if the token is valid
     * "Add Current Account" button now actually works after the first try -serinova

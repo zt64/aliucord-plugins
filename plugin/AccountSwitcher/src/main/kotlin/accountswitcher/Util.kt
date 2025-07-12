@@ -1,18 +1,60 @@
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS", "MISSING_DEPENDENCY_SUPERCLASS_WARNING")
+
 package accountswitcher
 
-import AccountSwitcher
+import android.content.Context
 import com.aliucord.Http
+import com.aliucord.utils.GsonUtils
+import com.aliucord.utils.GsonUtils.fromJson
+import com.aliucord.utils.GsonUtils.toJson
 import com.discord.models.user.MeUser
 import com.discord.utilities.rest.RestAPI
 import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 
-private val accountsType = TypeToken
-    .getParameterized(
-        ArrayList::class.java,
-        Account::class.javaObjectType
-    ).getType()
+class SharedPreferencesBackedMap(context: Context) : AbstractMutableMap<Long, Account>() {
+    private val prefs = context.getSharedPreferences("AccountSwitcher", Context.MODE_PRIVATE)
+    private val type: Type = object : TypeToken<ArrayList<Account>>() {}.type
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
+    private fun getMap(): MutableMap<Long, Account> {
+        val json = prefs.getString("accounts", "[]")
+        val accounts: List<Account> = GsonUtils.gson.fromJson(json, type)
+        return accounts.associateBy { it.id }.toMutableMap()
+    }
+
+    private fun saveMap(map: Map<Long, Account>) {
+        val json = GsonUtils.gson.toJson(map.values)
+        prefs.edit().putString("accounts", json).apply()
+    }
+
+    override val entries: MutableSet<MutableMap.MutableEntry<Long, Account>>
+        get() = getMap().entries
+
+    override fun put(key: Long, value: Account): Account? {
+        val map = getMap()
+        val previousValue = map.put(key, value)
+        saveMap(map)
+        return previousValue
+    }
+
+    override fun remove(key: Long): Account? {
+        val map = getMap()
+        val previousValue = map.remove(key)
+        saveMap(map)
+        return previousValue
+    }
+
+    fun export(): String {
+        return GsonUtils.gson.toJson(getMap().values)
+    }
+
+    fun import(json: String): Int {
+        val accounts: List<Account> = GsonUtils.gson.fromJson(json, type)
+        getMap().putAll(accounts.associateBy { it.id })
+        return accounts.size
+    }
+}
+
 fun fetchUser(token: String): MeUser? = try {
     Http
         .Request("https://discord.com/api/v9/users/@me")
@@ -23,10 +65,4 @@ fun fetchUser(token: String): MeUser? = try {
         .json(MeUser::class.java)
 } catch (e: Throwable) {
     null
-}
-
-fun getAccounts(): ArrayList<Account> = try {
-    AccountSwitcher.mSettings.getObject("accounts", ArrayList(), accountsType)
-} catch (e: Throwable) {
-    arrayListOf<Account>().also { AccountSwitcher.mSettings.setObject("accounts", it) }
 }

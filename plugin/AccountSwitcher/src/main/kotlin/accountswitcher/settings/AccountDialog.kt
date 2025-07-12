@@ -1,5 +1,8 @@
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS", "MISSING_DEPENDENCY_SUPERCLASS_WARNING")
+
 package accountswitcher.settings
 
+import AccountSwitcher.Companion.accounts
 import accountswitcher.Account
 import accountswitcher.fetchUser
 import android.content.res.ColorStateList
@@ -16,7 +19,6 @@ import java.util.regex.Pattern
 private const val TOKEN_REGEX =
     """(mfa\.[a-z0-9_-]{20,})|([a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.([a-z0-9_-]{27,38}))"""
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class AccountDialog(private val adapter: AccountAdapter, private val account: Account? = null) : InputDialog() {
     private val token = account?.token
 
@@ -28,7 +30,12 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
     override fun onViewBound(view: View) {
         if (token == null) {
             setTitle("Add Account")
-            setDescription("Please input the account token")
+            setDescription(
+                """
+                Enter your Discord token to add an account.
+                You can get this token by using the Token plugin.
+                """.trimIndent()
+            )
         } else {
             setTitle("Edit Account")
         }
@@ -38,10 +45,8 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
         setOnOkListener {
             val inputToken = input.trim()
 
-            if (adapter.accounts.any { it != account && it.token == inputToken }) {
-                return@setOnOkListener Utils.showToast(
-                    "An account with this token already exists"
-                )
+            if (accounts.any { it.value != account && it.value.token == inputToken }) {
+                return@setOnOkListener Utils.showToast("An account with this token already exists")
             }
 
             if (account?.token == inputToken) return@setOnOkListener dismiss()
@@ -50,19 +55,16 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
                 val userId = fetchUser(inputToken)?.id
                     ?: return@execute Utils.showToast("Invalid token")
 
-                if (account?.token != null) adapter.removeAccount(account.token)
+                if (account?.token != null) adapter.removeAccount(account.id)
 
                 adapter.addAccount(inputToken, userId)
                 StoreStream.getUsers().fetchUsers(listOf(userId))
 
                 Utils.mainThread.post {
                     adapter.notifyItemChanged(
-                        adapter.accounts.indexOfFirst { it.token == inputToken }
+                        accounts.values.indexOfFirst { it.token == inputToken }
                     )
                 }
-
-                // Save the accounts to JSON
-                adapter.saveAccounts()
 
                 dismiss()
             }

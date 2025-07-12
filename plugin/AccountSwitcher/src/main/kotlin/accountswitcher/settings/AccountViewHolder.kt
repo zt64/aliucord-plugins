@@ -5,9 +5,10 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
-import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
-import android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -21,25 +22,27 @@ import com.lytefast.flexinput.R
 class AccountViewHolder(
     private val adapter: AccountAdapter,
     layout: LinearLayout,
-    isSettings: Boolean
+    edit: Boolean
 ) : RecyclerView.ViewHolder(layout) {
     val avatar: SimpleDraweeView
     val name: TextView
-    private val info: LinearLayout
     val userId: TextView
+    val activeIndicator: View
+    private val info: LinearLayout
 
     init {
         val ctx = layout.context
         val p = DimenUtils.dpToPx(2)
 
-        layout.orientation = LinearLayout.HORIZONTAL
-        layout.gravity = Gravity.CENTER_VERTICAL
-        layout.background = GradientDrawable().apply {
-            cornerRadius = 16f
-            setColor(ColorCompat.getThemedColor(ctx, R.b.colorBackgroundSecondary))
+        layout.apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            background = GradientDrawable().apply {
+                cornerRadius = 16f
+                setColor(ColorCompat.getThemedColor(ctx, R.b.colorBackgroundSecondary))
+            }
+            DimenUtils.dpToPx(8).let { setPadding(it, it, it, it) }
         }
-
-        DimenUtils.dpToPx(8).let { layout.setPadding(it, it, it, it) }
 
         avatar = SimpleDraweeView(ctx).apply {
             layoutParams = LinearLayout.LayoutParams(DimenUtils.dpToPx(52), DimenUtils.dpToPx(52))
@@ -52,7 +55,14 @@ class AccountViewHolder(
             setPadding(p, p, p, p)
         }
 
-        userId = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_SubText).apply {
+        activeIndicator = TextView(ctx, null, 0, R.i.UiKit_TextView_Bold).apply {
+            text = "Active"
+            setTextColor(ContextCompat.getColor(ctx, R.c.status_green))
+            visibility = View.GONE
+        }
+
+        userId = TextView(ctx, null, 0, R.i.UiKit_TextView_SingleLine).apply {
+            textSize = 12f
             setPadding(p, p, p, p)
         }
 
@@ -62,24 +72,26 @@ class AccountViewHolder(
             }
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_VERTICAL
+            addView(activeIndicator)
             addView(name)
             addView(userId)
             layout.addView(this)
         }
 
-        if (isSettings) {
-            ToolbarButton(ctx).run {
-                setPadding(p, p, p * 4, p)
-                layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT)
-                ContextCompat.getDrawable(ctx, R.e.ic_edit_24dp)!!.mutate().let {
-                    Utils.tintToTheme(it)
-                    setImageDrawable(it, false)
-                }
-                setOnClickListener { adapter.onEdit(adapterPosition) }
-                layout.addView(this)
-            }
+        if (edit) {
+            // Potentially enable when there are more settings for accounts
+            // val editButton = ToolbarButton(ctx).apply {
+            //     setPadding(p, p, p * 4, p)
+            //     layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT)
+            //     ContextCompat.getDrawable(ctx, R.e.ic_edit_24dp)!!.mutate().let {
+            //         Utils.tintToTheme(it)
+            //         setImageDrawable(it, false)
+            //     }
+            //     setOnClickListener { adapter.onEdit(adapterPosition) }
+            // }
+            // layout.addView(editButton)
 
-            ToolbarButton(ctx).run {
+            val removeButton = ToolbarButton(ctx).apply {
                 setPadding(p * 4, p, p, p)
                 layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT)
                 ContextCompat.getDrawable(ctx, R.e.ic_delete_24dp)!!.mutate().let {
@@ -87,8 +99,8 @@ class AccountViewHolder(
                     setImageDrawable(it, false)
                 }
                 setOnClickListener { adapter.onRemove(adapterPosition) }
-                layout.addView(this)
             }
+            layout.addView(removeButton)
         } else {
             layout.setOnClickListener { adapter.onClick(ctx, adapterPosition) }
         }

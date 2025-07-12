@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.aliucord.gradle.AliucordExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.LibraryExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
@@ -40,6 +41,12 @@ subprojects {
 
         lint {
             disable += "SetTextI18n"
+        }
+    }
+
+    configure<LibraryAndroidComponentsExtension> {
+        beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+            variantBuilder.enable = false
         }
     }
 

@@ -59,7 +59,7 @@ class PluginSettings : SettingsPage() {
                             }
                         } catch (e: Throwable) {
                             e.printStackTrace()
-                            Utils.showToast("Failed to import accounts. Is the file valid?")
+                            Utils.showToast("Failed to import accounts. Is this a valid accounts json file?")
                         }
                     }
                 }
@@ -171,12 +171,14 @@ class PluginSettings : SettingsPage() {
                                     Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
                                     Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
                             )
-                            type = "application/json"
 
                             putExtra(Intent.EXTRA_TITLE, "select file to import accounts from")
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                type = "application/json"
                                 putExtra(DocumentsContract.EXTRA_INITIAL_URI, File(Constants.BASE_PATH).toURI())
+                            } else {
+                                type = "application/octet-stream"
                             }
                         }
                     )

@@ -3,6 +3,9 @@ description = "Adds the ability to quickly switch accounts"
 
 aliucord.changelog.set(
     """
+    # 1.4.1
+    * Fixed inability to import accounts on Android 7 due to incorrect mimetype.
+    
     # 1.4.0
     * Added an export and import button to the settings page, allowing users to export their accounts to a file and import them back.
     * The file is not encrypted, so keep it private, it is your responsibility to keep it safe.

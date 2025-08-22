@@ -5,11 +5,17 @@ plugins {
     id("com.google.protobuf") version "0.9.4"
 }
 
-version = "1.0.5"
+version = "1.1.0"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.0
+    - Add support for favorite and recent emojis
+    - Add support for recent stickers
+    
+    * Note: Using an emoji or sticker will not update the recents list. This will come in a future update.
+    
     # 1.0.5
     - Fix gifs not updating in real time
     

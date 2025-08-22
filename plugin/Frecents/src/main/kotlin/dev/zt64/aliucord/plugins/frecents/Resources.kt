@@ -2,7 +2,7 @@ package dev.zt64.aliucord.plugins.frecents
 
 import com.aliucord.Utils
 
-object Id {
+object Resources {
     val gif_category_item_icon by lazy { Utils.getResId("gif_category_item_icon", "id") }
     val gif_category_item_title by lazy { Utils.getResId("gif_category_item_title", "id") }
     val gif_category_title by lazy { Utils.getResId("gif_category_title", "id") }

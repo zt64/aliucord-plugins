@@ -49,7 +49,7 @@ android {
 }
 
 protobuf {
-    val version = "4.28.3"
+    val version = "4.32.0"
     protoc {
         artifact = "com.google.protobuf:protoc:$version"
     }

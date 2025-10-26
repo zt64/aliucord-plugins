@@ -2,14 +2,17 @@ import com.google.protobuf.gradle.id
 import com.google.protobuf.gradle.proto
 
 plugins {
-    id("com.google.protobuf") version "0.9.4"
+    id("com.google.protobuf") version "0.9.5"
 }
 
-version = "1.1.0"
+version = "1.1.1"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.1
+    - Rework emoji sorting logic as a potential fix for recent emojis not appearing
+
     # 1.1.0
     - Add support for favorite and recent emojis
     - Add support for recent stickers

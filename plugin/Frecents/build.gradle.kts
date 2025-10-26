@@ -5,11 +5,14 @@ plugins {
     id("com.google.protobuf") version "0.9.5"
 }
 
-version = "1.1.1"
+version = "1.1.2"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.2
+    - Temporarily disabled favoriting gifs sent in chat to workaround a bug preventing clicking images
+    
     # 1.1.1
     - Rework emoji sorting logic as a potential fix for recent emojis not appearing
 

@@ -14,23 +14,13 @@ import com.aliucord.patcher.*
 import com.aliucord.utils.RxUtils.map
 import com.aliucord.utils.RxUtils.switchMap
 import com.aliucord.utils.lazyField
-import com.aliucord.wrappers.embeds.MessageEmbedWrapper.Companion.rawVideo
-import com.aliucord.wrappers.embeds.MessageEmbedWrapper.Companion.url
-import com.aliucord.wrappers.embeds.VideoWrapper.Companion.url
-import com.aliucord.wrappers.messages.AttachmentWrapper.Companion.type
-import com.aliucord.wrappers.messages.AttachmentWrapper.Companion.url
-import com.discord.api.message.attachment.MessageAttachment
-import com.discord.api.message.embed.EmbedType
-import com.discord.api.message.embed.MessageEmbed
 import com.discord.databinding.ExpressionPickerHeaderItemBinding
 import com.discord.models.domain.emoji.Emoji
 import com.discord.models.gifpicker.dto.ModelGif
 import com.discord.stores.*
 import com.discord.stores.StoreMediaFavorites.Favorite
-import com.discord.utilities.embed.EmbedResourceUtils
 import com.discord.widgets.chat.input.gifpicker.*
 import com.discord.widgets.chat.input.sticker.*
-import com.discord.widgets.chat.list.InlineMediaView
 import com.discord.widgets.emoji.EmojiSheetViewModel
 import com.discord.widgets.emoji.EmojiSheetViewModel.ViewState
 import com.lytefast.flexinput.R
@@ -403,54 +393,54 @@ class Frecents : Plugin() {
 
         // NOTE: These views are recycled, so it's important to perform condition checks inside the listeners so data is up to date
         // Patch to favorite/unfavorite embedded gifs from a URL on long click
-        patcher.after<InlineMediaView>(
-            "updateUIWithEmbed",
-            MessageEmbed::class.java,
-            Int::class.javaObjectType,
-            Int::class.javaObjectType,
-            Boolean::class.javaPrimitiveType!!
-        ) { (_, messageEmbed: MessageEmbed, width: Int, height: Int) ->
-            binding.a.setOnLongClickListener {
-                if (!EmbedResourceUtils.INSTANCE.isAnimated(messageEmbed)) return@setOnLongClickListener false
-
-                val gifUrl = messageEmbed.rawVideo?.url
-                    ?.replace("AAAPo", "AAAAC") ?: messageEmbed.url
-                val model = ModelGif(gifUrl, messageEmbed.url, width, height)
-
-                toggleFavoriteGif(model)
-
-                true
-            }
-        }
+        // patcher.after<InlineMediaView>(
+        //     "updateUIWithEmbed",
+        //     MessageEmbed::class.java,
+        //     Int::class.javaObjectType,
+        //     Int::class.javaObjectType,
+        //     Boolean::class.javaPrimitiveType!!
+        // ) { (_, messageEmbed: MessageEmbed, width: Int, height: Int) ->
+        //     binding.a.setOnLongClickListener {
+        //         if (!EmbedResourceUtils.INSTANCE.isAnimated(messageEmbed)) return@setOnLongClickListener false
+        //
+        //         val gifUrl = messageEmbed.rawVideo?.url
+        //             ?.replace("AAAPo", "AAAAC") ?: messageEmbed.url
+        //         val model = ModelGif(gifUrl, messageEmbed.url, width, height)
+        //
+        //         toggleFavoriteGif(model)
+        //
+        //         true
+        //     }
+        // }
 
         // Favorite/unfavorite gif file attachment on long click
-        patcher.after<InlineMediaView>(
-            "updateUIWithAttachment",
-            MessageAttachment::class.java,
-            Int::class.javaObjectType,
-            Int::class.javaObjectType,
-            Boolean::class.javaPrimitiveType!!
-        ) { (_, messageAttachment: MessageAttachment, width: Int?, height: Int?) ->
-            binding.c.setOnLongClickListener {
-                if (width == null || height == null) return@setOnLongClickListener false
-
-                val embedType = when (messageAttachment.type.ordinal) {
-                    0 -> EmbedType.VIDEO
-                    1 -> EmbedType.IMAGE
-                    2 -> EmbedType.FILE
-                    else -> throw NoWhenBranchMatchedException()
-                }
-
-                val url = messageAttachment.url
-
-                if (!EmbedResourceUtils.INSTANCE.isAnimated(embedType, url)) return@setOnLongClickListener false
-
-                val model = ModelGif(url, url, width, height)
-
-                toggleFavoriteGif(model)
-                true
-            }
-        }
+        // patcher.after<InlineMediaView>(
+        //     "updateUIWithAttachment",
+        //     MessageAttachment::class.java,
+        //     Int::class.javaObjectType,
+        //     Int::class.javaObjectType,
+        //     Boolean::class.javaPrimitiveType!!
+        // ) { (_, messageAttachment: MessageAttachment, width: Int?, height: Int?) ->
+        //     binding.c.setOnLongClickListener {
+        //         if (width == null || height == null) return@setOnLongClickListener false
+        //
+        //         val embedType = when (messageAttachment.type.ordinal) {
+        //             0 -> EmbedType.VIDEO
+        //             1 -> EmbedType.IMAGE
+        //             2 -> EmbedType.FILE
+        //             else -> throw NoWhenBranchMatchedException()
+        //         }
+        //
+        //         val url = messageAttachment.url
+        //
+        //         if (!EmbedResourceUtils.INSTANCE.isAnimated(embedType, url)) return@setOnLongClickListener false
+        //
+        //         val model = ModelGif(url, url, width, height)
+        //
+        //         toggleFavoriteGif(model)
+        //         true
+        //     }
+        // }
 
         // Patch to add a favorite button to the URL actions widget
         // Can't implement unless I find a way to get the width and height of the gif

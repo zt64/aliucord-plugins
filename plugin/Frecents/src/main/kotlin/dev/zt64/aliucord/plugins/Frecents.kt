@@ -47,6 +47,10 @@ class Frecents : Plugin() {
 
     private var frecencySettings = FrecencySettingsManager()
 
+    init {
+        settingsTab = SettingsTab(FrecentsSettings::class.java).withArgs(frecencySettings)
+    }
+
     private fun toggleFavoriteGif(model: ModelGif) {
         val tenorGifUrl = URLDecoder.decode(model.tenorGifUrl, Charset.defaultCharset().name())
         val isFavorited = frecencySettings.settings.favoriteGifs.gifsMap.containsKey(tenorGifUrl)

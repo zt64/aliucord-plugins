@@ -5,37 +5,42 @@ plugins {
     id("com.google.protobuf") version "0.9.5"
 }
 
-version = "1.1.2"
+version = "1.1.3"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.3
+    - Added settings page with export debug information
+    - If you are having issues with Frecents, please use this button and share the exported file with 
+    as much detail as possible
+
     # 1.1.2
     - Temporarily disabled favoriting gifs sent in chat to workaround a bug preventing clicking images
     
     # 1.1.1
-    - Rework emoji sorting logic as a potential fix for recent emojis not appearing
+    - Reworked emoji sorting logic as a potential fix for recent emojis not appearing
 
     # 1.1.0
-    - Add support for favorite and recent emojis
-    - Add support for recent stickers
+    - Added support for favorite and recent emojis
+    - Added support for recent stickers
     
     * Note: Using an emoji or sticker will not update the recents list. This will come in a future update.
     
     # 1.0.5
-    - Fix gifs not updating in real time
+    - Fixed gifs not updating in real time
     
     # 1.0.4
-    - Fix preview gif sometimes not appearing
+    - Fixed preview gif sometimes not appearing
     
     # 1.0.3
-    - Fix favorites icon disappearing
+    - Fixed favorites icon disappearing
     
     # 1.0.2
-    - Fix crash caused by having no favorites
+    - Fixed crash caused by having no favorites
     
     # 1.0.1
-    - Fix mixup causing favorites category to not appear
+    - Fixed mixup causing favorites category to not appear
 
     # 1.0.0
     - Initial release

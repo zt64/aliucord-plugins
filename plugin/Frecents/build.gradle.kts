@@ -5,11 +5,14 @@ plugins {
     id("com.google.protobuf") version "0.9.5"
 }
 
-version = "1.1.3"
+version = "1.1.4"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.4
+    - Fixed an issue causing non-frecents events to be parsed, resulting in errors.
+    
     # 1.1.3
     - Added settings page with export debug information
     - If you are having issues with Frecents, please use this button and share the exported file with 

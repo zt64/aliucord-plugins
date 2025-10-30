@@ -77,6 +77,8 @@ class FrecencySettingsManager {
     }
 
     fun handleGatewayUpdate(response: GatewayResponse) {
+        if (response.settings.type != 2) return // Skip non-frecency settings
+
         val newSettings = decodeSettings(response.settings.proto)
 
         settings = if (response.partial) {

@@ -101,12 +101,14 @@ class Frecents : Plugin() {
 
             frecencySettings.observeSettings().switchMap { frecents ->
                 ScalarSynchronousObservable(
-                    frecents.favoriteEmojis.emojisList.map {
+                    frecents.favoriteEmojis.emojisList.mapNotNull {
                         if (pattern.matcher(it).matches()) {
                             Favorite.FavCustomEmoji(it)
                         } else {
                             @Suppress("USELESS_CAST") // IDE doesn't like without this cast
-                            Favorite.FavUnicodeEmoji(emojiStore.unicodeEmojisNamesMap[it]!!.uniqueId) as Favorite
+                            emojiStore.unicodeEmojisNamesMap[it]?.let { emoji ->
+                                Favorite.FavUnicodeEmoji(emoji.uniqueId) as Favorite
+                            }
                         }
                     }.toSet()
                 )

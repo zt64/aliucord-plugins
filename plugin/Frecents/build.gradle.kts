@@ -5,11 +5,14 @@ plugins {
     id("com.google.protobuf") version "0.9.5"
 }
 
-version = "1.1.4"
+version = "1.1.5"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.5
+    - Fixed a potential error caused by unsupported emojis in favorites or recents.
+
     # 1.1.4
     - Fixed an issue causing non-frecents events to be parsed, resulting in errors.
     

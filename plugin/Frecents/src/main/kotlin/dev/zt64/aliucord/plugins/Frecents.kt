@@ -47,6 +47,10 @@ class Frecents : Plugin() {
 
     private var frecencySettings = FrecencySettingsManager()
 
+    init {
+        settingsTab = SettingsTab(FrecentsSettings::class.java).withArgs(frecencySettings)
+    }
+
     private fun toggleFavoriteGif(model: ModelGif) {
         val tenorGifUrl = URLDecoder.decode(model.tenorGifUrl, Charset.defaultCharset().name())
         val isFavorited = frecencySettings.settings.favoriteGifs.gifsMap.containsKey(tenorGifUrl)
@@ -58,7 +62,7 @@ class Frecents : Plugin() {
                         gifs.remove(tenorGifUrl)
                     } else {
                         gifs[tenorGifUrl] = FrecencyUserSettingsKt.favoriteGIF {
-                            format = FrecencyUserSettings.GIFType.GIFTYPE_IMAGE
+                            format = FrecencyUserSettings.GIFType.GIF_TYPE_IMAGE
                             this.width = model.width
                             this.height = model.height
                             src = model.gifImageUrl
@@ -94,6 +98,7 @@ class Frecents : Plugin() {
         patcher.instead<StoreMediaFavorites>("observeFavorites", Set::class.java) {
             val pattern = Pattern.compile("\\d+")
             val emojiStore = StoreStream.getEmojis()
+
             frecencySettings.observeSettings().switchMap { frecents ->
                 ScalarSynchronousObservable(
                     frecents.favoriteEmojis.emojisList.map {
@@ -193,18 +198,7 @@ class Frecents : Plugin() {
         // Patch to use the frequently used stickers from the frecency user settings
         patcher.instead<StoreStickers>("observeFrequentlyUsedStickerIds") {
             frecencySettings.observeSettings().map { settings ->
-                val now = System.currentTimeMillis()
-
-                settings.stickerFrecency.stickersMap
-                    .mapNotNull { (key, entry) ->
-                        FrecencyCalculator.calculateFrecencyScore(key, entry, now)?.let { frecency ->
-                            key to frecency
-                        }
-                    }
-                    .sortedByDescending { it.second }
-                    .map { it.first }
-                    .take(FrecencyCalculator.RECENT_STICKERS_MAX)
-                    .toList()
+                FrecencyCalculator.sortStickers(settings.stickerFrecency.stickersMap)
             }
         }
 
@@ -403,7 +397,6 @@ class Frecents : Plugin() {
 
         // NOTE: These views are recycled, so it's important to perform condition checks inside the listeners so data is up to date
         // Patch to favorite/unfavorite embedded gifs from a URL on long click
-        // TODO: Why do these break regular images?
         // patcher.after<InlineMediaView>(
         //     "updateUIWithEmbed",
         //     MessageEmbed::class.java,

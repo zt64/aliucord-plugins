@@ -1,75 +1,72 @@
 package dev.zt64.aliucord.plugins.frecents
 
-import com.discord.api.sticker.Sticker
 import com.discord.models.domain.emoji.Emoji
 import discord_protos.discord_users.v1.FrecencyUserSettingsOuterClass.FrecencyUserSettings.FrecencyItem
-import kotlin.math.ceil
 
 object FrecencyCalculator {
-    const val RECENT_EMOJIS_MAX = 32
-    const val RECENT_STICKERS_MAX = 22
+    private const val RECENT_EMOJIS_MAX = 32
+    private const val RECENT_STICKERS_MAX = 22
 
+    private const val MAX_SAMPLES = 10
+    private const val BONUS = 1.0
+
+    /**
+     * @param frecencyMap A map of emoji IDs to their frecency data.
+     * @param emojiIdsMap A map of emoji IDs to their corresponding Emoji objects.
+     * @param unicodeEmojisMap A map of unicode emoji strings to their corresponding Emoji objects
+     */
     fun sortEmojis(
         frecencyMap: Map<String, FrecencyItem>,
         emojiIdsMap: Map<String, Emoji>,
         unicodeEmojisMap: Map<String, Emoji>
     ): List<Emoji> {
-        val now = System.currentTimeMillis()
+        return sortByFrecency(frecencyMap, RECENT_EMOJIS_MAX) { key ->
+            emojiIdsMap[key] ?: unicodeEmojisMap[key]
+        }
+    }
 
+    /**
+     * @param frecencyMap A map of sticker IDs to their frecency data.
+     */
+    fun sortStickers(frecencyMap: Map<Long, FrecencyItem>): List<Long> {
+        return sortByFrecency(frecencyMap, RECENT_STICKERS_MAX) { it }
+    }
+
+    private inline fun <K : Any, T : Any> sortByFrecency(
+        frecencyMap: Map<K, FrecencyItem>,
+        maxItems: Int,
+        crossinline lookup: (K) -> T?
+    ): List<T> {
+        val now = System.currentTimeMillis()
         return frecencyMap
+            .asSequence()
             .mapNotNull { (key, entry) ->
-                calculateFrecencyScore(key, entry, now)?.let { frecency ->
-                    val emoji = emojiIdsMap[key] ?: unicodeEmojisMap[key]
-                    emoji?.let { it to frecency }
+                lookup(key)?.let { item ->
+                    calculateFrecencyScore(entry, now)?.let { frecency -> item to frecency }
                 }
             }
             .sortedByDescending { it.second }
+            .take(maxItems)
             .map { it.first }
-            .take(RECENT_EMOJIS_MAX)
+            .toList()
     }
 
-    fun sortStickers(frecencyMap: Map<Long, FrecencyItem>, stickersMap: Map<Long, Sticker>): List<Sticker> {
-        val now = System.currentTimeMillis()
+    private fun calculateFrecencyScore(entry: FrecencyItem, now: Long): Double? {
+        if (entry.totalUses <= 0) return null
 
-        return frecencyMap
-            .mapNotNull { (key, entry) ->
-                calculateFrecencyScore(key, entry, now)?.let { frecency ->
-                    stickersMap[key]?.let { it to frecency }
-                }
-            }
-            .sortedByDescending { it.second }
-            .map { it.first }
-            .take(RECENT_STICKERS_MAX)
-    }
+        val recentUses = entry.recentUsesList
 
-    fun calculateFrecencyScore(key: String, entry: FrecencyItem, now: Long): Double? {
-        return calculateFrecencyScore(computeBonus(key) / 100.0, entry, now)
-    }
-
-    fun calculateFrecencyScore(key: Long, entry: FrecencyItem, now: Long): Double? {
-        return calculateFrecencyScore(computeBonus(key) / 100.0, entry, now)
-    }
-
-    fun calculateFrecencyScore(bonus: Double, entry: FrecencyItem, now: Long): Double? {
-        val recentUses = entry.recentUsesList.ifEmpty { return null }
-
-        val score = recentUses.take(10).sumOf { timestamp ->
+        val score = recentUses.take(MAX_SAMPLES).sumOf { timestamp ->
             val daysAgo = (now - timestamp) / (1000.0 * 60.0 * 60.0 * 24.0)
-            bonus * computeWeight(daysAgo)
+            BONUS * computeWeight(daysAgo)
         }
 
-        if (score <= 0) return null
-
-        return ceil(entry.totalUses * (score / recentUses.size))
+        return if (score > 0 && recentUses.isNotEmpty()) {
+            entry.totalUses * (score / (100.0 * recentUses.size))
+        } else {
+            entry.totalUses.toDouble()
+        }
     }
-
-    // Might be used later on, I'm not sure
-    @Suppress("unused")
-    private fun computeBonus(key: Long) = 100
-
-    // Might be used later on, I'm not sure
-    @Suppress("unused")
-    private fun computeBonus(key: String) = 100
 
     private fun computeWeight(daysAgo: Double): Int = when {
         daysAgo <= 3.0 -> 100

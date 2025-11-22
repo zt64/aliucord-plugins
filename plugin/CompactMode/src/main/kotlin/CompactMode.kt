@@ -65,6 +65,12 @@ class CompactMode : Plugin() {
             null
         }
 
+        val pollsClass = try {
+            Class.forName("com.aliucord.coreplugins.polls.chatview.WidgetChatListAdapterItemPoll")
+        } catch (_: Throwable) {
+            null
+        }
+
         patcher.after<WidgetChatListItem>(
             "onConfigure",
             Int::class.java,
@@ -80,6 +86,13 @@ class CompactMode : Plugin() {
                         .setGuidelineBegin(contentMargin)
                     return@after
                 }
+            }
+
+            if (pollsClass?.isInstance(this) == true) {
+                itemView.run {
+                    setPadding(contentMargin, paddingTop, paddingRight, paddingBottom)
+                }
+                return@after
             }
 
             val layoutParams = when (this) {

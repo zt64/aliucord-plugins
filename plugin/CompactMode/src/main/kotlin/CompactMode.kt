@@ -56,6 +56,21 @@ class CompactMode : Plugin() {
         val usernameViewId = getResId("chat_list_adapter_item_text_name", "id")
         val loadingTextId = getResId("chat_list_adapter_item_text_loading", "id")
 
+        val avatarDecorationId = try {
+            Class.forName("com.aliucord.coreplugins.decorations.avatar.AvatarDecoratorKt")
+                .getDeclaredField("decoId")
+                .also { it.isAccessible = true }
+                .get(null) as Int
+        } catch (_: Throwable) {
+            null
+        }
+
+        val pollsClass = try {
+            Class.forName("com.aliucord.coreplugins.polls.chatview.WidgetChatListAdapterItemPoll")
+        } catch (_: Throwable) {
+            null
+        }
+
         patcher.after<WidgetChatListItem>(
             "onConfigure",
             Int::class.java,
@@ -71,6 +86,13 @@ class CompactMode : Plugin() {
                         .setGuidelineBegin(contentMargin)
                     return@after
                 }
+            }
+
+            if (pollsClass?.isInstance(this) == true) {
+                itemView.run {
+                    setPadding(contentMargin, paddingTop, paddingRight, paddingBottom)
+                }
+                return@after
             }
 
             val layoutParams = when (this) {
@@ -101,12 +123,27 @@ class CompactMode : Plugin() {
             when (itemView.id) {
                 // Regular message
                 messageRootId -> {
+                    val avatarDecoration = avatarDecorationId?.let { itemView.findViewById<View?>(it) }
+                    val decoEnabled = avatarDecoration != null
+
                     itemView
                         .findViewById<View>(loadingTextId)
                         .layoutParams<MarginLayoutParams>()
                         .marginStart = 0
 
                     val headerView = itemView.findViewById<ConstraintLayout>(headerLayoutId)
+
+                    // Reverts avatar decorator's top padding on header, so the avatar gets centred properly
+                    if (decoEnabled) {
+                        headerView.run {
+                            setPadding(
+                                paddingLeft,
+                                paddingTop - 6.dp,
+                                paddingRight,
+                                paddingBottom
+                            )
+                        }
+                    }
 
                     itemView.findViewById<Guideline>(guidelineId).setGuidelineBegin(contentMargin)
                     itemView.setPadding(0, settings.messagePadding.dp, 0, 0)
@@ -116,13 +153,26 @@ class CompactMode : Plugin() {
                     }
                     if (settings.hideAvatar) {
                         avatarView!!.visibility = View.GONE
+                        avatarDecoration?.visibility = View.GONE
 
                         headerView.layoutParams<ConstraintLayout.LayoutParams>().marginStart = contentMargin
 
                         return@after
                     }
 
-                    2.dp.let { dp -> avatarView!!.setPadding(dp, dp, dp, dp) }
+                    2.dp.let { dp ->
+                        val decoOffset = if (decoEnabled) {
+                            // Adds offset for decorations
+                            dp + (settings.avatarScale.dp / 11)
+                        } else {
+                            dp
+                        }
+                        avatarView!!.setPadding(decoOffset, decoOffset, dp, dp)
+                        avatarDecoration?.layoutParams<MarginLayoutParams>()?.apply {
+                            topMargin = dp
+                            leftMargin = dp
+                        }
+                    }
 
                     val constraintLayout = itemView as ConstraintLayout
                     val constraintSet = ConstraintSet().apply {
@@ -134,6 +184,11 @@ class CompactMode : Plugin() {
                             settings.avatarScale.dp.let { dp ->
                                 constrainWidth(id, dp)
                                 constrainHeight(id, dp)
+                                avatarDecorationId?.let { decoId ->
+                                    val decoSize = dp * 12 / 11 - 4.dp
+                                    constrainWidth(decoId, decoSize)
+                                    constrainHeight(decoId, decoSize)
+                                }
                             }
 
                             setMargin(id, ConstraintSet.START, settings.headerMargin.dp)

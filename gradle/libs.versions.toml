@@ -5,7 +5,7 @@ aliucord-gradle = "753ad25"
 #noinspection GradleDependency
 kotlin = "1.5.21"
 android = "7.4.2"
-ktlintPlugin = "12.3.0"
+ktlintPlugin = "14.0.1"
 #noinspection GradleDependency Newer versions incompatible with other plugins
 ktlint = "0.50.0"
 

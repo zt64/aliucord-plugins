@@ -1,6 +1,6 @@
 [versions]
 discord = "aliucord-SNAPSHOT"
-aliucord-core = "2.4.0"
+aliucord-core = "2.5.0"
 aliucord-gradle = "753ad25"
 #noinspection GradleDependency
 kotlin = "1.5.21"

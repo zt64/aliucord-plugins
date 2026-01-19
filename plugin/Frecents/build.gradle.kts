@@ -2,7 +2,7 @@ import com.google.protobuf.gradle.id
 import com.google.protobuf.gradle.proto
 
 plugins {
-    id("com.google.protobuf") version "0.9.5"
+    id("com.google.protobuf") version "0.9.6"
 }
 
 version = "1.1.5"

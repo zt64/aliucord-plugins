@@ -153,7 +153,10 @@ class CompactMode : Plugin() {
                     }
                     if (settings.hideAvatar) {
                         avatarView!!.visibility = View.GONE
-                        avatarDecoration?.visibility = View.GONE
+                        avatarDecoration?.layoutParams<ConstraintLayout.LayoutParams>()?.run {
+                            height = 0
+                            width = 0
+                        }
 
                         headerView.layoutParams<ConstraintLayout.LayoutParams>().marginStart = contentMargin
 

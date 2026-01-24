@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - '.github/workflows/**'
       - 'gradle.properties'
       - 'gradle/**'
       - 'plugin/**'
@@ -40,8 +41,8 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/src
           ./gradlew make generateUpdaterJson
-          cp plugin/**/build/*.zip $GITHUB_WORKSPACE/builds
-          cp build/updater.json $GITHUB_WORKSPACE/builds
+          cp plugin/*/build/outputs/*.zip $GITHUB_WORKSPACE/builds
+          cp build/outputs/updater.json $GITHUB_WORKSPACE/builds
 
       - name: Push builds
         run: |

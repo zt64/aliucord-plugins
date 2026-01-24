@@ -34,7 +34,7 @@ import java.nio.charset.Charset
 import java.util.regex.Pattern
 import j0.l.e.k as ScalarSynchronousObservable
 
-internal data class GatewayResponse(val settings: Settings, val partial: Boolean) {
+data class GatewayResponse(val settings: Settings, val partial: Boolean) {
     data class Settings(val proto: String, val type: Int)
 }
 

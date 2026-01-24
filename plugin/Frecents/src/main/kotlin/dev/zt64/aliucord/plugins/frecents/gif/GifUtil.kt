@@ -24,5 +24,7 @@ object GifUtil {
         }
             .replace("AAAPo", "AAAAM")
             .replace(".mp4", ".gif")
+            .replace("AAAPs", "AAAAM")
+            .replace(".webm", ".gif")
     }
 }

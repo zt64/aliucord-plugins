@@ -1,5 +1,3 @@
-@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
-
 package dev.zt64.aliucord.plugins.frecents
 
 import com.discord.databinding.InlineMediaViewBinding

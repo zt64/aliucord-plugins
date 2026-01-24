@@ -5,11 +5,14 @@ plugins {
     id("com.google.protobuf") version "0.9.5"
 }
 
-version = "1.1.5"
+version = "1.1.6"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.6
+    - Fix webm GIFs not showing up in favorite GIFs (credit to aubymori)
+    
     # 1.1.5
     - Fixed a potential error caused by unsupported emojis in favorites or recents.
 

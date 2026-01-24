@@ -1,10 +1,9 @@
-@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
-
 package dev.zt64.aliucord.plugins
 
 import android.content.Context
 import android.view.View
-import android.widget.*
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
@@ -20,7 +19,7 @@ import com.discord.models.gifpicker.dto.ModelGif
 import com.discord.stores.*
 import com.discord.stores.StoreMediaFavorites.Favorite
 import com.discord.widgets.chat.input.gifpicker.*
-import com.discord.widgets.chat.input.sticker.*
+import com.discord.widgets.chat.input.sticker.OwnedHeaderViewHolder
 import com.discord.widgets.emoji.EmojiSheetViewModel
 import com.discord.widgets.emoji.EmojiSheetViewModel.ViewState
 import com.lytefast.flexinput.R
@@ -35,7 +34,7 @@ import java.nio.charset.Charset
 import java.util.regex.Pattern
 import j0.l.e.k as ScalarSynchronousObservable
 
-data class GatewayResponse(val settings: Settings, val partial: Boolean) {
+internal data class GatewayResponse(val settings: Settings, val partial: Boolean) {
     data class Settings(val proto: String, val type: Int)
 }
 

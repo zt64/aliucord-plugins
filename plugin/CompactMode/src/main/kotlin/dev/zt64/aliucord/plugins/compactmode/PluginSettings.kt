@@ -1,4 +1,4 @@
-package compactmode
+package dev.zt64.aliucord.plugins.compactmode
 
 import android.os.Bundle
 import android.view.View
@@ -13,7 +13,6 @@ import com.aliucord.widgets.BottomSheet
 import com.discord.views.CheckedSetting
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(val settings: SettingsAPI) : BottomSheet() {
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
@@ -62,7 +61,7 @@ class PluginSettings(val settings: SettingsAPI) : BottomSheet() {
 
         addView(
             TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-                text = "CompactMode"
+                text = "dev.zt64.aliucord.plugins.compactmode.CompactMode"
             }
         )
 

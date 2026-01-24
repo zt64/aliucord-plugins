@@ -1,3 +1,5 @@
+package dev.zt64.aliucord.plugins.compactmode
+
 import android.content.Context
 import android.view.Gravity
 import android.view.View
@@ -19,7 +21,6 @@ import com.aliucord.utils.lazyField
 import com.discord.utilities.textprocessing.node.EmojiNode
 import com.discord.widgets.chat.list.adapter.*
 import com.discord.widgets.chat.list.entries.ChatListEntry
-import compactmode.PluginSettings
 
 @AliucordPlugin(requiresRestart = true)
 class CompactMode : Plugin() {

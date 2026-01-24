@@ -3,7 +3,7 @@
 import com.aliucord.gradle.AliucordExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.LibraryExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 subprojects {
@@ -16,10 +16,14 @@ subprojects {
         plugin(libs.plugins.ktlint.get().pluginId)
     }
 
+    kotlinExtension.apply {
+        jvmToolchain(21)
+    }
+
     configure<LibraryExtension> {
         namespace = "com.aliucord.plugins"
 
-        compileSdk = 34
+        compileSdk = 36
 
         defaultConfig {
             minSdk = 21
@@ -30,13 +34,11 @@ subprojects {
             shaders = false
             buildConfig = true
             resValues = false
-            androidResources = false
             aidl = false
         }
 
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
+        androidResources {
+            enable = false
         }
 
         lint {
@@ -66,20 +68,12 @@ subprojects {
     }
 
     dependencies {
-        val discord by configurations
         val compileOnly by configurations
-        val implementation by configurations
 
-        discord(libs.discord)
+        compileOnly(libs.discord)
         compileOnly(libs.aliucord)
-        // compileOnly("com.github.Aliucord:Aliucord:unspecified")
-    }
-
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "11"
-            freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-        }
+        compileOnly(libs.aliuhook)
+        compileOnly(libs.kotlin.stdlib)
     }
 }
 
@@ -92,9 +86,7 @@ tasks.register("generateReadMe") {
     doLast {
         val readMe = rootProject.file("README.md")
         val plugins = subprojects
-            .filterNot {
-                it.extensions.getByType<AliucordExtension>().excludeFromUpdaterJson.get()
-            }
+            .filter { it.extensions.getByType<AliucordExtension>().deploy.get() }
             .sortedBy { it.name }
 
         val content = buildString {

@@ -77,7 +77,7 @@ class InvitesPage(private val channel: Channel) : AppFragment(Utils.getResId("wi
             }
         }
 
-        (WidgetServerSettingsInstantInvites.Model.Companion).get(
+        (WidgetServerSettingsInstantInvites.Model.Companion)!!.get(
             channel.guildId,
             StoreStream.getGuilds(),
             StoreStream.getInstantInvites()
@@ -85,37 +85,37 @@ class InvitesPage(private val channel: Channel) : AppFragment(Utils.getResId("wi
     }
 
     //    private fun configureUI(model: WidgetServerSettingsInstantInvites.Model) {
-//        val viewFlipper = requireView().findViewById<AppViewFlipper>(viewFlipperId)
-//        val invitesRecycler = requireView().findViewById<RecyclerView>(recyclerId)
-//
-//        val invites = model.inviteItems
-//        if (invites.isEmpty()) {
-//            viewFlipper.displayedChild = 2
-//            return
-//        } else  {
-//            invitesRecycler.run {
-//                adapter = WidgetServerSettingsInstantInvites.Adapter(this).also { adapter ->
-//                    val onInviteSelectedListener = { modelInvite: ModelInvite ->
-//                        WidgetServerSettingsInstantInvitesActions.create(parentFragmentManager, modelInvite.code)
-//                    }
-//
-//                    val onInviteExpiredListener = { modelInvite: ModelInvite ->
-//                        StoreStream.getInstantInvites().onInviteRemoved(modelInvite)
-//                    }
-//
-//                    adapter.configure(invites, onInviteSelectedListener, onInviteExpiredListener)
-//                }
-//                layoutManager = LinearLayoutManager(context)
-//            }
-//            viewFlipper.displayedChild = 1
-//        }
-//    }
-//
+    //        val viewFlipper = requireView().findViewById<AppViewFlipper>(viewFlipperId)
+    //        val invitesRecycler = requireView().findViewById<RecyclerView>(recyclerId)
+    //
+    //        val invites = model.inviteItems
+    //        if (invites.isEmpty()) {
+    //            viewFlipper.displayedChild = 2
+    //            return
+    //        } else  {
+    //            invitesRecycler.run {
+    //                adapter = WidgetServerSettingsInstantInvites.Adapter(this).also { adapter ->
+    //                    val onInviteSelectedListener = { modelInvite: ModelInvite ->
+    //                        WidgetServerSettingsInstantInvitesActions.create(parentFragmentManager, modelInvite.code)
+    //                    }
+    //
+    //                    val onInviteExpiredListener = { modelInvite: ModelInvite ->
+    //                        StoreStream.getInstantInvites().onInviteRemoved(modelInvite)
+    //                    }
+    //
+    //                    adapter.configure(invites, onInviteSelectedListener, onInviteExpiredListener)
+    //                }
+    //                layoutManager = LinearLayoutManager(context)
+    //            }
+    //            viewFlipper.displayedChild = 1
+    //        }
+    //    }
+    //
     override fun onViewBoundOrOnResume() {
         super.onViewBoundOrOnResume()
         ObservableExtensionsKt.appSubscribe(
             ObservableExtensionsKt.ui(
-                (WidgetServerSettingsInstantInvites.Model.Companion).get(
+                (WidgetServerSettingsInstantInvites.Model.Companion)!!.get(
                     channel.guildId,
                     StoreStream.getGuilds(),
                     StoreStream.getInstantInvites()
@@ -132,7 +132,7 @@ class InvitesPage(private val channel: Channel) : AppFragment(Utils.getResId("wi
             { },
             {
                 Utils.showToast("guh")
-//            configureUI(it)
+                //            configureUI(it)
             }
         )
     }

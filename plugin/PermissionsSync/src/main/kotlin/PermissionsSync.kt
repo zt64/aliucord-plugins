@@ -65,7 +65,7 @@ class PermissionsSync : Plugin() {
 
             val categoryName = StoreStream.getChannels().getChannel(model.channel.parentId).name
 
-            (WidgetChannelSettingsPermissionsAdvanced.Model.Companion)
+            (WidgetChannelSettingsPermissionsAdvanced.Model.Companion)!!
                 .get(model.channel.parentId)
                 .subscribe {
                     val parentModel = this
@@ -113,7 +113,7 @@ class PermissionsSync : Plugin() {
                                             .updatePermissionOverwrites(
                                                 model.channel.id,
                                                 permissionOverwrite.id,
-                                                (RestAPIParams.ChannelPermissionOverwrites.Companion)
+                                                (RestAPIParams.ChannelPermissionOverwrites.Companion)!!
                                                     .fromPermissionOverwrite(permissionOverwrite)
                                             ).await()
                                             .second

@@ -91,7 +91,7 @@ class Frecents : Plugin() {
         )
     }
 
-    override fun start(ctx: Context) {
+    override fun start(context: Context) {
         GatewayAPI.onEvent<GatewayResponse>("USER_SETTINGS_PROTO_UPDATE", frecencySettings::handleGatewayUpdate)
 
         // Patch to make favorite emotes use the frecency user settings
@@ -319,7 +319,7 @@ class Frecents : Plugin() {
 
             itemView.findViewById<ImageView>(Resources.gif_category_item_icon).apply {
                 visibility = View.VISIBLE
-                setImageDrawable(ContextCompat.getDrawable(ctx, R.e.ic_emoji_picker_category_favorites_star)!!)
+                setImageDrawable(ContextCompat.getDrawable(context, R.e.ic_emoji_picker_category_favorites_star)!!)
             }
 
             itemView.findViewById<TextView>(Resources.gif_category_item_title).text = "Favorites"

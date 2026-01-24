@@ -4,8 +4,9 @@ pluginManagement {
     repositories {
         google()
         gradlePluginPortal()
+
+        maven("https://maven.aliucord.com/releases")
         maven("https://maven.aliucord.com/snapshots")
-        maven("https://jitpack.io")
     }
 }
 
@@ -13,6 +14,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://maven.aliucord.com/releases")
         maven("https://maven.aliucord.com/snapshots")
     }
 

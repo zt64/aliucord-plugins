@@ -3,21 +3,27 @@ discord = "126021"
 aliucord-core = "2.6.0"
 aliucord-gradle = "2.3.0"
 aliuhook = "1.1.4"
-#noinspection GradleDependency
-kotlin = "2.2.20"
+kotlin = "2.3.0"
+#noinspection GradleDependency Alibabacord still on 1.5.21
+kotlin-stdlib = "1.5.21"
+#noinspection AndroidGradlePluginVersion
 android = "8.13.2"
+wire = "5.5.0"
+#noinspection NewerVersionAvailable
+shadow = "8.3.8"
 ktlintPlugin = "14.0.1"
-#noinspection GradleDependency Newer versions incompatible with other plugins
-ktlint = "0.50.0"
+ktlint = "1.8.0"
 
 [libraries]
 discord = { module = "com.discord:discord", version.ref = "discord" }
 aliucord = { module = "com.aliucord:Aliucord", version.ref = "aliucord-core" }
 aliuhook = { module = "com.aliucord:Aliuhook", version.ref = "aliuhook" }
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin-stdlib" }
 
 [plugins]
 android-library = { id = "com.android.library", version.ref = "android" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 aliucord = { id = "com.aliucord.plugin", version.ref = "aliucord-gradle" }
+wire = { id = "com.squareup.wire", version.ref = "wire" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintPlugin" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

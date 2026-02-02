@@ -46,7 +46,7 @@ class FrecentsSettings(private val frecencySettingsManager: FrecencySettingsMana
                 setOnClickListener {
                     try {
                         val file = File(Constants.BASE_PATH, "Frecents.bin").apply {
-                            writeBytes(frecencySettingsManager.settings.toByteArray())
+                            writeBytes(frecencySettingsManager.settings.encode())
                         }
 
                         Toast.makeText(ctx, "Succesfully wrote to ${file.absolutePath}", Toast.LENGTH_LONG).show()

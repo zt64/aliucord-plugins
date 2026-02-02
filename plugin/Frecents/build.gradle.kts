@@ -1,15 +1,34 @@
-import com.google.protobuf.gradle.id
-import com.google.protobuf.gradle.proto
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id("com.google.protobuf") version "0.9.5"
+    alias(libs.plugins.wire)
+    alias(libs.plugins.shadow)
 }
 
-version = "1.1.6"
+wire {
+    kotlin { }
+}
+
+val shadowJar by tasks.register<ShadowJar>("shadowJar") {
+    relocate("okio", "com.o.okio.okio")
+    archiveClassifier.set("shadowed")
+}
+
+project.afterEvaluate {
+    tasks.compileDex {
+        dependsOn(shadowJar)
+        input.setFrom(shadowJar.archiveFile.map { zipTree(it) })
+    }
+}
+
+version = "1.1.7"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.7
+    - Switched frecents code generation to be more maintainable. Shouldn't have any noticeable affects.
+        
     # 1.1.6
     - Fix webm GIFs not showing up in favorite GIFs (credit to aubymori)
     
@@ -55,42 +74,3 @@ aliucord.changelog.set(
     - Initial release
     """.trimIndent()
 )
-
-android {
-    sourceSets {
-        named("main") {
-            proto { }
-
-            java {
-                srcDirs("${protobuf.generatedFilesBaseDir}/main/javalite")
-            }
-        }
-    }
-}
-
-protobuf {
-    val version = "4.28.3"
-    protoc {
-        artifact = "com.google.protobuf:protoc:$version"
-    }
-
-    plugins {
-        id("javalite") {
-            artifact = "com.google.protobuf:protoc-gen-javalite:$version"
-        }
-    }
-
-    generateProtoTasks {
-        all().forEach {
-            it.plugins {
-                id("java") {
-                    option("lite")
-                }
-
-                create("kotlin") {
-                    option("lite")
-                }
-            }
-        }
-    }
-}

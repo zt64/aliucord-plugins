@@ -1,12 +1,13 @@
 package dev.zt64.aliucord.plugins.frecents
 
 import android.util.Base64
+import com.aliucord.Constants
 import com.aliucord.Http
 import com.aliucord.Utils
-import dev.zt64.aliucord.plugins.GatewayResponse
-import discord_protos.discord_users.v1.FrecencyUserSettingsOuterClass.FrecencyUserSettings
+import discord_protos.discord_users.v1.FrecencyUserSettings
 import rx.Observable
 import rx.subjects.BehaviorSubject
+import java.io.File
 
 private const val ROUTE = "/users/@me/settings-proto/2"
 
@@ -15,6 +16,8 @@ class FrecencySettingsManager {
 
     @Volatile
     private var _settings: FrecencyUserSettings? = null
+
+    private var debug = false
 
     var settings: FrecencyUserSettings
         get() = _settings ?: loadSettingsSync().also { _settings = it }
@@ -35,7 +38,7 @@ class FrecencySettingsManager {
     //             val res = Http.Request
     //                 .newDiscordRNRequest(ROUTE, "GET")
     //                 .execute()
-    //                 .json(Response::class.java)
+    //                 .json(Response::class.java2)
     //
     //             decodeSettings(res.settings)
     //         }.let {
@@ -82,7 +85,22 @@ class FrecencySettingsManager {
         val newSettings = decodeSettings(response.settings.proto)
 
         settings = if (response.partial) {
-            settings.toBuilder().mergeFrom(newSettings).build()
+            // Wire doesn't support partial merging like protobuf, so we manually merge non-null fields
+            settings.copy(
+                versions = newSettings.versions ?: settings.versions,
+                favorite_gifs = newSettings.favorite_gifs ?: settings.favorite_gifs,
+                favorite_stickers = newSettings.favorite_stickers ?: settings.favorite_stickers,
+                sticker_frecency = newSettings.sticker_frecency ?: settings.sticker_frecency,
+                favorite_emojis = newSettings.favorite_emojis ?: settings.favorite_emojis,
+                emoji_frecency = newSettings.emoji_frecency ?: settings.emoji_frecency,
+                application_command_frecency = newSettings.application_command_frecency ?: settings.application_command_frecency,
+                favorite_soundboard_sounds = newSettings.favorite_soundboard_sounds ?: settings.favorite_soundboard_sounds,
+                application_frecency = newSettings.application_frecency ?: settings.application_frecency,
+                heard_sound_frecency = newSettings.heard_sound_frecency ?: settings.heard_sound_frecency,
+                played_sound_frecency = newSettings.played_sound_frecency ?: settings.played_sound_frecency,
+                guild_and_channel_frecency = newSettings.guild_and_channel_frecency ?: settings.guild_and_channel_frecency,
+                emoji_reaction_frecency = newSettings.emoji_reaction_frecency ?: settings.emoji_reaction_frecency
+            )
         } else {
             newSettings
         }
@@ -90,6 +108,15 @@ class FrecencySettingsManager {
 
     private fun loadSettingsSync(): FrecencyUserSettings {
         return try {
+            if (debug) {
+                try {
+                    val bin = File(Constants.BASE_PATH, "Frecents.bin").readBytes()
+                    return FrecencyUserSettings.ADAPTER.decode(bin)
+                } catch (e: Exception) {
+                    Utils.showToast("Falling back to network load: ${e.message}")
+                }
+            }
+
             val res = Http.Request
                 .newDiscordRNRequest(ROUTE, "GET")
                 .execute()
@@ -103,6 +130,8 @@ class FrecencySettingsManager {
     }
 
     private fun patchSettingsSync() {
+        if (debug) return
+
         val res = Http.Request
             .newDiscordRNRequest(ROUTE, "PATCH")
             .executeWithJson(Patch(settings))
@@ -114,12 +143,12 @@ class FrecencySettingsManager {
     }
 
     private fun decodeSettings(encoded: String): FrecencyUserSettings {
-        return FrecencyUserSettings.parseFrom(Base64.decode(encoded, Base64.DEFAULT))
+        return FrecencyUserSettings.ADAPTER.decode(Base64.decode(encoded, Base64.DEFAULT))
     }
 
     private data class Patch(val settings: String) {
         constructor(settings: FrecencyUserSettings) : this(
-            Base64.encodeToString(settings.toByteArray(), Base64.DEFAULT)
+            Base64.encodeToString(FrecencyUserSettings.ADAPTER.encode(settings), Base64.DEFAULT)
         )
     }
 

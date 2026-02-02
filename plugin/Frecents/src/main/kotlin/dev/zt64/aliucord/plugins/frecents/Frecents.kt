@@ -1,4 +1,4 @@
-package dev.zt64.aliucord.plugins
+package dev.zt64.aliucord.plugins.frecents
 
 import android.content.Context
 import android.view.View
@@ -23,12 +23,9 @@ import com.discord.widgets.chat.input.sticker.OwnedHeaderViewHolder
 import com.discord.widgets.emoji.EmojiSheetViewModel
 import com.discord.widgets.emoji.EmojiSheetViewModel.ViewState
 import com.lytefast.flexinput.R
-import dev.zt64.aliucord.plugins.frecents.*
 import dev.zt64.aliucord.plugins.frecents.gif.GifCategoryItemFavorites
 import dev.zt64.aliucord.plugins.frecents.gif.GifUtil
-import discord_protos.discord_users.v1.FrecencyUserSettingsKt
-import discord_protos.discord_users.v1.FrecencyUserSettingsOuterClass.FrecencyUserSettings
-import discord_protos.discord_users.v1.copy
+import discord_protos.discord_users.v1.FrecencyUserSettings
 import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.util.regex.Pattern
@@ -52,24 +49,24 @@ class Frecents : Plugin() {
 
     private fun toggleFavoriteGif(model: ModelGif) {
         val tenorGifUrl = URLDecoder.decode(model.tenorGifUrl, Charset.defaultCharset().name())
-        val isFavorited = frecencySettings.settings.favoriteGifs.gifsMap.containsKey(tenorGifUrl)
+        val isFavorited = frecencySettings.settings.favorite_gifs!!.gifs.containsKey(tenorGifUrl)
+
         frecencySettings.updateSettings {
-            it.copy {
-                favoriteGifs = favoriteGifs.copy {
-                    val gifs = gifs
-                    if (isFavorited) {
-                        gifs.remove(tenorGifUrl)
-                    } else {
-                        gifs[tenorGifUrl] = FrecencyUserSettingsKt.favoriteGIF {
-                            format = FrecencyUserSettings.GIFType.GIF_TYPE_IMAGE
-                            this.width = model.width
-                            this.height = model.height
-                            src = model.gifImageUrl
-                            order = if (gifs.isEmpty()) 1 else gifs.values.maxOf { it.order } + 1
-                        }
-                    }
-                }
+            val gifs = it.favorite_gifs!!.gifs.toMutableMap()
+
+            if (isFavorited) {
+                gifs.remove(tenorGifUrl)
+            } else {
+                gifs[tenorGifUrl] = FrecencyUserSettings.FavoriteGIF(
+                    format = FrecencyUserSettings.GIFType.GIF_TYPE_IMAGE,
+                    src = model.gifImageUrl,
+                    width = model.width,
+                    height = model.height,
+                    order = if (gifs.isEmpty()) 1 else gifs.values.maxOf { it.order } + 1
+                )
             }
+
+            it.copy(favorite_gifs = it.favorite_gifs.copy(gifs = gifs))
         }
 
         frecencySettings.patchSettingsAsync(
@@ -100,13 +97,12 @@ class Frecents : Plugin() {
 
             frecencySettings.observeSettings().switchMap { frecents ->
                 ScalarSynchronousObservable(
-                    frecents.favoriteEmojis.emojisList.mapNotNull {
+                    frecents.favorite_emojis!!.emojis.mapNotNull {
                         if (pattern.matcher(it).matches()) {
                             Favorite.FavCustomEmoji(it)
                         } else {
-                            @Suppress("USELESS_CAST") // IDE doesn't like without this cast
-                            emojiStore.unicodeEmojisNamesMap[it]?.let {
-                                Favorite.FavUnicodeEmoji(it.uniqueId) as Favorite
+                            emojiStore.unicodeEmojisNamesMap[it]?.let { model ->
+                                Favorite.FavUnicodeEmoji(model.uniqueId)
                             }
                         }
                     }.toSet()
@@ -115,7 +111,7 @@ class Frecents : Plugin() {
         }
 
         // Patch to make clicking an emoji update the frecency user settings
-        // patcher.instead<StoreEmoji>("onEmojiUsed", String::class.java) { (param, emojiKey: String) ->
+        // patcher.instead<StoreEmoji>("onEmojiUsed", String::class.java2) { (param, emojiKey: String) ->
         //     frecencySettings.updateSettings {
         //         it.copy {
         //             val frecency = emojiFrecency.getEmojisOrDefault(
@@ -146,10 +142,9 @@ class Frecents : Plugin() {
         patcher.instead<StoreEmoji>("getFrequentlyUsedEmojis", Map::class.java) { param ->
             @Suppress("UNCHECKED_CAST")
             val emojiIdsMap = param.args[0] as Map<String, Emoji>
-            val settings = frecencySettings.settings
 
             FrecencyCalculator.sortEmojis(
-                frecencyMap = settings.emojiFrecency.emojisMap,
+                frecencyMap = frecencySettings.settings.emoji_frecency!!.emojis,
                 emojiIdsMap = emojiIdsMap,
                 unicodeEmojisMap = unicodeEmojisNamesMap
             )
@@ -167,17 +162,15 @@ class Frecents : Plugin() {
             }
 
             frecencySettings.updateSettings {
-                it.copy {
-                    favoriteEmojis = favoriteEmojis.copy {
-                        if (favorite) {
-                            emojis.add(data)
-                        } else {
-                            val newList = emojis.filter { it != data }
-                            emojis.clear()
-                            emojis.addAll(newList)
-                        }
-                    }
+                val updatedEmojis = if (favorite) {
+                    it.favorite_emojis!!.emojis + data
+                } else {
+                    it.favorite_emojis!!.emojis.filter { emoji -> emoji != data }
                 }
+
+                it.copy(
+                    favorite_emojis = it.favorite_emojis!!.copy(emojis = updatedEmojis)
+                )
             }
             frecencySettings.patchSettingsAsync(
                 onError = { _, e ->
@@ -187,11 +180,11 @@ class Frecents : Plugin() {
         }
 
         // patcher.before<StickerPickerViewModel.ViewState.Stickers>(
-        //     String::class.java,
-        //     List::class.java,
-        //     List::class.java,
-        //     Boolean::class.java,
-        //     Boolean::class.java
+        //     String::class.java2,
+        //     List::class.java2,
+        //     List::class.java2,
+        //     Boolean::class.java2,
+        //     Boolean::class.java2
         // ) { (param, _: Any, a: List<MGRecyclerDataPayload>) ->
         //     param.args[1] = listOf(HeaderItem(FavoritesItem)) + a
         // }
@@ -199,7 +192,7 @@ class Frecents : Plugin() {
         // Patch to use the frequently used stickers from the frecency user settings
         patcher.instead<StoreStickers>("observeFrequentlyUsedStickerIds") {
             frecencySettings.observeSettings().map { settings ->
-                FrecencyCalculator.sortStickers(settings.stickerFrecency.stickersMap)
+                FrecencyCalculator.sortStickers(settings.sticker_frecency!!.stickers)
             }
         }
 
@@ -227,7 +220,7 @@ class Frecents : Plugin() {
         // }
 
         // Patch to make long clicking a sticker add it to favorites
-        // patcher.after<StickerViewHolder>("configureSticker", MGRecyclerDataPayload::class.java) { (_, payload: MGRecyclerDataPayload) ->
+        // patcher.after<StickerViewHolder>("configureSticker", MGRecyclerDataPayload::class.java2) { (_, payload: MGRecyclerDataPayload) ->
         //     StickerViewHolder.`access$getBinding$p`(this).a.setOnLongClickListener {
         //         val stickerItem = payload as StickerItem
         //         val isFavorited = stickerItem.sticker.id in frecencySettings.settings.favoriteStickers.stickerIdsList
@@ -270,8 +263,8 @@ class Frecents : Plugin() {
         // Add favorites section to the sticker categories list
         // patcher.after<OwnedHeaderViewHolder>(
         //     "onConfigure",
-        //     Int::class.java,
-        //     MGRecyclerDataPayload::class.java
+        //     Int::class.java2,
+        //     MGRecyclerDataPayload::class.java2
         // ) { (_, _: Int, data: MGRecyclerDataPayload) ->
         //     if (data !is HeaderItem) return@after
         //
@@ -309,8 +302,8 @@ class Frecents : Plugin() {
         ) { (_, gifCategoryItem: GifCategoryItem?) ->
             if (gifCategoryItem !is GifCategoryItemFavorites) return@after
 
-            if (frecencySettings.settings.favoriteGifs.gifsCount > 0) {
-                setPreviewImage(GifUtil.mqGifUrl(frecencySettings.settings.favoriteGifs.gifsMap.values.random().src))
+            if (frecencySettings.settings.favorite_gifs!!.gifs.isNotEmpty()) {
+                setPreviewImage(GifUtil.mqGifUrl(frecencySettings.settings.favorite_gifs!!.gifs.values.random().src))
             } else {
                 // Clear it out, so it doesn't show the last preview
                 setPreviewImage("")
@@ -349,7 +342,7 @@ class Frecents : Plugin() {
                 is GifCategoryItem.Standard -> store.observeGifsForSearchQuery(item.gifCategory.categoryName)
                 is GifCategoryItem.Trending -> store.observeTrendingCategoryGifs()
                 is GifCategoryItemFavorites -> frecencySettings.observeSettings().map {
-                    it.favoriteGifs.gifsMap
+                    it.favorite_gifs!!.gifs
                         .asSequence()
                         .sortedByDescending { it.value.order }
                         .map { (tenorUrl, v) ->
@@ -362,14 +355,14 @@ class Frecents : Plugin() {
         }
 
         // Experiment using ExoPlayer for mp4 gifs
-        // val bindingField = GifViewHolder.Gif::class.java
+        // val bindingField = GifViewHolder.Gif::class.java2
         //     .getDeclaredField("binding")
         //     .apply { isAccessible = true }
 
         // val m = b.a.p.i.a(ctx)
         // lateinit var playerView: PlayerView
         //
-        // patcher.after<GifViewHolder.Gif>(GifItemViewBinding::class.java) { (_, binding: GifItemViewBinding) ->
+        // patcher.after<GifViewHolder.Gif>(GifItemViewBinding::class.java2) { (_, binding: GifItemViewBinding) ->
         //     playerView = PlayerView(binding.root.context, null).apply {
         //         layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
         //         visibility = View.GONE
@@ -380,7 +373,7 @@ class Frecents : Plugin() {
         //     (binding.root as ViewGroup).addView(playerView)
         // }
         //
-        // patcher.instead<GifViewHolder.Gif>("setGifImage", ModelGif::class.java) { (_, gif: ModelGif) ->
+        // patcher.instead<GifViewHolder.Gif>("setGifImage", ModelGif::class.java2) { (_, gif: ModelGif) ->
         //     val binding = bindingField[this] as GifItemViewBinding
         //     val url = gif.gifImageUrl
         //
@@ -400,7 +393,7 @@ class Frecents : Plugin() {
         // Patch to favorite/unfavorite embedded gifs from a URL on long click
         // patcher.after<InlineMediaView>(
         //     "updateUIWithEmbed",
-        //     MessageEmbed::class.java,
+        //     MessageEmbed::class.java2,
         //     Int::class.javaObjectType,
         //     Int::class.javaObjectType,
         //     Boolean::class.javaPrimitiveType!!
@@ -421,7 +414,7 @@ class Frecents : Plugin() {
         // Favorite/unfavorite gif file attachment on long click
         // patcher.after<InlineMediaView>(
         //     "updateUIWithAttachment",
-        //     MessageAttachment::class.java,
+        //     MessageAttachment::class.java2,
         //     Int::class.javaObjectType,
         //     Int::class.javaObjectType,
         //     Boolean::class.javaPrimitiveType!!
@@ -449,10 +442,10 @@ class Frecents : Plugin() {
 
         // Patch to add a favorite button to the URL actions widget
         // Can't implement unless I find a way to get the width and height of the gif
-        // val getBinding = WidgetUrlActions::class.java
+        // val getBinding = WidgetUrlActions::class.java2
         //     .getDeclaredMethod("getBinding").apply { isAccessible = true }
         //
-        // patcher.after<WidgetUrlActions>("onViewCreated", View::class.java, Bundle::class.java) {
+        // patcher.after<WidgetUrlActions>("onViewCreated", View::class.java2, Bundle::class.java2) {
         //     val binding = getBinding(this) as WidgetUrlActionsBinding
         //     val url = WidgetUrlActions.`access$getUrl$p`(this)
         //

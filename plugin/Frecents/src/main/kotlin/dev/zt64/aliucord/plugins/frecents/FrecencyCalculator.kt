@@ -1,7 +1,7 @@
 package dev.zt64.aliucord.plugins.frecents
 
 import com.discord.models.domain.emoji.Emoji
-import discord_protos.discord_users.v1.FrecencyUserSettingsOuterClass.FrecencyUserSettings.FrecencyItem
+import discord_protos.discord_users.v1.FrecencyUserSettings.FrecencyItem
 
 object FrecencyCalculator {
     private const val RECENT_EMOJIS_MAX = 32
@@ -52,9 +52,9 @@ object FrecencyCalculator {
     }
 
     private fun calculateFrecencyScore(entry: FrecencyItem, now: Long): Double? {
-        if (entry.totalUses <= 0) return null
+        if (entry.total_uses <= 0) return null
 
-        val recentUses = entry.recentUsesList
+        val recentUses = entry.recent_uses
 
         val score = recentUses.take(MAX_SAMPLES).sumOf { timestamp ->
             val daysAgo = (now - timestamp) / (1000.0 * 60.0 * 60.0 * 24.0)
@@ -62,9 +62,9 @@ object FrecencyCalculator {
         }
 
         return if (score > 0 && recentUses.isNotEmpty()) {
-            entry.totalUses * (score / (100.0 * recentUses.size))
+            entry.total_uses * (score / (100.0 * recentUses.size))
         } else {
-            entry.totalUses.toDouble()
+            entry.total_uses.toDouble()
         }
     }
 

@@ -49,11 +49,10 @@ class Frecents : Plugin() {
 
     private fun toggleFavoriteGif(model: ModelGif) {
         val tenorGifUrl = URLDecoder.decode(model.tenorGifUrl, Charset.defaultCharset().name())
-        val isFavorited = frecencySettings.settings.favorite_gifs!!.gifs.containsKey(tenorGifUrl)
+        val gifs = frecencySettings.settings.favorite_gifs?.gifs.orEmpty().toMutableMap()
+        val isFavorited = tenorGifUrl in gifs
 
         frecencySettings.updateSettings {
-            val gifs = it.favorite_gifs!!.gifs.toMutableMap()
-
             if (isFavorited) {
                 gifs.remove(tenorGifUrl)
             } else {
@@ -66,7 +65,7 @@ class Frecents : Plugin() {
                 )
             }
 
-            it.copy(favorite_gifs = it.favorite_gifs.copy(gifs = gifs))
+            copy(favorite_gifs = favorite_gifs?.copy(gifs = gifs))
         }
 
         frecencySettings.patchSettingsAsync(
@@ -97,7 +96,7 @@ class Frecents : Plugin() {
 
             frecencySettings.observeSettings().switchMap { frecents ->
                 ScalarSynchronousObservable(
-                    frecents.favorite_emojis!!.emojis.mapNotNull {
+                    frecents.favorite_emojis?.emojis.orEmpty().mapNotNull {
                         if (pattern.matcher(it).matches()) {
                             Favorite.FavCustomEmoji(it)
                         } else {
@@ -144,7 +143,7 @@ class Frecents : Plugin() {
             val emojiIdsMap = param.args[0] as Map<String, Emoji>
 
             FrecencyCalculator.sortEmojis(
-                frecencyMap = frecencySettings.settings.emoji_frecency!!.emojis,
+                frecencyMap = frecencySettings.settings.emoji_frecency?.emojis.orEmpty(),
                 emojiIdsMap = emojiIdsMap,
                 unicodeEmojisMap = unicodeEmojisNamesMap
             )
@@ -162,16 +161,17 @@ class Frecents : Plugin() {
             }
 
             frecencySettings.updateSettings {
-                val updatedEmojis = if (favorite) {
-                    it.favorite_emojis!!.emojis + data
-                } else {
-                    it.favorite_emojis!!.emojis.filter { emoji -> emoji != data }
-                }
-
-                it.copy(
-                    favorite_emojis = it.favorite_emojis!!.copy(emojis = updatedEmojis)
+                copy(
+                    favorite_emojis = favorite_emojis?.copy(
+                        emojis = if (favorite) {
+                            favorite_emojis.emojis + data
+                        } else {
+                            favorite_emojis.emojis.filter { it != data }
+                        }
+                    )
                 )
             }
+
             frecencySettings.patchSettingsAsync(
                 onError = { _, e ->
                     Utils.showToast("Failed to update favorite emoji: ${e.message}")
@@ -192,7 +192,7 @@ class Frecents : Plugin() {
         // Patch to use the frequently used stickers from the frecency user settings
         patcher.instead<StoreStickers>("observeFrequentlyUsedStickerIds") {
             frecencySettings.observeSettings().map { settings ->
-                FrecencyCalculator.sortStickers(settings.sticker_frecency!!.stickers)
+                FrecencyCalculator.sortStickers(settings.sticker_frecency?.stickers.orEmpty())
             }
         }
 
@@ -302,8 +302,9 @@ class Frecents : Plugin() {
         ) { (_, gifCategoryItem: GifCategoryItem?) ->
             if (gifCategoryItem !is GifCategoryItemFavorites) return@after
 
-            if (frecencySettings.settings.favorite_gifs!!.gifs.isNotEmpty()) {
-                setPreviewImage(GifUtil.mqGifUrl(frecencySettings.settings.favorite_gifs!!.gifs.values.random().src))
+            val favoriteGifs = frecencySettings.settings.favorite_gifs?.gifs.orEmpty()
+            if (favoriteGifs.isNotEmpty()) {
+                setPreviewImage(GifUtil.mqGifUrl(favoriteGifs.values.random().src))
             } else {
                 // Clear it out, so it doesn't show the last preview
                 setPreviewImage("")
@@ -342,7 +343,8 @@ class Frecents : Plugin() {
                 is GifCategoryItem.Standard -> store.observeGifsForSearchQuery(item.gifCategory.categoryName)
                 is GifCategoryItem.Trending -> store.observeTrendingCategoryGifs()
                 is GifCategoryItemFavorites -> frecencySettings.observeSettings().map {
-                    it.favorite_gifs!!.gifs
+                    it.favorite_gifs?.gifs
+                        .orEmpty()
                         .asSequence()
                         .sortedByDescending { it.value.order }
                         .map { (tenorUrl, v) ->

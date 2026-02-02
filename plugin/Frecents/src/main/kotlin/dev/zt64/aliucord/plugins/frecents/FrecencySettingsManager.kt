@@ -55,7 +55,7 @@ class FrecencySettingsManager {
         return frecencyUserSettingsSubject
     }
 
-    fun updateSettings(updater: (FrecencyUserSettings) -> FrecencyUserSettings) {
+    fun updateSettings(updater: FrecencyUserSettings.() -> FrecencyUserSettings) {
         settings = updater(settings)
     }
 

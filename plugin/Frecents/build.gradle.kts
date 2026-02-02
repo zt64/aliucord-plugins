@@ -44,11 +44,14 @@ afterEvaluate {
     }
 }
 
-version = "1.1.7"
+version = "1.1.8"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.8
+    - Fixed errors resulting in broken app behavior
+
     # 1.1.7
     - Switched frecents code generation to be more maintainable. Shouldn't have any noticeable affects.
         

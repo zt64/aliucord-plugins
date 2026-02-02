@@ -9,15 +9,38 @@ wire {
     kotlin { }
 }
 
-val shadowJar by tasks.register<ShadowJar>("shadowJar") {
+val shadowDir = layout.buildDirectory.file("intermediates/shadowed")
+
+val relocateJar by tasks.register<ShadowJar>("relocateJar") {
+    from(
+        tasks.named("compileDebugJavaWithJavac"),
+        tasks.named("compileDebugKotlin")
+    )
+
+    from(
+        project.configurations.named("implementationArtifacts").map { config ->
+            config.incoming.artifactView {
+                attributes.attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+            }.files
+        }
+    )
+
     relocate("okio", "com.o.okio.okio")
-    archiveClassifier.set("shadowed")
+    archiveClassifier = "shadowed"
+    destinationDirectory = layout.buildDirectory.dir("intermediates")
+    outputs.upToDateWhen { false }
 }
 
-project.afterEvaluate {
+val copyShadowed by tasks.register<Sync>("copyShadowed") {
+    dependsOn(relocateJar)
+    from(zipTree(relocateJar.archiveFile))
+    into(shadowDir)
+}
+
+afterEvaluate {
     tasks.compileDex {
-        dependsOn(shadowJar)
-        input.setFrom(shadowJar.archiveFile.map { zipTree(it) })
+        dependsOn(copyShadowed)
+        input.setFrom(shadowDir)
     }
 }
 

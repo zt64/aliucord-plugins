@@ -1,5 +1,3 @@
-@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS", "MISSING_DEPENDENCY_SUPERCLASS_WARNING")
-
 package accountswitcher
 
 import AccountSwitcher.Companion.accounts

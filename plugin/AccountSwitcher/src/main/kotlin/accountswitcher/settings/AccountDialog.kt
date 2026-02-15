@@ -32,9 +32,9 @@ class AccountDialog(private val adapter: AccountAdapter, private val account: Ac
             setTitle("Add Account")
             setDescription(
                 """
-                Enter your Discord token to add an account.
-                You can get this token by using the Token plugin.
-                """.trimIndent()
+Enter your Discord token to add an account.
+You can get this token by using the Token plugin.
+"""
             )
         } else {
             setTitle("Edit Account")

@@ -1,8 +1,11 @@
-version = "1.4.1"
+version = "1.4.2"
 description = "Adds the ability to quickly switch accounts"
 
 aliucord.changelog.set(
     """
+    # 1.4.2
+    * Fixed crash caused by add account dialog
+        
     # 1.4.1
     * Fixed inability to import accounts on Android 7 due to incorrect mimetype.
     

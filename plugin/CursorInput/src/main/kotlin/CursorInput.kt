@@ -3,26 +3,21 @@ import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.*
 import com.discord.widgets.chat.input.AppFlexInputViewModel
-import com.lytefast.flexinput.R
-import com.lytefast.flexinput.fragment.`FlexInputFragment$c`
-import com.lytefast.flexinput.widget.FlexEditText
+import com.discord.widgets.chat.input.autocomplete.InputAutocomplete
+import com.discord.widgets.chat.input.autocomplete.`InputAutocomplete$1`
 
 @AliucordPlugin
 class CursorInput : Plugin() {
-    private lateinit var flexEditText: FlexEditText
-
     override fun start(context: Context) {
-        patcher.after<`FlexInputFragment$c`>("invoke", Object::class.java) {
-            flexEditText = (it.result as b.b.a.e.a).root.findViewById(R.f.text_input)
-        }
-
         patcher.instead<AppFlexInputViewModel>(
             "onInputTextAppended",
             String::class.java
         ) { (_, str: String) ->
+            val listener = singleAttachmentSelectedListener as? `InputAutocomplete$1`
+            val flexEditText = listener?.`this$0`?.let { InputAutocomplete.`access$getEditText$p`(it) }
             val baseString = requireViewState().a
 
-            if (!::flexEditText.isInitialized) {
+            if (flexEditText == null) {
                 onInputTextChanged(baseString + str, null)
             } else {
                 val selectionEnd = flexEditText.selectionEnd

@@ -60,11 +60,10 @@ subprojects {
     }
 
     configure<KtlintExtension> {
-        version.set(libs.versions.ktlint)
-
-        coloredOutput.set(true)
-        outputColorName.set("RED")
-        ignoreFailures.set(true)
+        version = libs.versions.ktlint
+        coloredOutput = true
+        outputColorName = "RED"
+        ignoreFailures = true
     }
 
     dependencies {
@@ -90,27 +89,23 @@ tasks.register("generateReadMe") {
             .sortedBy { it.name }
 
         val content = buildString {
-            // Header with badges
-            appendLine("# Aliucord Plugins")
-            appendLine()
             appendLine(
-                "[![Plugins](https://img.shields.io/badge/Plugins-${plugins.size}-blue?style=for-the-badge)](https://github.com/zt64/aliucord-plugins)"
+                """
+                    # Aliucord Plugins
+                    
+                    [![Plugins](https://img.shields.io/badge/Plugins-${plugins.size}-blue?style=for-the-badge)](https://github.com/zt64/aliucord-plugins)
+                    
+                    A collection of plugins for [Aliucord](https://github.com/Aliucord), a Discord mobile client mod.
+                    
+                    ## 📥 Installation
+                    
+                    Click on a plugin name to download, then move the downloaded file to the `/sdcard/Aliucord/plugins` folder on your device.
+                    
+                    ## 🧩 Available Plugins
+                    | Plugin | Description |
+                    |:-------|:------------|
+                """.trimIndent()
             )
-            appendLine()
-            appendLine("A collection of plugins for [Aliucord](https://github.com/Aliucord), a Discord mobile client mod.")
-            appendLine()
-
-            // Installation section with emoji
-            appendLine("## 📥 Installation")
-            appendLine()
-            appendLine("Click on a plugin name to download, then move the downloaded file to the `Aliucord/plugins` folder on your device.")
-            appendLine()
-
-            // Plugin list in table format
-            appendLine("## 🧩 Available Plugins")
-            appendLine()
-            appendLine("| Plugin | Description |")
-            appendLine("|:-------|:------------|")
 
             plugins.forEach { subproject ->
                 val description = subproject.description ?: "No description provided."

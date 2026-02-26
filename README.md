@@ -6,10 +6,9 @@ A collection of plugins for [Aliucord](https://github.com/Aliucord), a Discord m
 
 ## 📥 Installation
 
-Click on a plugin name to download, then move the downloaded file to the `Aliucord/plugins` folder on your device.
+Click on a plugin name to download, then move the downloaded file to the `/sdcard/Aliucord/plugins` folder on your device.
 
 ## 🧩 Available Plugins
-
 | Plugin | Description |
 |:-------|:------------|
 | [**AccountSwitcher**](https://github.com/zt64/aliucord-plugins/raw/builds/AccountSwitcher.zip) | Adds the ability to quickly switch accounts |

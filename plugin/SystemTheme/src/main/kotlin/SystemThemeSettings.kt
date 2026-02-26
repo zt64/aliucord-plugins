@@ -1,5 +1,3 @@
-@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
-
 import android.view.View
 import com.aliucord.Utils
 import com.aliucord.api.SettingsAPI

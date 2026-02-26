@@ -23,7 +23,6 @@ import com.discord.views.RadioManager
 import com.lytefast.flexinput.R
 import java.io.File
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : SettingsPage() {
     private var launcher: ActivityResultLauncher<Intent>? = null
 

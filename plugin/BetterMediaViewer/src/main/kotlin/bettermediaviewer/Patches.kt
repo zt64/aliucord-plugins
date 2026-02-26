@@ -35,7 +35,6 @@ import com.google.android.material.appbar.AppBarLayout
 import com.lytefast.flexinput.R
 import java.util.concurrent.TimeUnit
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 object Patches {
     private var settings: SettingsAPI = PluginManager.plugins["BetterMediaViewer"]?.settings!!
 

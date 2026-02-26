@@ -15,7 +15,6 @@ import com.aliucord.widgets.BottomSheet
 import com.discord.views.CheckedSetting
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
     private var SettingsAPI.reverse: Boolean by settings.delegate(false)
     private var SettingsAPI.threshold: Int by settings.delegate(1)

@@ -68,7 +68,6 @@ class AttachmentSheetTweaks : Plugin() {
     override fun stop(context: Context) = patcher.unpatchAll()
 }
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class B : BottomSheet() {
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)

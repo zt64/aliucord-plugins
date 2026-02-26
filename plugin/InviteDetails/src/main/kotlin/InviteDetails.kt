@@ -24,7 +24,6 @@ import com.discord.widgets.guilds.profile.WidgetGuildProfileSheet
 import com.facebook.drawee.view.SimpleDraweeView
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class InviteDetails : Plugin() {
     override fun start(context: Context) {

@@ -18,7 +18,6 @@ import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.chat.list.actions.WidgetChatListActions
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class QuickStar : Plugin() {
     private val getBindingMethod = WidgetChatListActions::class.java

@@ -27,7 +27,6 @@ import com.discord.utilities.rest.RestAPI
 import com.discord.widgets.channels.permissions.WidgetChannelSettingsPermissionsAdvanced
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class PermissionsSync : Plugin() {
     private val getBindingMethod by lazy {

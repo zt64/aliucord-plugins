@@ -15,7 +15,6 @@ import com.discord.widgets.home.WidgetHomeHeaderManager
 import com.discord.widgets.home.WidgetHomeModel
 import noburnin.PluginSettings
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin(requiresRestart = true)
 class NoBurnIn : Plugin() {
     init {

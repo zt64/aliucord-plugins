@@ -24,7 +24,6 @@ import com.discord.widgets.chat.overlay.`WidgetChatOverlay$binding$2`
 import com.lytefast.flexinput.R
 import kotlin.properties.Delegates
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class CharCounter : Plugin() {
     private var SettingsAPI.reverse: Boolean by settings.delegate(false)

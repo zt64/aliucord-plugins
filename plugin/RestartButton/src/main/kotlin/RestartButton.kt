@@ -9,7 +9,6 @@ import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.settings.WidgetSettings
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class RestartButton : Plugin() {
     override fun start(context: Context) {

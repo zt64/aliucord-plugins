@@ -14,7 +14,6 @@ import com.aliucord.widgets.BottomSheet
 import com.discord.views.CheckedSetting
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
     @Suppress("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {

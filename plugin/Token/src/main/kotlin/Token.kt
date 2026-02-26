@@ -8,7 +8,6 @@ import com.discord.api.commands.ApplicationCommandType
 import com.discord.stores.StoreStream
 import com.discord.utilities.rest.RestAPI
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class Token : Plugin() {
     override fun start(context: Context) {

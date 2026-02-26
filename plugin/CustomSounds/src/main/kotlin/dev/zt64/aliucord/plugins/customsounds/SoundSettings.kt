@@ -1,5 +1,3 @@
-@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
-
 package dev.zt64.aliucord.plugins.customsounds
 
 import android.app.Activity

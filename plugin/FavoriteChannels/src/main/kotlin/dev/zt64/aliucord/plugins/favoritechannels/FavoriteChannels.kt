@@ -1,5 +1,3 @@
-@file:Suppress("MISSING_DEPENDENCY_CLASS")
-
 package dev.zt64.aliucord.plugins.favoritechannels
 
 import android.content.Context
@@ -27,7 +25,6 @@ import dev.zt64.aliucord.plugins.favoritechannels.items.*
 
 private const val FLAG_FAVORITE = 1 shl 11
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin(requiresRestart = true)
 class FavoriteChannels : Plugin() {
     init {
@@ -178,12 +175,12 @@ class FavoriteChannels : Plugin() {
                     ?.getChannelOverride(`$textChannelId`)
                     ?.let { it.flags and FLAG_FAVORITE != 0 } ?: false
                 val isChannelOrChildSelected = `$channelSelected` ||
-                    (`$areAnyChildThreadsSelected$5$inlined` as `WidgetChannelListModel$Companion$guildListBuilder$5`)
-                        .invoke(`$textChannel`.id)
+                        (`$areAnyChildThreadsSelected$5$inlined` as `WidgetChannelListModel$Companion$guildListBuilder$5`)
+                            .invoke(`$textChannel`.id)
                 val areAllChildThreadsRead = (`$areAllChildThreadsRead$4$inlined` as `WidgetChannelListModel$Companion$guildListBuilder$4`)
                     .invoke(`$textChannel`.id)
                 val shouldHideChannel = (isCollapsed && noMentions && (`$isCategoryMuted` || `$isMuted` || !`$unread`)) ||
-                    (`$isMuted` && `$guild$inlined`.hideMutedChannels)
+                        (`$isMuted` && `$guild$inlined`.hideMutedChannels)
                 val shouldBeHidden =
                     !(isChannelOrChildFavorited || isChannelOrChildSelected || !areAllChildThreadsRead || !shouldHideChannel)
 

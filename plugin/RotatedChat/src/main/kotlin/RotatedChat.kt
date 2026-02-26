@@ -15,7 +15,6 @@ import com.discord.databinding.WidgetChatListBinding
 import com.discord.widgets.chat.list.WidgetChatList
 import com.discord.widgets.chat.list.model.WidgetChatListModel
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class RotatedChat : Plugin() {
     private val getBindingMethod = WidgetChatList::class.java

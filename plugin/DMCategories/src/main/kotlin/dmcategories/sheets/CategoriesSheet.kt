@@ -19,7 +19,6 @@ import com.lytefast.flexinput.R
 import dmcategories.CategoryDialog
 import dmcategories.Util
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class CategoriesSheet(private val channelId: Long) : BottomSheet() {
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)

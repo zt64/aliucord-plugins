@@ -21,7 +21,6 @@ import com.discord.widgets.user.profile.UserStatusPresenceCustomView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PresetAdapter(
     private val widgetUserSetCustomStatus: WidgetUserSetCustomStatus,
     private val presets: ArrayList<UserStatusPresenceCustomView.ViewState.WithStatus>
@@ -109,13 +108,11 @@ class PresetAdapter(
                     modelEmoji.surrogates,
                     false
                 )
-
                 is ModelEmojiCustom -> UserStatusPresenceCustomView.Emoji(
                     modelEmoji.uniqueId,
                     modelEmoji.name,
                     modelEmoji.isAnimated
                 )
-
                 else -> return@EmojiPickerListener
             }
 

@@ -13,7 +13,6 @@ import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.channels.settings.WidgetTextChannelSettings
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class ChannelInvites : Plugin() {
     override fun start(c: Context) {

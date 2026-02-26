@@ -8,7 +8,6 @@ import com.aliucord.settings.delegate
 import com.aliucord.widgets.BottomSheet
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class PluginSettings(private val settings: SettingsAPI) : BottomSheet() {
     private var SettingsAPI.showSelected: Boolean by settings.delegate(true)
     private var SettingsAPI.showUnread: Boolean by settings.delegate(false)

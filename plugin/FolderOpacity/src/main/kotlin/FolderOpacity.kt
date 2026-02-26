@@ -25,7 +25,6 @@ import com.discord.widgets.guilds.list.GuildListViewHolder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.lytefast.flexinput.R
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class FolderOpacity : Plugin() {
     private val folderViewHolderMap = HashMap<Long, GuildListViewHolder.FolderViewHolder>()

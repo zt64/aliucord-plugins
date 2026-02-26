@@ -1,5 +1,3 @@
-@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
-
 package developerutils
 
 import InfoSheet

@@ -26,7 +26,6 @@ import com.google.gson.reflect.TypeToken
 import com.lytefast.flexinput.R
 import customstatuspresets.PresetAdapter
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class CustomStatusPresets : Plugin() {
     private val presetType = TypeToken.getParameterized(

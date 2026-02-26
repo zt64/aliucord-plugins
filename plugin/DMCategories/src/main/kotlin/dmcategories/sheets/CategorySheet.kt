@@ -14,7 +14,6 @@ import dmcategories.CategoryDialog
 import dmcategories.DMCategory
 import dmcategories.Util
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 class CategorySheet(private val category: DMCategory) : BottomSheet() {
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)

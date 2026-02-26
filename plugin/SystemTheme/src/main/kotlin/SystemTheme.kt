@@ -1,5 +1,3 @@
-@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
-
 import android.content.Context
 import android.content.res.Configuration
 import com.aliucord.annotations.AliucordPlugin
@@ -18,7 +16,7 @@ class SystemTheme : Plugin() {
         settingsTab = SettingsTab(SystemThemeSettings::class.java).withArgs(settings)
     }
 
-    override fun start(ctx: Context) {
+    override fun start(context: Context) {
         // Lets save the current value of the sync theme setting then restore when plugin is stopped
         if (!settings.exists("sync_theme")) {
             settings.setBool("sync_theme", userSettingsSystem.isThemeSyncEnabled)
@@ -41,7 +39,7 @@ class SystemTheme : Plugin() {
         }
     }
 
-    override fun stop(ctx: Context) {
+    override fun stop(context: Context) {
         patcher.unpatchAll()
 
         // Restore the sync theme setting to its original value

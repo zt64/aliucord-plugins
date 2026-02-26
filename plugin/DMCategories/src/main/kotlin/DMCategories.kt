@@ -30,7 +30,6 @@ private val categoryType = TypeToken
         DMCategory::class.javaObjectType
     ).getType()
 
-@Suppress("MISSING_DEPENDENCY_SUPERCLASS")
 @AliucordPlugin
 class DMCategories : Plugin() {
     private val getBindingMethod = WidgetChannelsListItemChannelActions::class.java

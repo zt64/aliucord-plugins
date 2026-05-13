@@ -45,9 +45,9 @@ object FrecencyCalculator {
                     calculateFrecencyScore(entry, now)?.let { frecency -> item to frecency }
                 }
             }
-            .sortedByDescending { it.second }
+            .sortedByDescending { (_, frecency) -> frecency } // Fixes weird Huawei crash
             .take(maxItems)
-            .map { it.first }
+            .map { (item, _) -> item }  // Fixes weird Huawei crash
             .toList()
     }
 

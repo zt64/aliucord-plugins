@@ -57,7 +57,11 @@ class Frecents : Plugin() {
                 gifs.remove(tenorGifUrl)
             } else {
                 gifs[tenorGifUrl] = FrecencyUserSettings.FavoriteGIF(
-                    format = FrecencyUserSettings.GIFType.GIF_TYPE_IMAGE,
+                    format = if (model.gifImageUrl.endsWith(".mp4")) {
+                        FrecencyUserSettings.GIFType.GIF_TYPE_VIDEO
+                    } else {
+                        FrecencyUserSettings.GIFType.GIF_TYPE_IMAGE
+                    },
                     src = model.gifImageUrl,
                     width = model.width,
                     height = model.height,

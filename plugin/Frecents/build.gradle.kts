@@ -44,11 +44,15 @@ afterEvaluate {
     }
 }
 
-version = "1.1.8"
+version = "1.1.9"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.1.9
+    - Fixed crash occuring on EMUI
+    - Fixed video gifs saving as images, resulting in gifs not displaying properly in some cases
+        
     # 1.1.8
     - Fixed errors resulting in broken app behavior
 

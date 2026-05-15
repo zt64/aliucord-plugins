@@ -1,27 +1,47 @@
 package dev.zt64.aliucord.plugins.frecents
 
 import android.content.Context
+import android.os.Build
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.GatewayAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.*
+import com.aliucord.patcher.after
+import com.aliucord.patcher.before
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component2
+import com.aliucord.patcher.component3
+import com.aliucord.patcher.instead
 import com.aliucord.utils.RxUtils.map
 import com.aliucord.utils.RxUtils.switchMap
-import com.aliucord.utils.lazyField
-import com.discord.databinding.ExpressionPickerHeaderItemBinding
 import com.discord.models.domain.emoji.Emoji
 import com.discord.models.gifpicker.dto.ModelGif
-import com.discord.stores.*
+import com.discord.player.MediaSource
+import com.discord.player.MediaType
+import com.discord.stores.StoreEmoji
+import com.discord.stores.StoreGifPicker
+import com.discord.stores.StoreMediaFavorites
 import com.discord.stores.StoreMediaFavorites.Favorite
-import com.discord.widgets.chat.input.gifpicker.*
-import com.discord.widgets.chat.input.sticker.OwnedHeaderViewHolder
+import com.discord.stores.StoreStickers
+import com.discord.stores.StoreStream
+import com.discord.widgets.chat.input.gifpicker.GifAdapterItem
+import com.discord.widgets.chat.input.gifpicker.GifCategoryItem
+import com.discord.widgets.chat.input.gifpicker.GifCategoryViewHolder
+import com.discord.widgets.chat.input.gifpicker.GifCategoryViewModel
+import com.discord.widgets.chat.input.gifpicker.GifPickerViewModel
+import com.discord.widgets.chat.input.gifpicker.GifViewHolder
+import com.discord.widgets.chat.input.gifpicker.WidgetGifCategory
+import com.discord.widgets.chat.input.gifpicker.WidgetGifPicker
 import com.discord.widgets.emoji.EmojiSheetViewModel
 import com.discord.widgets.emoji.EmojiSheetViewModel.ViewState
+import com.discord.widgets.media.WidgetMedia
 import com.lytefast.flexinput.R
 import dev.zt64.aliucord.plugins.frecents.gif.GifCategoryItemFavorites
 import dev.zt64.aliucord.plugins.frecents.gif.GifUtil
@@ -37,11 +57,15 @@ data class GatewayResponse(val settings: Settings, val partial: Boolean) {
 
 @AliucordPlugin(requiresRestart = true)
 class Frecents : Plugin() {
-    private val bindingField by lazyField<OwnedHeaderViewHolder>("binding")
-    private val OwnedHeaderViewHolder.binding
-        get() = bindingField[this] as ExpressionPickerHeaderItemBinding
+    // private val bindingField by lazyField<OwnedHeaderViewHolder>("binding")
+    // private val OwnedHeaderViewHolder.binding
+    //     get() = bindingField[this] as ExpressionPickerHeaderItemBinding
 
-    private var frecencySettings = FrecencySettingsManager()
+    private val frecencySettings = FrecencySettingsManager()
+
+    private companion object {
+        private val STAR_ITEM_ID = View.generateViewId()
+    }
 
     init {
         settingsTab = SettingsTab(FrecentsSettings::class.java).withArgs(frecencySettings)
@@ -68,6 +92,8 @@ class Frecents : Plugin() {
                     order = if (gifs.isEmpty()) 1 else gifs.values.maxOf { it.order } + 1
                 )
             }
+
+            logger.debug("Updated gif: $model")
 
             copy(favorite_gifs = favorite_gifs?.copy(gifs = gifs))
         }
@@ -114,6 +140,7 @@ class Frecents : Plugin() {
         }
 
         // Patch to make clicking an emoji update the frecency user settings
+        // TODO: Figure out how to properly update the score
         // patcher.instead<StoreEmoji>("onEmojiUsed", String::class.java2) { (param, emojiKey: String) ->
         //     frecencySettings.updateSettings {
         //         it.copy {
@@ -183,14 +210,26 @@ class Frecents : Plugin() {
             )
         }
 
+        // // Add favorites section to the sticker categories list
         // patcher.before<StickerPickerViewModel.ViewState.Stickers>(
-        //     String::class.java2,
-        //     List::class.java2,
-        //     List::class.java2,
-        //     Boolean::class.java2,
-        //     Boolean::class.java2
+        //     String::class.java,
+        //     List::class.java,
+        //     List::class.java,
+        //     Boolean::class.java,
+        //     Boolean::class.java
         // ) { (param, _: Any, a: List<MGRecyclerDataPayload>) ->
         //     param.args[1] = listOf(HeaderItem(FavoritesItem)) + a
+        // }
+
+        // // Ensure the favorites header shows the correct title
+        // patcher.after<OwnedHeaderViewHolder>(
+        //     "onConfigure",
+        //     Int::class.java,
+        //     MGRecyclerDataPayload::class.java
+        // ) { (_, _: Int, data: MGRecyclerDataPayload) ->
+        //     if (data !is HeaderItem) return@after
+        //
+        //     if (data.headerType == FavoritesItem) binding.b.text = "Favorites"
         // }
 
         // Patch to use the frequently used stickers from the frecency user settings
@@ -264,17 +303,6 @@ class Frecents : Plugin() {
         //     }
         // }
 
-        // Add favorites section to the sticker categories list
-        // patcher.after<OwnedHeaderViewHolder>(
-        //     "onConfigure",
-        //     Int::class.java2,
-        //     MGRecyclerDataPayload::class.java2
-        // ) { (_, _: Int, data: MGRecyclerDataPayload) ->
-        //     if (data !is HeaderItem) return@after
-        //
-        //     if (data.headerType == FavoritesItem) binding.b.text = "Favorites (coming soon)"
-        // }
-
         // Add favorites section to the gif categories list
         patcher.before<WidgetGifPicker>(
             "handleViewState",
@@ -285,7 +313,7 @@ class Frecents : Plugin() {
             )
         }
 
-        // Long click gif in search results to favorite/unfavorite
+        // Long click GIF in search results to favorite/unfavorite
         patcher.after<GifViewHolder.Gif>(
             "configure",
             GifAdapterItem.GifItem::class.java,
@@ -298,7 +326,7 @@ class Frecents : Plugin() {
             }
         }
 
-        // Add favorites section to the gif categories list
+        // Add favorites section to the GIF categories list
         patcher.after<GifCategoryViewHolder>(
             "configure",
             GifCategoryItem::class.java,
@@ -322,7 +350,7 @@ class Frecents : Plugin() {
             itemView.findViewById<TextView>(Resources.gif_category_item_title).text = "Favorites"
         }
 
-        // Patch to set the title of the gif category
+        // Patch to set the title of the GIF category
         patcher.instead<WidgetGifCategory>("setUpTitle") {
             val binding = WidgetGifCategory.`access$getBinding$p`(this)
             val gifCategoryItem = WidgetGifCategory.`access$getGifCategory`(this)
@@ -350,7 +378,7 @@ class Frecents : Plugin() {
                     it.favorite_gifs?.gifs
                         .orEmpty()
                         .asSequence()
-                        .sortedByDescending { it.value.order }
+                        .sortedByDescending { (_, gif) -> gif.order }
                         .map { (tenorUrl, v) ->
                             ModelGif(GifUtil.mqGifUrl(v.src), tenorUrl, v.width, v.height)
                         }
@@ -360,134 +388,61 @@ class Frecents : Plugin() {
             }.map(GifCategoryViewModel::StoreState)
         }
 
-        // Experiment using ExoPlayer for mp4 gifs
-        // val bindingField = GifViewHolder.Gif::class.java2
-        //     .getDeclaredField("binding")
-        //     .apply { isAccessible = true }
+        // Add star button to media viewer for GIFs
+        patcher.after<WidgetMedia>("onViewBoundOrOnResume") {
+            val mediaSource = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                mostRecentIntent.getParcelableExtra("INTENT_MEDIA_SOURCE", MediaSource::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                mostRecentIntent.getParcelableExtra("INTENT_MEDIA_SOURCE")
+            }
 
-        // val m = b.a.p.i.a(ctx)
-        // lateinit var playerView: PlayerView
-        //
-        // patcher.after<GifViewHolder.Gif>(GifItemViewBinding::class.java2) { (_, binding: GifItemViewBinding) ->
-        //     playerView = PlayerView(binding.root.context, null).apply {
-        //         layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-        //         visibility = View.GONE
-        //         resizeMode = 1
-        //         useController = false
-        //     }
-        //
-        //     (binding.root as ViewGroup).addView(playerView)
-        // }
-        //
-        // patcher.instead<GifViewHolder.Gif>("setGifImage", ModelGif::class.java2) { (_, gif: ModelGif) ->
-        //     val binding = bindingField[this] as GifItemViewBinding
-        //     val url = gif.gifImageUrl
-        //
-        //     if (url.endsWith("mp4")) {
-        //         playerView.visibility = View.VISIBLE
-        //         binding.a.visibility = View.GONE
-        //         val mediaSource = b.c.a.a0.d.P(MediaType.VIDEO, url, "javaClass")
-        //         m.a(mediaSource, true, true, 0, playerView, null)
-        //     } else {
-        //         playerView.visibility = View.GONE
-        //         binding.a.visibility = View.VISIBLE
-        //         MGImages.`setImage$default`(binding.b, listOf(url), 0, 0, false, null, null, null, 252, null)
-        //     }
-        // }
+            val mediaUrl = mostRecentIntent.getStringExtra("INTENT_MEDIA_URL")!!.substringBefore('?')
+                .replace("media.discordapp.net", "cdn.discordapp.com")
+            // media source is only present on links to GIFs, so it can be used for checking if the media is a GIF
+            // otherwise fallback to checking if the URL ends with .gif, which is likely a file attachment
+            val url = mediaSource?.takeIf { it.l == MediaType.GIFV }?.j?.toString()
+                ?: mostRecentIntent
+                    .getStringExtra("INTENT_IMAGE_URL")
+                    ?.takeIf {
+                        it
+                            .substringBefore('?')
+                            .endsWith(".gif", ignoreCase = true)
+                    }
+                ?: return@after
 
-        // NOTE: These views are recycled, so it's important to perform condition checks inside the listeners so data is up to date
-        // Patch to favorite/unfavorite embedded gifs from a URL on long click
-        // patcher.after<InlineMediaView>(
-        //     "updateUIWithEmbed",
-        //     MessageEmbed::class.java2,
-        //     Int::class.javaObjectType,
-        //     Int::class.javaObjectType,
-        //     Boolean::class.javaPrimitiveType!!
-        // ) { (_, messageEmbed: MessageEmbed, width: Int, height: Int) ->
-        //     binding.a.setOnLongClickListener {
-        //         if (!EmbedResourceUtils.INSTANCE.isAnimated(messageEmbed)) return@setOnLongClickListener false
-        //
-        //         val gifUrl = messageEmbed.rawVideo?.url
-        //             ?.replace("AAAPo", "AAAAC") ?: messageEmbed.url
-        //         val model = ModelGif(gifUrl, messageEmbed.url, width, height)
-        //
-        //         toggleFavoriteGif(model)
-        //
-        //         true
-        //     }
-        // }
+            val width = mostRecentIntent.getIntExtra("INTENT_MEDIA_WIDTH", 0)
+            val height = mostRecentIntent.getIntExtra("INTENT_MEDIA_HEIGHT", 0)
+            var starred = mediaUrl in frecencySettings.settings.favorite_gifs?.gifs.orEmpty()
 
-        // Favorite/unfavorite gif file attachment on long click
-        // patcher.after<InlineMediaView>(
-        //     "updateUIWithAttachment",
-        //     MessageAttachment::class.java2,
-        //     Int::class.javaObjectType,
-        //     Int::class.javaObjectType,
-        //     Boolean::class.javaPrimitiveType!!
-        // ) { (_, messageAttachment: MessageAttachment, width: Int?, height: Int?) ->
-        //     binding.c.setOnLongClickListener {
-        //         if (width == null || height == null) return@setOnLongClickListener false
-        //
-        //         val embedType = when (messageAttachment.type.ordinal) {
-        //             0 -> EmbedType.VIDEO
-        //             1 -> EmbedType.IMAGE
-        //             2 -> EmbedType.FILE
-        //             else -> throw NoWhenBranchMatchedException()
-        //         }
-        //
-        //         val url = messageAttachment.url
-        //
-        //         if (!EmbedResourceUtils.INSTANCE.isAnimated(embedType, url)) return@setOnLongClickListener false
-        //
-        //         val model = ModelGif(url, url, width, height)
-        //
-        //         toggleFavoriteGif(model)
-        //         true
-        //     }
-        // }
+            val starredDrawable = ContextCompat.getDrawable(context, R.e.ic_emoji_picker_category_favorites_star)!!.mutate()
 
-        // Patch to add a favorite button to the URL actions widget
-        // Can't implement unless I find a way to get the width and height of the gif
-        // val getBinding = WidgetUrlActions::class.java2
-        //     .getDeclaredMethod("getBinding").apply { isAccessible = true }
-        //
-        // patcher.after<WidgetUrlActions>("onViewCreated", View::class.java2, Bundle::class.java2) {
-        //     val binding = getBinding(this) as WidgetUrlActionsBinding
-        //     val url = WidgetUrlActions.`access$getUrl$p`(this)
-        //
-        //     binding.a.addView(
-        //         TextView(binding.root.context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-        //             var isFavorited = frecencyUserSettings.favoriteGifs.gifsMap.containsKey(url)
-        //             val icon = ContextCompat
-        //                 .getDrawable(
-        //                     context,
-        //                     R.e.ic_guild_invite_24dp
-        //                 )!!
-        //                 .mutate()
-        //                 .apply {
-        //                     setTint(ColorCompat.getThemedColor(context, R.b.colorInteractiveNormal))
-        //                 }
-        //
-        //             text = if (isFavorited) {
-        //                 "Unfavorite GIF"
-        //             } else {
-        //                 "Favorite GIF"
-        //             }
-        //
-        //             setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
-        //             setOnClickListener {
-        //                 toggleFavorite(
-        //                     ModelGif(
-        //                         mqGifUrl(url),
-        //                         url,
-        //                         width,
-        //                         height
-        //                     )
-        //                 )
-        //             }
-        //         }
-        //     )
-        // }
+            fun starTitle() = if (starred) "Unfavorite" else "Favorite"
+            fun updateStarTint() {
+                if (starred) {
+                    starredDrawable.setTint(ContextCompat.getColor(context, R.c.status_yellow))
+                } else {
+                    starredDrawable.setTintList(null)
+                }
+            }
+
+            updateStarTint()
+
+            val menuItem = with(WidgetMedia.`access$getBinding$p`(this).root.findViewById<Toolbar>(R.f.action_bar_toolbar).menu) {
+                removeItem(STAR_ITEM_ID)
+                add(Menu.NONE, STAR_ITEM_ID, Menu.NONE, starTitle())
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    .setIcon(starredDrawable)
+            }
+
+            menuItem.setOnMenuItemClickListener {
+                toggleFavoriteGif(ModelGif(url, mediaUrl, width, height))
+                starred = !starred
+                menuItem.title = starTitle()
+                updateStarTint()
+                true
+            }
+        }
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()

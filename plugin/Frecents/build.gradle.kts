@@ -44,14 +44,17 @@ afterEvaluate {
     }
 }
 
-version = "1.1.9"
+version = "1.2.0"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.2.0
+    - Added favorite button to the media viewer for GIFs. Unexpected bugs may occur, please report them if you find any.
+
     # 1.1.9
     - Fixed crash occuring on EMUI
-    - Fixed video gifs saving as images, resulting in gifs not displaying properly in some cases
+    - Fixed video GIFs saving as images, resulting in GIFs not displaying properly in some cases
         
     # 1.1.8
     - Fixed errors resulting in broken app behavior

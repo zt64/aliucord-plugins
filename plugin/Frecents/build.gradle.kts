@@ -44,11 +44,14 @@ afterEvaluate {
     }
 }
 
-version = "1.2.0"
+version = "1.2.1"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.2.1
+    - Fix missing soundboard field causing crashes
+
     # 1.2.0
     - Added favorite button to the media viewer for GIFs. Unexpected bugs may occur, please report them if you find any.
 

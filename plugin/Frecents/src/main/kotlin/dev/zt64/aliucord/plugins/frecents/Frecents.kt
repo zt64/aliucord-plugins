@@ -1,6 +1,7 @@
 package dev.zt64.aliucord.plugins.frecents
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Build
 import android.view.Menu
 import android.view.MenuItem
@@ -12,6 +13,7 @@ import androidx.core.content.ContextCompat
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.GatewayAPI
+import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
 import com.aliucord.patcher.before
@@ -19,8 +21,13 @@ import com.aliucord.patcher.component1
 import com.aliucord.patcher.component2
 import com.aliucord.patcher.component3
 import com.aliucord.patcher.instead
+import com.aliucord.settings.delegate
 import com.aliucord.utils.RxUtils.map
 import com.aliucord.utils.RxUtils.switchMap
+import com.aliucord.utils.accessField
+import com.aliucord.wrappers.embeds.ImageWrapper.Companion.url
+import com.aliucord.wrappers.embeds.MessageEmbedWrapper.Companion.rawImage
+import com.discord.api.message.embed.MessageEmbed
 import com.discord.models.domain.emoji.Emoji
 import com.discord.models.gifpicker.dto.ModelGif
 import com.discord.player.MediaSource
@@ -31,6 +38,7 @@ import com.discord.stores.StoreMediaFavorites
 import com.discord.stores.StoreMediaFavorites.Favorite
 import com.discord.stores.StoreStickers
 import com.discord.stores.StoreStream
+import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.chat.input.gifpicker.GifAdapterItem
 import com.discord.widgets.chat.input.gifpicker.GifCategoryItem
 import com.discord.widgets.chat.input.gifpicker.GifCategoryViewHolder
@@ -55,12 +63,15 @@ data class GatewayResponse(val settings: Settings, val partial: Boolean) {
     data class Settings(val proto: String, val type: Int)
 }
 
+var MessageEmbed.url by accessField<String>()
+
 @AliucordPlugin(requiresRestart = true)
 class Frecents : Plugin() {
     // private val bindingField by lazyField<OwnedHeaderViewHolder>("binding")
     // private val OwnedHeaderViewHolder.binding
     //     get() = bindingField[this] as ExpressionPickerHeaderItemBinding
 
+    private val SettingsAPI.favoriteAnything: Boolean by settings.delegate(false)
     private val frecencySettings = FrecencySettingsManager()
 
     private companion object {
@@ -68,7 +79,7 @@ class Frecents : Plugin() {
     }
 
     init {
-        settingsTab = SettingsTab(FrecentsSettings::class.java).withArgs(frecencySettings)
+        settingsTab = SettingsTab(FrecentsSettings::class.java).withArgs(settings, frecencySettings)
     }
 
     private fun toggleFavoriteGif(model: ModelGif) {
@@ -336,7 +347,7 @@ class Frecents : Plugin() {
 
             val favoriteGifs = frecencySettings.settings.favorite_gifs?.gifs.orEmpty()
             if (favoriteGifs.isNotEmpty()) {
-                setPreviewImage(GifUtil.mqGifUrl(favoriteGifs.values.random().src))
+                setPreviewImage(GifUtil.fixupGifUrl(favoriteGifs.values.random().src))
             } else {
                 // Clear it out, so it doesn't show the last preview
                 setPreviewImage("")
@@ -380,7 +391,7 @@ class Frecents : Plugin() {
                         .asSequence()
                         .sortedByDescending { (_, gif) -> gif.order }
                         .map { (tenorUrl, v) ->
-                            ModelGif(GifUtil.mqGifUrl(v.src), tenorUrl, v.width, v.height)
+                            ModelGif(GifUtil.fixupGifUrl(v.src), tenorUrl, v.width, v.height)
                         }
                         .toList()
                 }
@@ -388,7 +399,30 @@ class Frecents : Plugin() {
             }.map(GifCategoryViewModel::StoreState)
         }
 
-        // Add star button to media viewer for GIFs
+        // Patch to pass the correct media url to the viewer, for favouriting
+        var prevUrl: String? = null
+        patcher.before<WidgetMedia.Companion>(
+            "launch",
+            Context::class.java,
+            MessageEmbed::class.java
+        ) { (_, _: Context, embed: MessageEmbed) ->
+            embed.rawImage?.let {
+                prevUrl = embed.url
+                embed.url = it.url
+            }
+        }
+        patcher.after<WidgetMedia.Companion>(
+            "launch",
+            Context::class.java,
+            MessageEmbed::class.java
+        ) { (_, _: Context, embed: MessageEmbed) ->
+            prevUrl?.let {
+                embed.url = it
+                prevUrl = null
+            }
+        }
+
+        // Add star button to media viewer
         patcher.after<WidgetMedia>("onViewBoundOrOnResume") {
             val mediaSource = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 mostRecentIntent.getParcelableExtra("INTENT_MEDIA_SOURCE", MediaSource::class.java)
@@ -397,32 +431,46 @@ class Frecents : Plugin() {
                 mostRecentIntent.getParcelableExtra("INTENT_MEDIA_SOURCE")
             }
 
-            val mediaUrl = mostRecentIntent.getStringExtra("INTENT_MEDIA_URL")!!.substringBefore('?')
+            val mediaUrl = mostRecentIntent.getStringExtra("INTENT_MEDIA_URL")!!
                 .replace("media.discordapp.net", "cdn.discordapp.com")
+
             // media source is only present on links to GIFs, so it can be used for checking if the media is a GIF
-            // otherwise fallback to checking if the URL ends with .gif, which is likely a file attachment
-            val url = mediaSource?.takeIf { it.l == MediaType.GIFV }?.j?.toString()
-                ?: mostRecentIntent
-                    .getStringExtra("INTENT_IMAGE_URL")
-                    ?.takeIf {
+            val mediaSourceUrl = mediaSource
+                ?.takeIf { it.l == MediaType.GIFV }
+                ?.j?.toString()
+                // klipy is special in that the mp4 normally returned would not play nor get converted by discord's proxy properly,
+                // therefore we replicate stock (desktop) behaviour of using the other proxied klipy url (webp) from the intent
+                // instead
+                ?.takeIf { !it.contains("https/static.klipy.com/ii") }
+
+            // fallback to checking if the URL ends with a media extension, which is likely a file attachment
+            val intentUrl = mostRecentIntent
+                .getStringExtra("INTENT_IMAGE_URL")
+                ?.takeIf { settings.favoriteAnything ||
+                    listOf("gif", "webp", "avif").contains(
                         it
                             .substringBefore('?')
-                            .endsWith(".gif", ignoreCase = true)
-                    }
-                ?: return@after
+                            .substringAfterLast(".")
+                            .lowercase()
+                    )
+                }
+                ?.let(GifUtil::addProxyParameters)
+
+            val url = mediaSourceUrl ?: intentUrl ?: return@after
 
             val width = mostRecentIntent.getIntExtra("INTENT_MEDIA_WIDTH", 0)
             val height = mostRecentIntent.getIntExtra("INTENT_MEDIA_HEIGHT", 0)
             var starred = mediaUrl in frecencySettings.settings.favorite_gifs?.gifs.orEmpty()
 
             val starredDrawable = ContextCompat.getDrawable(context, R.e.ic_emoji_picker_category_favorites_star)!!.mutate()
+            val themedColor = ColorStateList.valueOf(ColorCompat.getThemedColor(this, R.b.colorInteractiveNormal));
 
             fun starTitle() = if (starred) "Unfavorite" else "Favorite"
             fun updateStarTint() {
                 if (starred) {
                     starredDrawable.setTint(ContextCompat.getColor(context, R.c.status_yellow))
                 } else {
-                    starredDrawable.setTintList(null)
+                    starredDrawable.setTintList(themedColor)
                 }
             }
 

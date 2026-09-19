@@ -44,11 +44,19 @@ afterEvaluate {
     }
 }
 
-version = "1.2.1"
+version = "1.2.2"
 description = "Adds support for favorite GIFs, emojis, stickers, and recent items"
 
 aliucord.changelog.set(
     """
+    # 1.2.2
+    - Fixed (most) GIFs not showing up
+        - Includes gifs, avifs, mp4s (static), etc
+        - Some previous favourited klipy GIFs may be displayed as static; it has to be refavourited for Aliucord to display it animated
+    - Added support for favouriting .avif and .webp
+    - Added option to favourite anything, including videos (displayed static in gif picker) and images
+    - Fixed favourite icon being themed incorrectly in light mode
+
     # 1.2.1
     - Fix missing soundboard field causing crashes
 

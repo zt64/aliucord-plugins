@@ -5,18 +5,43 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import com.aliucord.Constants
+import com.aliucord.Utils
+import com.aliucord.api.SettingsAPI
 import com.aliucord.fragments.SettingsPage
+import com.aliucord.settings.delegate
 import com.aliucord.views.Button
+import com.discord.views.CheckedSetting
 import com.lytefast.flexinput.R
 import java.io.File
 
-class FrecentsSettings(private val frecencySettingsManager: FrecencySettingsManager) : SettingsPage() {
+class FrecentsSettings(
+    private val settings: SettingsAPI,
+    private val frecencySettingsManager: FrecencySettingsManager
+) : SettingsPage() {
+    private var SettingsAPI.favoriteAnything: Boolean by settings.delegate(false)
+
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 
         setActionBarTitle("Frecents")
 
         val ctx = requireContext()
+
+        addHeader(ctx, "Settings")
+        addView(
+            Utils
+                .createCheckedSetting(
+                    context = ctx,
+                    type = CheckedSetting.ViewType.SWITCH,
+                    text = "Favorite anything",
+                    subtext = "Lets you favorite any type of media, including plain images"
+                ).apply {
+                    isChecked = settings.favoriteAnything
+                    setOnCheckedListener { settings.favoriteAnything = it }
+                }
+        )
+
+        addHeader(ctx, "Debug")
 
         addView(
             TextView(ctx, null, 0, R.i.UiKit_TextView).apply {

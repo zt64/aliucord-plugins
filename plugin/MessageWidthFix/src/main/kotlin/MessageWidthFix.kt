@@ -7,6 +7,8 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
+import com.aliucord.utils.ViewUtils.findViewById
+import com.discord.views.sticker.StickerView
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemEmbed
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemSticker
 import com.discord.widgets.chat.list.adapter.WidgetChatListItem
@@ -26,8 +28,6 @@ class MessageWidthFix : Plugin() {
             ChatListEntry::class.java
         ) {
             val chatListEntry = it.args[1] as ChatListEntry
-
-            itemView.resources.getDimension(R.d.chat_cell_horizontal_spacing_padding)
 
             when (this) {
                 is WidgetChatListAdapterItemEmbed -> (itemView as ConstraintLayout).run {
@@ -49,6 +49,12 @@ class MessageWidthFix : Plugin() {
                 is WidgetChatListAdapterItemSticker -> (itemView as FrameLayout).run {
                     layoutParams.width = RelativeLayout.LayoutParams.MATCH_PARENT
 
+                    // apply margin to sticker view, not the whole chat item view
+                    (layoutParams as RecyclerView.LayoutParams).apply { marginStart = 0 }
+                    val stickerView = itemView.findViewById<StickerView>("chat_list_adapter_item_sticker")
+                    val chatDimension = itemView.resources.getDimension(R.d.uikit_guideline_chat).toInt()
+                    (stickerView.layoutParams as FrameLayout.LayoutParams).apply { marginStart = chatDimension }
+
                     // Discord devs too lazy to do it themselves
                     setOnLongClickListener {
                         val stickerEntry = chatListEntry as StickerEntry
@@ -58,6 +64,14 @@ class MessageWidthFix : Plugin() {
                             stickerEntry.message.hasThread()
                         )
                         true
+                    }
+                    // for TapTap to work with stickers
+                    setOnClickListener {
+                        val stickerEntry = chatListEntry as StickerEntry
+                        adapter.eventHandler.onMessageClicked(
+                            stickerEntry.message,
+                            stickerEntry.message.hasThread()
+                        )
                     }
                 }
             }

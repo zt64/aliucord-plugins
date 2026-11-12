@@ -7,6 +7,9 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
+import com.aliucord.patcher.component1
+import com.aliucord.patcher.component2
+import com.aliucord.patcher.component3
 import com.aliucord.utils.ViewUtils.findViewById
 import com.discord.views.sticker.StickerView
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemEmbed
@@ -26,37 +29,30 @@ class MessageWidthFix : Plugin() {
             "onConfigure",
             Int::class.java,
             ChatListEntry::class.java
-        ) {
-            val chatListEntry = it.args[1] as ChatListEntry
-
+        ) { (_, _: Any, chatListEntry: ChatListEntry) ->
             when (this) {
-                is WidgetChatListAdapterItemEmbed -> (itemView as ConstraintLayout).run {
-                    (layoutParams as RecyclerView.LayoutParams).apply {
-                        width = RecyclerView.LayoutParams.MATCH_PARENT
-                    }
+                is WidgetChatListAdapterItemEmbed -> (itemView as ConstraintLayout).apply {
+                    (layoutParams as RecyclerView.LayoutParams).width = RecyclerView.LayoutParams.MATCH_PARENT
 
-                    (
-                        findViewById<MaterialCardView>(
-                            containerCardViewId
-                        ).layoutParams as ConstraintLayout.LayoutParams
-                    ).apply {
-                        width = ConstraintLayout.LayoutParams.WRAP_CONTENT
-                        horizontalBias = 0.0f
-                        constrainedWidth = true
-                    }
+                    val cardLayoutParams = findViewById<MaterialCardView>(containerCardViewId)
+                        .layoutParams as ConstraintLayout.LayoutParams
+                    cardLayoutParams.width = ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    cardLayoutParams.horizontalBias = 0.0f
+                    cardLayoutParams.constrainedWidth = true
                 }
+                is WidgetChatListAdapterItemSticker -> {
+                    val itemView = itemView as FrameLayout
+                    itemView.layoutParams.width = RelativeLayout.LayoutParams.MATCH_PARENT
 
-                is WidgetChatListAdapterItemSticker -> (itemView as FrameLayout).run {
-                    layoutParams.width = RelativeLayout.LayoutParams.MATCH_PARENT
+                    // Apply the margin to the sticker, not the whole chat item.
+                    (itemView.layoutParams as RecyclerView.LayoutParams).marginStart = 0
 
-                    // apply margin to sticker view, not the whole chat item view
-                    (layoutParams as RecyclerView.LayoutParams).apply { marginStart = 0 }
-                    val stickerView = itemView.findViewById<StickerView>("chat_list_adapter_item_sticker")
-                    val chatDimension = itemView.resources.getDimension(R.d.uikit_guideline_chat).toInt()
-                    (stickerView.layoutParams as FrameLayout.LayoutParams).apply { marginStart = chatDimension }
+                    val stickerLayoutParams = itemView
+                        .findViewById<StickerView>("chat_list_adapter_item_sticker")
+                        .layoutParams as FrameLayout.LayoutParams
+                    stickerLayoutParams.marginStart = itemView.resources.getDimension(R.d.uikit_guideline_chat).toInt()
 
-                    // Discord devs too lazy to do it themselves
-                    setOnLongClickListener {
+                    itemView.setOnLongClickListener {
                         val stickerEntry = chatListEntry as StickerEntry
                         adapter.eventHandler.onMessageLongClicked(
                             stickerEntry.message,
@@ -65,8 +61,9 @@ class MessageWidthFix : Plugin() {
                         )
                         true
                     }
-                    // for TapTap to work with stickers
-                    setOnClickListener {
+
+                    // Keep TapTap sticker handling working.
+                    itemView.setOnClickListener {
                         val stickerEntry = chatListEntry as StickerEntry
                         adapter.eventHandler.onMessageClicked(
                             stickerEntry.message,

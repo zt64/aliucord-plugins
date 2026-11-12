@@ -1,8 +1,12 @@
-version = "1.0.3"
+version = "1.0.4"
 description = "Fixes the width on embeds and stickers to make long press work"
 
 aliucord.changelog.set(
     """
+    # 1.0.4
+    * Fix sticker view margins (#142)
+    * Fix TapTap support (#142)
+    
     # 1.0.2
     * Support Discord V112.4
     

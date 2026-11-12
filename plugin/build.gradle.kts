@@ -21,7 +21,7 @@ subprojects {
     }
 
     configure<LibraryExtension> {
-        namespace = "com.aliucord.plugins"
+        namespace = "dev.zt64.aliucord.plugin"
 
         compileSdk = 36
 
@@ -67,7 +67,7 @@ subprojects {
     }
 
     dependencies {
-        val compileOnly by configurations
+        val compileOnly = configurations.getByName("compileOnly")
 
         compileOnly(libs.discord)
         compileOnly(libs.aliucord)
